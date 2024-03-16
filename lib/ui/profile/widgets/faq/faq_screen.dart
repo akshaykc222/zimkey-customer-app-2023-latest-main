@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../../../../constants/colors.dart';
 import '../../../../data/model/profile/faq/faq_response.dart';
@@ -21,9 +19,11 @@ class FaqScreenState extends State<FaqScreen> with TickerProviderStateMixin {
   TextEditingController subjectController = TextEditingController();
   final FocusNode _subjectNode = FocusNode();
   ValueNotifier<bool> isFilled = ValueNotifier(false);
-  ValueNotifier<List<GetFaq>> searchList = ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<GetFaq>> searchList =
+      ValueNotifier(List.empty(growable: true));
   List<GetFaq> faqList = List.empty(growable: true);
-  ValueNotifier<List<String>> searchFaqCategories = ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<String>> searchFaqCategories =
+      ValueNotifier(List.empty(growable: true));
   List<String> faqCategories = List.empty(growable: true);
 
   @override
@@ -41,7 +41,9 @@ class FaqScreenState extends State<FaqScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => FaqCubit(profileProvider: RepositoryProvider.of<ProfileProvider>(context))..loadFAQ(),
+      create: (context) => FaqCubit(
+          profileProvider: RepositoryProvider.of<ProfileProvider>(context))
+        ..loadFAQ(),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.zimkeyWhite,
@@ -109,7 +111,8 @@ class FaqScreenState extends State<FaqScreen> with TickerProviderStateMixin {
               children: [
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                   decoration: BoxDecoration(
                     color: AppColors.zimkeyLightGrey,
                     borderRadius: BorderRadius.circular(10),
@@ -189,15 +192,20 @@ class FaqScreenState extends State<FaqScreen> with TickerProviderStateMixin {
                       faqList.addAll(state.faqResponse.getFaqs);
                       faqCategories.clear();
                       List<GetFaq> tempFaqList = List.empty(growable: true);
-                      List<String> tempFaqCategoryList = List.empty(growable: true);
+                      List<String> tempFaqCategoryList =
+                          List.empty(growable: true);
+
                       for (GetFaq item in faqList) {
                         tempFaqList.add(item);
                         if (!faqCategories.contains(item.category)) {
                           tempFaqCategoryList.add(item.category);
                         }
                       }
+                      faqCategories.clear();
                       faqCategories.addAll(tempFaqCategoryList);
-                      searchFaqCategories.value = tempFaqCategoryList;
+                      searchFaqCategories.value.clear();
+                      searchFaqCategories.value =
+                          tempFaqCategoryList.toSet().toList();
                       searchList.value = tempFaqList;
                     }
                   },
@@ -207,35 +215,47 @@ class FaqScreenState extends State<FaqScreen> with TickerProviderStateMixin {
                     } else if (state is FaqLoadedState) {
                       return ValueListenableBuilder(
                           valueListenable: searchFaqCategories,
-                          builder: (BuildContext context, faqCategoryValue, Widget? child) {
+                          builder: (BuildContext context, faqCategoryValue,
+                              Widget? child) {
                             return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: List.generate(
                                     faqCategoryValue.length,
                                     (faqCategoryIndex) => Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 10),
                                               child: Text(
-                                                faqCategoryValue[faqCategoryIndex],
+                                                faqCategoryValue[
+                                                    faqCategoryIndex],
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   // fontWeight: FontWeight.bold,
-                                                  color: AppColors.zimkeyOrange.withOpacity(1),
+                                                  color: AppColors.zimkeyOrange
+                                                      .withOpacity(1),
                                                 ),
                                               ),
                                             ),
                                             ValueListenableBuilder(
                                               valueListenable: searchList,
-                                              builder: (BuildContext context, value, Widget? child) {
+                                              builder: (BuildContext context,
+                                                  value, Widget? child) {
                                                 return Column(
                                                     children: List.generate(
                                                         value.length,
-                                                        (index) => FAQItemWidget(
-                                                              faqItem: value[index],
+                                                        (index) =>
+                                                            FAQItemWidget(
+                                                              faqItem:
+                                                                  value[index],
                                                               thisMixin: this,
-                                                              faqCatg: faqCategoryValue[faqCategoryIndex],
+                                                              faqCatg:
+                                                                  faqCategoryValue[
+                                                                      faqCategoryIndex],
                                                             )));
                                               },
                                             ),
@@ -347,7 +367,9 @@ class _FAQItemWidgetState extends State<FAQItemWidget> {
       return Container(
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         decoration: BoxDecoration(
-            color: widget.faqItem.isExpanded ? Colors.grey[100] : AppColors.zimkeyWhite,
+            color: widget.faqItem.isExpanded
+                ? Colors.grey[100]
+                : AppColors.zimkeyWhite,
             borderRadius: BorderRadius.circular(7),
             boxShadow: [
               BoxShadow(

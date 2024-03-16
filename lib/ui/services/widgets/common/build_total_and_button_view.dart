@@ -314,6 +314,7 @@ class _TotalAndButtonViewState extends State<TotalAndButtonView> {
                                         ),
                                         AnimatedButton(
                                           onTap: () {
+                                            print("this is working");
                                             if (checkoutState
                                                     is! CheckoutLoadingState &&
                                                 acceptTerms.value) {
@@ -434,16 +435,39 @@ class _TotalAndButtonViewState extends State<TotalAndButtonView> {
           ),
           isError: false);
     } else if (overviewDataCubitState.customerAddress.id.isEmpty) {
-      HelperWidgets.showTopSnackBar(
-          context: context,
-          title: "Oops",
-          message: "Please select Address to continue",
-          icon: const Icon(
-            Icons.error,
-            color: Colors.red,
-            size: 28,
-          ),
-          isError: false);
+      try {
+        var user = HelperFunctions.user();
+        if (user == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text("Please login to continue"),
+            action: SnackBarAction(
+                label: "Login",
+                onPressed: () {
+                  HelperFunctions.navigateToLogin(context);
+                }),
+          ));
+        } else {
+          HelperWidgets.showTopSnackBar(
+              context: context,
+              title: "Oops",
+              message: "Please select Address to continue",
+              icon: const Icon(
+                Icons.error,
+                color: Colors.red,
+                size: 28,
+              ),
+              isError: false);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text("Please login to continue"),
+          action: SnackBarAction(
+              label: "Login",
+              onPressed: () {
+                HelperFunctions.setupInitialNavigation(context);
+              }),
+        ));
+      }
     }
   }
 

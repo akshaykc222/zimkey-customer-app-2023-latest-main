@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -31,14 +30,25 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   ValueNotifier<PackageInfo?> packageInfo = ValueNotifier(null);
-  ValueNotifier<User> userInfoNotifier = ValueNotifier(User(id:"",name: "",phone:"",email: ""));
-  ValueNotifier<Analytics> analyticsInfoNotifier = ValueNotifier(Analytics(openBookings: "", rewardPointBalance: "", totalBookings: "", pendingPaymentsCounts: ""));
-
+  ValueNotifier<User> userInfoNotifier =
+      ValueNotifier(User(id: "", name: "", phone: "", email: ""));
+  ValueNotifier<Analytics> analyticsInfoNotifier = ValueNotifier(Analytics(
+      openBookings: "",
+      rewardPointBalance: "",
+      totalBookings: "",
+      pendingPaymentsCounts: ""));
+  ValueNotifier<bool> hasLoginned = ValueNotifier(true);
   @override
   void initState() {
     super.initState();
     _initPackageInfo();
-    userInfoNotifier.value= HelperFunctions.user();
+    var user = HelperFunctions.user();
+    if (user == null) {
+      hasLoginned.value = false;
+    } else {
+      hasLoginned.value = true;
+      userInfoNotifier.value = user;
+    }
     BlocProvider.of<AuthBloc>(context).add(GetUserDetails());
   }
 
@@ -53,8 +63,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (words.length > 1) {
       // If there are multiple words, take the first letter from each word
       String firstInitial = words[0][0];
-      String secondInitial = words[1][0];
-      return '$firstInitial$secondInitial';
+      // String secondInitial = words[0][0];
+      return '$firstInitial';
     } else {
       // If there is only one word, take the first two characters
       if (name.length >= 2) {
@@ -68,31 +78,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          ProfileBloc(profileProvider: RepositoryProvider.of<ProfileProvider>(context))..add(LoadCmsContent()),
+      create: (context) => ProfileBloc(
+          profileProvider: RepositoryProvider.of<ProfileProvider>(context))
+        ..add(LoadCmsContent()),
       child: Scaffold(
           appBar: buildAppBar(),
           body: BlocConsumer<AuthBloc, AuthState>(
             listener: (BuildContext context, AuthState authState) {
               if (authState is UserUpdateSuccessState) {
-                ObjectFactory().prefs.saveUserData(
-                    User(
-                        id: authState.updateUserResponse.updateUser.id,
-                        name: authState.updateUserResponse.updateUser.name,
-                        phone: authState.updateUserResponse.updateUser.phone,
-                        email: authState.updateUserResponse.updateUser.email));
+                ObjectFactory().prefs.saveUserData(User(
+                    id: authState.updateUserResponse.updateUser.id,
+                    name: authState.updateUserResponse.updateUser.name,
+                    phone: authState.updateUserResponse.updateUser.phone,
+                    email: authState.updateUserResponse.updateUser.email));
                 userInfoNotifier.value = User(
-                  id: authState.updateUserResponse.updateUser.id,
-                  name: authState.updateUserResponse.updateUser.name,
-                  phone: authState.updateUserResponse.updateUser.phone,
-                  email: authState.updateUserResponse.updateUser.email);
-              }else if(authState is AuthUserDataLoadedState){
+                    id: authState.updateUserResponse.updateUser.id,
+                    name: authState.updateUserResponse.updateUser.name,
+                    phone: authState.updateUserResponse.updateUser.phone,
+                    email: authState.updateUserResponse.updateUser.email);
+              } else if (authState is AuthUserDataLoadedState) {
                 userInfoNotifier.value = User(
-                  id: authState.userDetailsResponse.me.id,
-                  name: authState.userDetailsResponse.me.name,
-                  phone: authState.userDetailsResponse.me.phone,
-                  email: authState.userDetailsResponse.me.email);
-                analyticsInfoNotifier.value=authState.userDetailsResponse.me.analytics;
+                    id: authState.userDetailsResponse.me.id,
+                    name: authState.userDetailsResponse.me.name,
+                    phone: authState.userDetailsResponse.me.phone,
+                    email: authState.userDetailsResponse.me.email);
+                analyticsInfoNotifier.value =
+                    authState.userDetailsResponse.me.analytics;
               }
             },
             builder: (context, authState) {
@@ -126,151 +137,211 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               authState is AuthLoadingState
                                   ? SizedBox(
                                       width: double.infinity,
-                                      child: Center(
-                                        child: HelperWidgets.progressIndicator(),
-                                      ),
+                                      child: HelperFunctions.checkLoggedIn()
+                                          ? Center(
+                                              child: HelperWidgets
+                                                  .progressIndicator(),
+                                            )
+                                          : SizedBox(
+                                              child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .zimkeyOrange),
+                                                  onPressed: () {
+                                                    HelperFunctions
+                                                        .navigateToLogin(
+                                                            context);
+                                                  },
+                                                  child: const Text("Login")),
+                                            ),
                                     )
                                   : ValueListenableBuilder(
-                                valueListenable: userInfoNotifier,
-                                    builder: (BuildContext context, User user, Widget? child) {
-                                  return Row(
-                                    children: [
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 80,
-                                        width: 80,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.zimkeyLightGrey,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: HelperFunctions.checkLoggedIn()
-                                            ? Text(
-                                          getAvatarInitials(user.name).toUpperCase(),
-                                          style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                                        )
-                                            : SvgPicture.asset(
-                                          'assets/images/icons/newIcons/profile-circle.svg',
-                                          height: 80,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            ReCase(user.name).titleCase,
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
+                                      valueListenable: userInfoNotifier,
+                                      builder: (BuildContext context, User user,
+                                          Widget? child) {
+                                        return Row(
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.center,
+                                              height: 80,
+                                              width: 80,
+                                              decoration: const BoxDecoration(
+                                                color:
+                                                    AppColors.zimkeyLightGrey,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: HelperFunctions
+                                                      .checkLoggedIn()
+                                                  ? Text(
+                                                      getAvatarInitials(
+                                                              user.name)
+                                                          .toUpperCase(),
+                                                      style: const TextStyle(
+                                                          fontSize: 40,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    )
+                                                  : SvgPicture.asset(
+                                                      'assets/images/icons/newIcons/profile-circle.svg',
+                                                      height: 80,
+                                                    ),
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            height: 3,
-                                          ),
-                                          Text(
-                                            '+91 ${(user.phone).substring(3)}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                            const SizedBox(
+                                              width: 20,
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            height: 3,
-                                          ),
-                                          Text(user.email,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  ReCase(user.name).titleCase,
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 3,
+                                                ),
+                                                Text(
+                                                  '+91 ${(user.phone).substring(3)}',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 3,
+                                                ),
+                                                Text(
+                                                  user.email,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                    },
-
-                                  ),
+                                          ],
+                                        );
+                                      },
+                                    ),
                               const SizedBox(
                                 height: 10,
                               ),
 
-                              authState is AuthUserDataLoadedState?ValueListenableBuilder(
-                                valueListenable: analyticsInfoNotifier,
-                                builder: (BuildContext context, analytics, Widget? child) {
-                                  return Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 20),
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.zimkeyGreen.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        overviewTiles(title:
-                                          'Zimkey \nPoints',
-                                         value: analytics.rewardPointBalance.toString(),
-                                          isinfo: true,description: authState.userDetailsResponse.me.zpointsDescription
-                                        ),
-                                        overviewTiles(
-                                          title: 'Open \nOrders',
-                                          value:analytics.openBookings,
-                                          isinfo: false,
-                                        ),
-                                        overviewTiles(
-                                          title: 'Total \nOrders',
-                                          value:analytics.totalBookings,
-                                          isinfo:false,
-                                        ),
-                                        overviewTiles(
-                                          title:'Pending \nPayments',
-                                          value:analytics.pendingPaymentsCounts,
-                                          isinfo:false,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ):const SizedBox() ,
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'General',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.zimkeyDarkGrey,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 7,
-                                  ),
-                                  profileMenuItem(
-                                    menuTitle: 'Edit Profile',
-                                    icon: 'assets/images/user.svg',
-                                    context: context,
-                                    screenName: RouteGenerator.editProfileScreen,
-                                  ),
-                                  profileMenuItem(
-                                    menuTitle: 'Address Book',
-                                    icon: 'assets/images/icons/newIcons/book.svg',
-                                    context: context,
-                                    screenName: RouteGenerator.addressListScreen,
-                                  ),
-                                  // profileMenuItem(
-                                  //     'Refer & Earn', 'assets/images/icons/newIcons/money-recive.svg', context, Container()),
-                                  profileMenuItem(
-                                    menuTitle: 'Customer Support',
-                                    icon: 'assets/images/icons/newIcons/support.svg',
-                                    context: context,
-                                    screenName: RouteGenerator.customerSupportScreen,
-                                  ),
-                                ],
-                              ),
+                              authState is AuthUserDataLoadedState
+                                  ? ValueListenableBuilder(
+                                      valueListenable: analyticsInfoNotifier,
+                                      builder: (BuildContext context, analytics,
+                                          Widget? child) {
+                                        return Column(
+                                          children: [
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 20),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 20),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.zimkeyGreen
+                                                    .withOpacity(0.05),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  overviewTiles(
+                                                      title: 'Zimkey \nPoints',
+                                                      value: analytics
+                                                          .rewardPointBalance
+                                                          .toString(),
+                                                      isinfo: true,
+                                                      description: authState
+                                                          .userDetailsResponse
+                                                          .me
+                                                          .zpointsDescription),
+                                                  overviewTiles(
+                                                    title: 'Open \nOrders',
+                                                    value:
+                                                        analytics.openBookings,
+                                                    isinfo: false,
+                                                  ),
+                                                  overviewTiles(
+                                                    title: 'Total \nOrders',
+                                                    value:
+                                                        analytics.totalBookings,
+                                                    isinfo: false,
+                                                  ),
+                                                  overviewTiles(
+                                                    title: 'Pending \nPayments',
+                                                    value: analytics
+                                                        .pendingPaymentsCounts,
+                                                    isinfo: false,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  'General',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors
+                                                        .zimkeyDarkGrey,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 7,
+                                                ),
+                                                profileMenuItem(
+                                                  menuTitle: 'Edit Profile',
+                                                  icon:
+                                                      'assets/images/user.svg',
+                                                  context: context,
+                                                  screenName: RouteGenerator
+                                                      .editProfileScreen,
+                                                ),
+                                                profileMenuItem(
+                                                  menuTitle: 'Address Book',
+                                                  icon:
+                                                      'assets/images/icons/newIcons/book.svg',
+                                                  context: context,
+                                                  screenName: RouteGenerator
+                                                      .addressListScreen,
+                                                ),
+                                                // profileMenuItem(
+                                                //     'Refer & Earn', 'assets/images/icons/newIcons/money-recive.svg', context, Container()),
+                                                profileMenuItem(
+                                                  menuTitle: 'Customer Support',
+                                                  icon:
+                                                      'assets/images/icons/newIcons/support.svg',
+                                                  context: context,
+                                                  screenName: RouteGenerator
+                                                      .customerSupportScreen,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    )
+                                  : const SizedBox(),
+
                               // buildRegister(),
                               const SizedBox(
                                 height: 20,
@@ -281,7 +352,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     return Center(
                                       child: HelperWidgets.progressIndicator(),
                                     );
-                                  } else if (cmsContentState is ProfileCmsContentLoadedState) {
+                                  } else if (cmsContentState
+                                      is ProfileCmsContentLoadedState) {
                                     return Column(
                                       children: [
                                         const Text(
@@ -297,42 +369,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                         profileMenuItem(
                                           menuTitle: 'FAQs',
-                                          icon: 'assets/images/icons/newIcons/faqSearch.svg',
+                                          icon:
+                                              'assets/images/icons/newIcons/faqSearch.svg',
                                           context: context,
                                           screenName: RouteGenerator.faqScreen,
                                         ),
                                         profileMenuItem(
                                             menuTitle: 'Terms of Service',
-                                            icon: 'assets/images/icons/newIcons/terms.svg',
+                                            icon:
+                                                'assets/images/icons/newIcons/terms.svg',
                                             context: context,
-                                            screenName: RouteGenerator.htmlViewerScreen,
+                                            screenName:
+                                                RouteGenerator.htmlViewerScreen,
                                             htmlData: cmsContentState
-                                                .getCmsContentsResponse.getCmsContent.termsConditionsCustomer),
+                                                .getCmsContentsResponse
+                                                .getCmsContent
+                                                .termsConditionsCustomer),
                                         profileMenuItem(
                                             menuTitle: 'Cancellation Policy',
-                                            icon: 'assets/images/icons/newIcons/cancellationPolicy.svg',
+                                            icon:
+                                                'assets/images/icons/newIcons/cancellationPolicy.svg',
                                             context: context,
-                                            screenName: RouteGenerator.htmlViewerScreen,
+                                            screenName:
+                                                RouteGenerator.htmlViewerScreen,
                                             htmlData: cmsContentState
-                                                .getCmsContentsResponse.getCmsContent.cancellationPolicyCustomer),
+                                                .getCmsContentsResponse
+                                                .getCmsContent
+                                                .cancellationPolicyCustomer),
                                         profileMenuItem(
                                             menuTitle: 'Privacy Policy',
                                             icon: 'assets/images/privacy.svg',
                                             context: context,
-                                            screenName: RouteGenerator.htmlViewerScreen,
-                                            htmlData: cmsContentState.getCmsContentsResponse.getCmsContent.privacyPolicy),
+                                            screenName:
+                                                RouteGenerator.htmlViewerScreen,
+                                            htmlData: cmsContentState
+                                                .getCmsContentsResponse
+                                                .getCmsContent
+                                                .privacyPolicy),
                                         profileMenuItem(
                                             menuTitle: 'Safety Policy',
-                                            icon: 'assets/images/icons/newIcons/safety.svg',
+                                            icon:
+                                                'assets/images/icons/newIcons/safety.svg',
                                             context: context,
-                                            screenName: RouteGenerator.htmlViewerScreen,
-                                            htmlData: cmsContentState.getCmsContentsResponse.getCmsContent.safetyPolicy),
+                                            screenName:
+                                                RouteGenerator.htmlViewerScreen,
+                                            htmlData: cmsContentState
+                                                .getCmsContentsResponse
+                                                .getCmsContent
+                                                .safetyPolicy),
                                         profileMenuItem(
                                             menuTitle: 'About Us',
-                                            icon: 'assets/images/icons/newIcons/informationProfile.svg',
+                                            icon:
+                                                'assets/images/icons/newIcons/informationProfile.svg',
                                             context: context,
-                                            screenName: RouteGenerator.htmlViewerScreen,
-                                            htmlData: cmsContentState.getCmsContentsResponse.getCmsContent.aboutUs),
+                                            screenName:
+                                                RouteGenerator.htmlViewerScreen,
+                                            htmlData: cmsContentState
+                                                .getCmsContentsResponse
+                                                .getCmsContent
+                                                .aboutUs),
                                       ],
                                     );
                                   } else {
@@ -348,14 +443,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       btn2Text: Strings.logoutText,
                                       btn1Text: Strings.cancel,
                                       btn2Pressed: () => logoutAction(),
-                                      btn1Pressed: () => Navigator.pop(context)),
+                                      btn1Pressed: () =>
+                                          Navigator.pop(context)),
                                   child: SizedBox(
                                       height: 40,
                                       width: MediaQuery.of(context).size.width,
                                       child: Align(
                                           alignment: Alignment.centerLeft,
                                           child: HelperWidgets.buildText(
-                                              text: "Sign Out", color: AppColors.zimkeyOrange, fontSize: 16)))),
+                                              text: "Sign Out",
+                                              color: AppColors.zimkeyOrange,
+                                              fontSize: 16)))),
                             ],
                           ),
                         ),
@@ -365,13 +463,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Container(
                           width: double.infinity,
                           color: AppColors.zimkeyLightGrey,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 15),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               ValueListenableBuilder(
                                 valueListenable: packageInfo,
-                                builder: (BuildContext context, value, Widget? child) {
+                                builder: (BuildContext context, value,
+                                    Widget? child) {
                                   return Text(
                                     'App Version ${value?.version}.${value?.buildNumber}',
                                     style: const TextStyle(
@@ -486,7 +586,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String htmlData = ""}) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, screenName, arguments: HtmlViewerScreenArg(htmlData: htmlData, title: menuTitle));
+        Navigator.pushNamed(context, screenName,
+            arguments:
+                HtmlViewerScreenArg(htmlData: htmlData, title: menuTitle));
       },
       child: Container(
         width: double.infinity,
@@ -513,7 +615,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget overviewTiles({required String title,required String value,required bool isinfo,String description=""}) {
+  Widget overviewTiles(
+      {required String title,
+      required String value,
+      required bool isinfo,
+      String description = ""}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -532,13 +638,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             if (isinfo)
               GestureDetector(
-                onTap: ()=>HelperDialog.confirmActionDialog(
-                    title: "",
-                    context: context,
-                    msg: description,) ,
+                onTap: () => HelperDialog.confirmActionDialog(
+                  title: "",
+                  context: context,
+                  msg: description,
+                ),
                 child: SvgPicture.asset(
                   'assets/images/icons/question.svg',
-                  colorFilter: const ColorFilter.mode(AppColors.zimkeyOrange, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(
+                      AppColors.zimkeyOrange, BlendMode.srcIn),
                   width: 15,
                   height: 15,
                 ),

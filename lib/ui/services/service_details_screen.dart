@@ -45,8 +45,13 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     BlocProvider.of<OverviewDataCubit>(context).clearAllSelection();
     BlocProvider.of<CalculatedServiceCostCubit>(context)
         .clearTotalCalculation();
-    BlocProvider.of<OverviewDataCubit>(context)
-        .addMobileNum(ObjectFactory().prefs.getUserData().phone);
+    try {
+      BlocProvider.of<OverviewDataCubit>(context)
+          .addMobileNum(ObjectFactory().prefs.getUserData().phone);
+    } catch (e) {
+      print(e);
+    }
+
     _bookPageController = PageController(
         initialPage: currentStageNoNotifier.value, keepPage: false);
   }

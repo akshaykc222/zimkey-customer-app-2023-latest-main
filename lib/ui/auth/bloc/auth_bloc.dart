@@ -12,7 +12,6 @@ import '../../../data/model/profile/edit_profile/update_user_response.dart';
 import '../../../data/provider/auth_provider.dart';
 
 part 'auth_event.dart';
-
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -42,14 +41,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<VerifyOtp>((event, emit) async {
       emit(AuthLoadingState());
-      final MutationOptions options = MutationOptions(document: gql(Mutations.verifyOtp), variables: {
+      final MutationOptions options =
+          MutationOptions(document: gql(Mutations.verifyOtp), variables: {
         "phoneNumber": event.phoneNum,
         "otp": event.otp,
         "deviceId": event.deviceId,
         "device": event.device,
-        "token": event.fcmToken
+        "token": event.fcmToken,
+        "app": "CUSTOMER"
       });
+      print("verify");
+      print(options.variables);
       ResponseModel stateModel = await authProvider.verifyOtp(options);
+
       if (stateModel is SuccessResponse) {
         emit(OtpVerifySuccessState(verifyOtpResponse: stateModel.value));
       } else if (stateModel is ErrorResponse) {
@@ -60,16 +64,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterUser>((event, emit) async {
       emit(AuthLoadingState());
       ResponseModel stateModel = await authProvider.registerUser({
-        "data": {"name": event.name, "email": event.mail, "refUid": event.referral}
+        "data": {
+          "name": event.name,
+          "email": event.mail,
+          "refUid": event.referral
+        }
       });
       if (stateModel is SuccessResponse) {
-        emit(UserRegistrationSuccessState(registerUserResponse: stateModel.value));
+        emit(UserRegistrationSuccessState(
+            registerUserResponse: stateModel.value));
       } else {}
     });
 
     on<UpdateUser>((event, emit) async {
       emit(AuthLoadingState());
-      ResponseModel stateModel = await authProvider.updateUser({"name": event.name, "email": event.mail});
+      ResponseModel stateModel = await authProvider
+          .updateUser({"name": event.name, "email": event.mail});
       if (stateModel is SuccessResponse) {
         emit(UserUpdateSuccessState(updateUserResponse: stateModel.value));
       } else {}

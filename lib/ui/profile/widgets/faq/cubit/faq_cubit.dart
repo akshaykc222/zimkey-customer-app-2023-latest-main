@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -19,13 +18,10 @@ class FaqCubit extends Cubit<FaqState> {
       document: gql(Queries.getFaqs),
     );
     ResponseModel stateModel = await profileProvider.loadFAQ(options);
-    if(stateModel is SuccessResponse){
+    if (stateModel is SuccessResponse) {
       emit(FaqLoadedState(faqResponse: stateModel.value));
-    }
-    else{
+    } else {
       emit(FaqErrorState());
     }
-
-
   }
 }

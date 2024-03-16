@@ -1,13 +1,11 @@
-import 'dart:ffi';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 
 import '../../../constants/colors.dart';
 import '../bloc/auth_bloc.dart';
@@ -31,7 +29,8 @@ class OtpSection extends StatefulWidget {
   State<OtpSection> createState() => _OtpSectionState();
 }
 
-class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateMixin {
+class _OtpSectionState extends State<OtpSection>
+    with SingleTickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
   final FocusNode otpNode = FocusNode();
   late TextEditingController otpTextController = TextEditingController();
@@ -46,25 +45,24 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       final androidInfo = await deviceInfo.androidInfo;
       androidInfoNotifier.value = androidInfo.model;
-      // print('Running on ${androidInfo.model}');  // e.g. "Moto G (4)"
+      print('Running on ${androidInfo.model}'); // e.g. "Moto G (4)"
 
       final iosInfo = await deviceInfo.iosInfo;
       iosInfoNotifier.value = iosInfo.utsname.machine;
       // print('Running on ${iosInfo.utsname.machine}');
-
     } catch (e) {
       // Handle any exceptions that occur during async operations.
       print('Error in checkAppConfig: $e');
       // You might want to show an error message to the user here.
     }
   }
+
   @override
   void initState() {
     // TODO: implement initState
+    checkAppConfig();
     super.initState();
-
   }
-
 
   @override
   void dispose() {
@@ -111,7 +109,8 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                                 text: 'Enter the 6 digit code sent to',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: AppColors.zimkeyDarkGrey.withOpacity(0.6),
+                                  color:
+                                      AppColors.zimkeyDarkGrey.withOpacity(0.6),
                                 ),
                               ),
                               TextSpan(
@@ -132,7 +131,8 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                   ),
                   InkWell(
                     onTap: () {
-                      BlocProvider.of<AuthBloc>(context).add(LoadInitialState());
+                      BlocProvider.of<AuthBloc>(context)
+                          .add(LoadInitialState());
                       otpTextController.clear();
                     },
                     child: const Text(
@@ -159,19 +159,22 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                 child: ValueListenableBuilder(
                   valueListenable: androidInfoNotifier,
                   builder: (BuildContext context, androidInfo, Widget? child) {
-                    return  ValueListenableBuilder(
+                    return ValueListenableBuilder(
                       valueListenable: iosInfoNotifier,
                       builder: (BuildContext context, iosInfo, Widget? child) {
                         return ValueListenableBuilder(
                           valueListenable: fcmTokenNotifier,
-                          builder: (BuildContext context, fcmToken, Widget? child) {
+                          builder:
+                              (BuildContext context, fcmToken, Widget? child) {
                             return Column(
                               children: [
                                 AnimatedBuilder(
                                   animation: widget.animationController,
-                                  builder: (BuildContext context, Widget? child) {
+                                  builder:
+                                      (BuildContext context, Widget? child) {
                                     return Transform.translate(
-                                      offset: Offset(widget.animation.value, 0.0),
+                                      offset:
+                                          Offset(widget.animation.value, 0.0),
                                       child: Form(
                                         key: formKey,
                                         child: PinCodeTextField(
@@ -180,7 +183,8 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                                           enabled: true,
                                           focusNode: otpNode,
                                           inputFormatters: [
-                                            FilteringTextInputFormatter.digitsOnly,
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
                                           ],
                                           appContext: context,
                                           pastedTextStyle: const TextStyle(
@@ -199,18 +203,27 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                                             shape: PinCodeFieldShape.circle,
                                             fieldHeight: 50,
                                             fieldWidth: 50,
-                                            activeFillColor: AppColors.zimkeyWhite,
-                                            activeColor: AppColors.zimkeyDarkGrey,
-                                            inactiveFillColor: AppColors.zimkeyLightGrey,
-                                            selectedFillColor: AppColors.zimkeyWhite,
-                                            selectedColor: AppColors.zimkeyOrange,
+                                            activeFillColor:
+                                                AppColors.zimkeyWhite,
+                                            activeColor:
+                                                AppColors.zimkeyDarkGrey,
+                                            inactiveFillColor:
+                                                AppColors.zimkeyLightGrey,
+                                            selectedFillColor:
+                                                AppColors.zimkeyWhite,
+                                            selectedColor:
+                                                AppColors.zimkeyOrange,
                                             borderWidth: 1,
-                                            inactiveColor: AppColors.zimkeyLightGrey,
-                                            disabledColor: AppColors.zimkeyLightGrey,
+                                            inactiveColor:
+                                                AppColors.zimkeyLightGrey,
+                                            disabledColor:
+                                                AppColors.zimkeyLightGrey,
                                           ),
                                           cursorColor: AppColors.zimkeyDarkGrey,
-                                          animationDuration: const Duration(milliseconds: 300),
-                                          backgroundColor: AppColors.zimkeyWhite,
+                                          animationDuration:
+                                              const Duration(milliseconds: 300),
+                                          backgroundColor:
+                                              AppColors.zimkeyWhite,
                                           enableActiveFill: true,
                                           animationType: AnimationType.scale,
                                           // errorAnimationController: errorController,
@@ -219,10 +232,27 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                                           onCompleted: (v) {
                                             // print("Completed");
                                           },
-                                          onChanged: (value) {
+                                          onChanged: (value) async {
                                             if (value.length == 6) {
-                                              BlocProvider.of<AuthBloc>(context)
-                                                  .add(VerifyOtp(otp: value, phoneNum: "+91${widget.mobileNum}",fcmToken: fcmToken!,deviceId:Platform.isAndroid?androidInfo:iosInfo ,device: Platform.isAndroid?"ANDROID":"IOS"));
+                                              FirebaseMessaging.instance
+                                                  .getToken()
+                                                  .then((token) {
+                                                BlocProvider.of<AuthBloc>(
+                                                        context)
+                                                    .add(VerifyOtp(
+                                                        otp: value,
+                                                        phoneNum:
+                                                            "+91${widget.mobileNum}",
+                                                        fcmToken: token ?? "",
+                                                        deviceId:
+                                                            Platform.isAndroid
+                                                                ? androidInfo
+                                                                : iosInfo,
+                                                        device:
+                                                            Platform.isAndroid
+                                                                ? "ANDROID"
+                                                                : "IOS"));
+                                              });
                                             }
                                           },
                                           beforeTextPaste: (text) {
@@ -245,13 +275,10 @@ class _OtpSectionState extends State<OtpSection> with SingleTickerProviderStateM
                               ],
                             );
                           },
-
                         );
                       },
-
                     );
                   },
-
                 ),
               ),
               const SizedBox(

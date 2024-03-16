@@ -1,3 +1,4 @@
+import 'package:customer/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,6 +15,7 @@ class ThemeCubit extends Cubit<ThemeData> {
       foregroundColor: Colors.white,
     ),
     brightness: Brightness.light,
+    useMaterial3: false,
   );
 
   static final headline1 = GoogleFonts.poppins(color: Colors.white);
@@ -23,11 +25,10 @@ class ThemeCubit extends Cubit<ThemeData> {
       foregroundColor: Colors.black,
     ),
     textTheme: GoogleFonts.poppinsTextTheme(Typography.whiteCupertino),
-    colorScheme: const ColorScheme.dark(
-        primary: Color(
-      0xFFBA0E72,
-    ),
-    ),scaffoldBackgroundColor: Colors.black,
+    useMaterial3: false,
+    colorScheme:
+        ColorScheme.fromSwatch().copyWith(secondary: AppColors.zimkeyOrange),
+    scaffoldBackgroundColor: Colors.black,
     brightness: Brightness.dark,
   );
 

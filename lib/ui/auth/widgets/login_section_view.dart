@@ -13,7 +13,9 @@ class LoginSection extends StatefulWidget {
   final FocusNode focusNode;
   final TextEditingController textEditingController;
 
-  const LoginSection({Key? key, required this.focusNode, required this.textEditingController}) : super(key: key);
+  const LoginSection(
+      {Key? key, required this.focusNode, required this.textEditingController})
+      : super(key: key);
 
   @override
   State<LoginSection> createState() => _LoginSectionState();
@@ -28,7 +30,7 @@ class _LoginSectionState extends State<LoginSection> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap:()=> HelperFunctions.hideKeyboard(),
+      onTap: () => HelperFunctions.hideKeyboard(),
       child: SafeArea(
         top: true,
         child: Container(
@@ -57,7 +59,8 @@ class _LoginSectionState extends State<LoginSection> {
               SingleChildScrollView(
                 reverse: true,
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     width: double.infinity,
@@ -123,7 +126,8 @@ class _LoginSectionState extends State<LoginSection> {
                               hintStyle: TextStyle(
                                 fontSize: 18,
                                 // color: Colors.red,
-                                color: AppColors.zimkeyDarkGrey.withOpacity(0.3),
+                                color:
+                                    AppColors.zimkeyDarkGrey.withOpacity(0.3),
                                 fontWeight: FontWeight.normal,
                               ),
                               hintText: 'Enter your mobile number',
@@ -140,7 +144,8 @@ class _LoginSectionState extends State<LoginSection> {
                         ),
                         ValueListenableBuilder(
                           valueListenable: showClearIcon,
-                          builder: (BuildContext context, bool value, Widget? child) {
+                          builder: (BuildContext context, bool value,
+                              Widget? child) {
                             return value
                                 ? IconButton(
                                     icon: const Icon(
@@ -167,13 +172,16 @@ class _LoginSectionState extends State<LoginSection> {
                     children: [
                       ValueListenableBuilder(
                         valueListenable: policySelected,
-                        builder: (BuildContext context, bool value, Widget? child) {
+                        builder:
+                            (BuildContext context, bool value, Widget? child) {
                           return InkWell(
                             onTap: () => policySelected.value = !value,
                             child: Container(
                               padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
-                                color: value ? AppColors.zimkeyOrange : AppColors.zimkeyWhite,
+                                color: value
+                                    ? AppColors.zimkeyOrange
+                                    : AppColors.zimkeyWhite,
                                 shape: BoxShape.rectangle,
                                 border: Border.all(
                                   color: AppColors.zimkeyOrange,
@@ -211,7 +219,8 @@ class _LoginSectionState extends State<LoginSection> {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    HelperFunctions.launchURL('https://www.zimkey.in/');
+                                    HelperFunctions.launchURL(
+                                        'https://zimkey.in/page-terms');
                                     print('Terms tapped!!');
                                   },
                               ),
@@ -230,7 +239,8 @@ class _LoginSectionState extends State<LoginSection> {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    HelperFunctions.launchURL('https://www.zimkey.in/');
+                                    HelperFunctions.launchURL(
+                                        'https://zimkey.in/privacy-policy');
                                     print('Terms tapped!!');
                                   },
                               ),
@@ -249,15 +259,19 @@ class _LoginSectionState extends State<LoginSection> {
                       Expanded(
                         child: ValueListenableBuilder(
                           valueListenable: selectRegisterButton,
-                          builder: (BuildContext context, bool registerSelected, Widget? child) {
+                          builder: (BuildContext context, bool registerSelected,
+                              Widget? child) {
                             return ValueListenableBuilder(
                               valueListenable: policySelected,
-                              builder: (BuildContext context, bool privacySelected, Widget? child) {
+                              builder: (BuildContext context,
+                                  bool privacySelected, Widget? child) {
                                 return GestureDetector(
                                   onTap: () async {
                                     if (registerSelected && privacySelected) {
-                                      BlocProvider.of<AuthBloc>(context)
-                                          .add(SendOtp(phoneNum: "+91${widget.textEditingController.text}"));
+                                      BlocProvider.of<AuthBloc>(context).add(
+                                          SendOtp(
+                                              phoneNum:
+                                                  "+91${widget.textEditingController.text}"));
                                       HelperWidgets.showTopSnackBar(
                                           context: context,
                                           title: "Alert",
@@ -268,7 +282,8 @@ class _LoginSectionState extends State<LoginSection> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     // width: MediaQuery.of(context).size.width - 190,
-                                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 20),
                                     decoration: BoxDecoration(
                                       color:
                                           // isFilled &&
@@ -279,7 +294,8 @@ class _LoginSectionState extends State<LoginSection> {
                                       borderRadius: BorderRadius.circular(30),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.zimkeyLightGrey.withOpacity(0.1),
+                                          color: AppColors.zimkeyLightGrey
+                                              .withOpacity(0.1),
                                           blurRadius: 5.0, // soften the shadow
                                           spreadRadius: 2.0, //extend the shadow
                                           offset: const Offset(
@@ -326,22 +342,25 @@ class _LoginSectionState extends State<LoginSection> {
                           //     duration: Duration(milliseconds: 500),
                           //   ),
                           // );
-                          HelperWidgets.showTopSnackBar(
-                              context: context,
-                              title: "Alert",
-                              message: "OTP sent",
-                              isError: false);
+                          // HelperWidgets.showTopSnackBar(
+                          //     context: context,
+                          //     title: "Alert",
+                          //     message: "OTP sent",
+                          //     isError: false);
+                          HelperFunctions.navigateToLocationSelection(context);
                         },
                         child: Container(
                           alignment: Alignment.center,
                           width: 100,
-                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 10),
                           decoration: BoxDecoration(
                             color: AppColors.zimkeyBgWhite,
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.zimkeyLightGrey.withOpacity(0.1),
+                                color:
+                                    AppColors.zimkeyLightGrey.withOpacity(0.1),
                                 blurRadius: 5.0, // soften the shadow
                                 spreadRadius: 2.0, //extend the shadow
                                 offset: const Offset(

@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants/colors.dart';
 import '../../data/model/auth/verify_otp_response.dart';
@@ -42,18 +42,18 @@ class HelperFunctions {
       count: count,
       effect: isDots
           ? WormEffect(
-        spacing: 3,
-        dotHeight: size,
-        dotWidth: size,
-        dotColor: dotColor.withOpacity(0.5),
-        activeDotColor: dotColor,
-      )
+              spacing: 3,
+              dotHeight: size,
+              dotWidth: size,
+              dotColor: dotColor.withOpacity(0.5),
+              activeDotColor: dotColor,
+            )
           : ExpandingDotsEffect(
-        dotHeight: size,
-        dotWidth: size,
-        dotColor: dotColor.withOpacity(0.5),
-        activeDotColor: dotColor,
-      ), // your preferred effect
+              dotHeight: size,
+              dotWidth: size,
+              dotColor: dotColor.withOpacity(0.5),
+              activeDotColor: dotColor,
+            ), // your preferred effect
     );
   }
 
@@ -68,21 +68,26 @@ class HelperFunctions {
   static void hideKeyboard() {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
-  static  void takeScreenShot(ScreenshotController controller, String bookingId) async {
-    await controller.capture(delay: const Duration(milliseconds: 10)).then((value) async {
-      final file = await uint8ListToFile(value!,bookingId);
+
+  static void takeScreenShot(
+      ScreenshotController controller, String bookingId) async {
+    await controller
+        .capture(delay: const Duration(milliseconds: 10))
+        .then((value) async {
+      final file = await uint8ListToFile(value!, bookingId);
       Share.shareXFiles([XFile(file.path)]);
     });
   }
 
-  static Future<File> uint8ListToFile(Uint8List data,String bookingId) async {
+  static Future<File> uint8ListToFile(Uint8List data, String bookingId) async {
     final directory = await getTemporaryDirectory();
     final file = File('${directory.path}/$bookingId.png');
     await file.writeAsBytes(data);
     return file;
   }
 
-  static KeyboardActionsConfig buildConfig({required BuildContext context, required List<FocusNode> focusNodeList}) {
+  static KeyboardActionsConfig buildConfig(
+      {required BuildContext context, required List<FocusNode> focusNodeList}) {
     return KeyboardActionsConfig(
       keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
       keyboardBarColor: Colors.grey[200],
@@ -104,34 +109,46 @@ class HelperFunctions {
     }
   }
 
-  static User user() {
-    return ObjectFactory().prefs.getUserData();
+  static User? user() {
+    try {
+      return ObjectFactory().prefs.getUserData();
+    } catch (e) {
+      return null;
+    }
   }
 
   static navigateToLogin(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.authScreen, (route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, RouteGenerator.authScreen, (route) => false);
   }
 
-  static setupInitialNavigation(BuildContext context){
-    if(ObjectFactory().prefs.isOnboardViewed()!){
-    checkLoggedIn()?navigateToHome(context):navigateToLogin(context);}
-    else{
+  static setupInitialNavigation(BuildContext context) {
+    if (ObjectFactory().prefs.isOnboardViewed()!) {
+      checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
+    } else {
       navigateToOnBoarding(context);
     }
   }
-  static checkNavigation(BuildContext context){
-    checkLoggedIn()?navigateToHome(context):navigateToLogin(context);}
 
-
+  static checkNavigation(BuildContext context) {
+    checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
+  }
 
   static navigateToHome(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.homeScreen, (route) => false,arguments: HomeNavigationArg(bottomNavIndex: 0));
+    Navigator.pushNamedAndRemoveUntil(
+        context, RouteGenerator.homeScreen, (route) => false,
+        arguments: HomeNavigationArg(bottomNavIndex: 0));
   }
+
   static navigateToOnBoarding(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.onboardingScreen, (route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, RouteGenerator.onboardingScreen, (route) => false);
   }
- static navigateToServices(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.homeScreen, (route) => false, arguments: HomeNavigationArg(bottomNavIndex: 1));
+
+  static navigateToServices(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(
+        context, RouteGenerator.homeScreen, (route) => false,
+        arguments: HomeNavigationArg(bottomNavIndex: 1));
   }
 
   static navigateToComingSoon(BuildContext context) {
@@ -139,14 +156,17 @@ class HelperFunctions {
   }
 
   static navigateToBookings(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.homeScreen, (route) => false, arguments: HomeNavigationArg(bottomNavIndex: 2));
+    Navigator.pushNamedAndRemoveUntil(
+        context, RouteGenerator.homeScreen, (route) => false,
+        arguments: HomeNavigationArg(bottomNavIndex: 2));
   }
 
   static navigateToLocationSelection(BuildContext context) {
     if (ObjectFactory().prefs.getSelectedLocation() != null) {
       navigateToHome(context);
     } else {
-      Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.locationSelectionScreen, (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          context, RouteGenerator.locationSelectionScreen, (route) => false);
     }
   }
 
@@ -159,7 +179,12 @@ class HelperFunctions {
   }
 
   static Future<void> launchURL(String url) async {
-    await canLaunchUrlString(url) ? await launchURL(url) : throw 'Could not launch $url';
+    try {
+      // print("lauching url $_url ${await canLaunchUrl(Uri.parse(_url))}");
+      await canLaunchUrl(Uri.parse(url))
+          ? await launchUrl(Uri.parse(url))
+          : throw 'Could not launch $url';
+    } catch (e) {}
   }
 
   static Function debounce(Function() action) {
@@ -172,8 +197,6 @@ class HelperFunctions {
     };
   }
 
-
-
   static ResponseModel handleResponse<T>(QueryResult response) {
     if (!response.hasException) {
       // Logger().i(response.data);
@@ -181,6 +204,12 @@ class HelperFunctions {
     } else {
       Logger().e(response.exception);
       if (response.exception != null) {
+        final error = response.exception?.graphqlErrors.firstWhere(
+            (element) => element.message.contains('Unauthorized'),
+            orElse: () => const GraphQLError(message: ""));
+        if (error?.message.isNotEmpty == true) {
+          return ResponseModel.unAuthorized();
+        }
         return ResponseModel<OperationException>.error(response.exception!);
       } else {
         return ResponseModel<String>.error("Something went wrong");
@@ -305,7 +334,11 @@ class HelperFunctions {
 
   static int calculateOffPercentage(String price, String listPrice) {
     if (double.tryParse(listPrice)!.round() > 0) {
-      return 100 - ((double.tryParse(price)!.round() / double.tryParse(listPrice)!.round()) * 100).round();
+      return 100 -
+          ((double.tryParse(price)!.round() /
+                      double.tryParse(listPrice)!.round()) *
+                  100)
+              .round();
     } else {
       return 0;
     }
@@ -325,7 +358,8 @@ class HelperFunctions {
   static bool isOthersSelected(List<Requirement> selectedRequirement) {
     var isOtherSelected = false;
     for (var element in selectedRequirement) {
-      if (element.title.toLowerCase() == "others" || element.title.toLowerCase() == "other") {
+      if (element.title.toLowerCase() == "others" ||
+          element.title.toLowerCase() == "other") {
         isOtherSelected = true;
         break;
       }
@@ -337,15 +371,18 @@ class HelperFunctions {
     return MediaQuery.of(context).size;
   }
 
-  static double screenHeight({required BuildContext context, double dividedBy = 1}) {
+  static double screenHeight(
+      {required BuildContext context, double dividedBy = 1}) {
     return screenSize(context).height / dividedBy;
   }
 
-  static double screenWidth({required BuildContext context, double dividedBy = 1}) {
+  static double screenWidth(
+      {required BuildContext context, double dividedBy = 1}) {
     return screenSize(context).width / dividedBy;
   }
 
-  static List<String> fetchReqIdList(List<Requirement> selectedRequirementList) {
+  static List<String> fetchReqIdList(
+      List<Requirement> selectedRequirementList) {
     List<String> temp = List.empty(growable: true);
     for (var element in selectedRequirementList) {
       temp.add(element.id);
