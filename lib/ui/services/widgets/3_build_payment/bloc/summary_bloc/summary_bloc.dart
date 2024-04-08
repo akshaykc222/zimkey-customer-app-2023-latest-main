@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -15,24 +13,34 @@ part 'summary_state.dart';
 class SummaryBloc extends Bloc<SummaryEvent, SummaryState> {
   final CheckoutProvider checkoutProvider;
   SummaryBloc({required this.checkoutProvider}) : super(SummaryInitial()) {
-    on<SummaryEvent>((event, emit) {
-    });
-    on<LoadCheckoutSummary>((event,emit) async {
+    on<SummaryEvent>((event, emit) {});
+    on<LoadCheckoutSummary>((event, emit) async {
       emit(SummaryLoadingState());
+      print({
+        "serviceBillingOptionId": event.serviceBillingOptionId,
+        "units": event.units,
+        "couponCode": event.couponCode,
+        "redeemPoints": event.redeemPoints,
+        "addressId": event.addressId
+      });
       final QueryOptions options = QueryOptions(
         document: gql(Queries.getBookingSummary),
-        variables:  <String, dynamic>{
+        variables: <String, dynamic>{
           "serviceBillingOptionId": event.serviceBillingOptionId,
           "units": event.units,
-          "couponCode":event.couponCode,
-          "redeemPoints":event.redeemPoints
+          "couponCode": event.couponCode,
+          "redeemPoints": event.redeemPoints,
+          "addressId": event.addressId
         },
       );
-      ResponseModel response = await checkoutProvider.loadCheckoutSummary(options);
-      if(response is SuccessResponse){
-        CheckoutSummaryResponse summaryResponse = response.value as CheckoutSummaryResponse;
-        emit(SummaryLoadedState(bookingSummary: summaryResponse.getBookingSummary));
-      }else{
+      ResponseModel response =
+          await checkoutProvider.loadCheckoutSummary(options);
+      if (response is SuccessResponse) {
+        CheckoutSummaryResponse summaryResponse =
+            response.value as CheckoutSummaryResponse;
+        emit(SummaryLoadedState(
+            bookingSummary: summaryResponse.getBookingSummary));
+      } else {
         emit(SummaryErrorState());
       }
     });

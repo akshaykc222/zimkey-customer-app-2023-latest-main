@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-BookingListResponse bookingListResponseFromJson(String str) => BookingListResponse.fromJson(json.decode(str));
+BookingListResponse bookingListResponseFromJson(String str) =>
+    BookingListResponse.fromJson(json.decode(str));
 
-String bookingListResponseToJson(BookingListResponse data) => json.encode(data.toJson());
+String bookingListResponseToJson(BookingListResponse data) =>
+    json.encode(data.toJson());
 
 class BookingListResponse {
   final GetUserBookingServiceItems getUserBookingServiceItems;
@@ -15,13 +17,15 @@ class BookingListResponse {
     required this.getUserBookingServiceItems,
   });
 
-  factory BookingListResponse.fromJson(Map<String, dynamic> json) => BookingListResponse(
-    getUserBookingServiceItems: GetUserBookingServiceItems.fromJson(json["getUserBookingServiceItems"]),
-  );
+  factory BookingListResponse.fromJson(Map<String, dynamic> json) =>
+      BookingListResponse(
+        getUserBookingServiceItems: GetUserBookingServiceItems.fromJson(
+            json["getUserBookingServiceItems"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "getUserBookingServiceItems": getUserBookingServiceItems.toJson(),
-  };
+        "getUserBookingServiceItems": getUserBookingServiceItems.toJson(),
+      };
 }
 
 class GetUserBookingServiceItems {
@@ -33,15 +37,16 @@ class GetUserBookingServiceItems {
     required this.pageInfo,
   });
 
-  factory GetUserBookingServiceItems.fromJson(Map<String, dynamic> json) => GetUserBookingServiceItems(
-    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-    pageInfo: PageInfo.fromJson(json["pageInfo"]),
-  );
+  factory GetUserBookingServiceItems.fromJson(Map<String, dynamic> json) =>
+      GetUserBookingServiceItems(
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        pageInfo: PageInfo.fromJson(json["pageInfo"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    "pageInfo": pageInfo.toJson(),
-  };
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+        "pageInfo": pageInfo.toJson(),
+      };
 }
 
 class Datum {
@@ -50,30 +55,32 @@ class Datum {
   final BookingService bookingService;
   final DateTime startDateTime;
   final DateTime endDateTime;
+  final String bookingServiceItemType;
 
-  Datum({
-    required this.id,
-    required this.bookingServiceItemStatus,
-    required this.bookingService,
-    required this.startDateTime,
-    required this.endDateTime,
-  });
+  Datum(
+      {required this.id,
+      required this.bookingServiceItemStatus,
+      required this.bookingService,
+      required this.startDateTime,
+      required this.endDateTime,
+      required this.bookingServiceItemType});
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-    id: json["id"],
-    bookingServiceItemStatus: json["bookingServiceItemStatus"],
-    bookingService: BookingService.fromJson(json["bookingService"]),
-    startDateTime: DateTime.parse(json["startDateTime"]),
-    endDateTime: DateTime.parse(json["endDateTime"]),
-  );
+        id: json["id"],
+        bookingServiceItemStatus: json["bookingServiceItemStatus"],
+        bookingService: BookingService.fromJson(json["bookingService"]),
+        startDateTime: DateTime.parse(json["startDateTime"]),
+        endDateTime: DateTime.parse(json["endDateTime"]),
+        bookingServiceItemType: json['bookingServiceItemType'],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "bookingServiceItemStatus": bookingServiceItemStatus,
-    "bookingService": bookingService.toJson(),
-    "startDateTime": startDateTime.toIso8601String(),
-    "endDateTime": endDateTime.toIso8601String(),
-  };
+        "id": id,
+        "bookingServiceItemStatus": bookingServiceItemStatus,
+        "bookingService": bookingService.toJson(),
+        "startDateTime": startDateTime.toIso8601String(),
+        "endDateTime": endDateTime.toIso8601String(),
+      };
 }
 
 class BookingService {
@@ -90,18 +97,18 @@ class BookingService {
   });
 
   factory BookingService.fromJson(Map<String, dynamic> json) => BookingService(
-    service: Service.fromJson(json["service"]),
-    serviceBillingOptionId: json["serviceBillingOptionId"],
-    booking: Booking.fromJson(json["booking"]),
-    unit: json["unit"],
-  );
+        service: Service.fromJson(json["service"]),
+        serviceBillingOptionId: json["serviceBillingOptionId"],
+        booking: Booking.fromJson(json["booking"]),
+        unit: json["unit"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "service": service.toJson(),
-    "serviceBillingOptionId": serviceBillingOptionId,
-    "booking": booking.toJson(),
-    "unit": unit,
-  };
+        "service": service.toJson(),
+        "serviceBillingOptionId": serviceBillingOptionId,
+        "booking": booking.toJson(),
+        "unit": unit,
+      };
 }
 
 class Booking {
@@ -112,32 +119,35 @@ class Booking {
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) => Booking(
-    userBookingNumber: json["userBookingNumber"],
-  );
+        userBookingNumber: json["userBookingNumber"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "userBookingNumber": userBookingNumber,
-  };
+        "userBookingNumber": userBookingNumber,
+      };
 }
 
 class Service {
+  final String id;
   final String name;
   final Icon icon;
 
   Service({
+    required this.id,
     required this.name,
     required this.icon,
   });
 
   factory Service.fromJson(Map<String, dynamic> json) => Service(
-    name: json["name"],
-    icon: Icon.fromJson(json["icon"]),
-  );
+        id: json['id'],
+        name: json["name"],
+        icon: Icon.fromJson(json["icon"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "name": name,
-    "icon": icon.toJson(),
-  };
+        "name": name,
+        "icon": icon.toJson(),
+      };
 }
 
 class Icon {
@@ -148,12 +158,12 @@ class Icon {
   });
 
   factory Icon.fromJson(Map<String, dynamic> json) => Icon(
-    url: json["url"],
-  );
+        url: json["url"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "url": url,
-  };
+        "url": url,
+      };
 }
 
 class PageInfo {
@@ -174,20 +184,20 @@ class PageInfo {
   });
 
   factory PageInfo.fromJson(Map<String, dynamic> json) => PageInfo(
-    hasNextPage: json["hasNextPage"],
-    currentPage: json["currentPage"],
-    currentCount: json["currentCount"],
-    nextPage: json["nextPage"] ?? 0,
-    totalPage: json["totalPage"],
-    totalCount: json["totalCount"],
-  );
+        hasNextPage: json["hasNextPage"],
+        currentPage: json["currentPage"],
+        currentCount: json["currentCount"],
+        nextPage: json["nextPage"] ?? 0,
+        totalPage: json["totalPage"],
+        totalCount: json["totalCount"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "hasNextPage": hasNextPage,
-    "currentPage": currentPage,
-    "currentCount": currentCount,
-    "nextPage": nextPage,
-    "totalPage": totalPage,
-    "totalCount": totalCount,
-  };
+        "hasNextPage": hasNextPage,
+        "currentPage": currentPage,
+        "currentCount": currentCount,
+        "nextPage": nextPage,
+        "totalPage": totalPage,
+        "totalCount": totalCount,
+      };
 }

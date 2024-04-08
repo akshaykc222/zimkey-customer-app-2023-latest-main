@@ -18,14 +18,22 @@ class BuildServices extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 13, right: 10),
-      child: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: List.generate(
-            state.homeResponse.getCombinedHome!.getHomeServices!.length,
-            (index) => gridServiceItem(
-                state.homeResponse.getCombinedHome!.getHomeServices![index],
-                context)),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 1,
+        ),
+        itemCount: state.homeResponse.getCombinedHome!.getHomeServices!.length,
+        itemBuilder: (BuildContext context, int index) {
+          return gridServiceItem(
+            state.homeResponse.getCombinedHome!.getHomeServices![index],
+            context,
+          );
+        },
       ),
     );
   }
@@ -72,9 +80,12 @@ class BuildServices extends StatelessWidget {
               height: 3,
             ),
             Center(
-              child:HelperWidgets.buildText(text: service.name!,fontSize: 11,textAlign: TextAlign.center,overflow: TextOverflow.ellipsis,maxLines: 2
-              ),
-
+              child: HelperWidgets.buildText(
+                  text: service.name!,
+                  fontSize: 11,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2),
             ),
           ],
         ),

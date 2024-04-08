@@ -123,6 +123,25 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
           const SizedBox(
             height: 10,
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Code : ${widget.getBookingServiceItem.workCode}',
+                  style: TextStyle(
+                    color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           rescheduleServiceAcceptOrDecline(widget.getBookingServiceItem),
           pendingPaymentView(widget.getBookingServiceItem),
           const SizedBox(
@@ -203,10 +222,20 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                         children: [
                           HelperWidgets.buildText(
                               text: "Service Type", fontSize: 13),
-                          HelperWidgets.buildText(
-                              text: widget
-                                  .getBookingServiceItem.bookingServiceItemType,
-                              fontSize: 13),
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: widget.getBookingServiceItem
+                                        .bookingServiceItemType ==
+                                    "REWORK"
+                                ? BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: AppColors.zimkeyOrange)
+                                : null,
+                            child: HelperWidgets.buildText(
+                                text: widget.getBookingServiceItem
+                                    .bookingServiceItemType,
+                                fontSize: 13),
+                          ),
                         ],
                       ),
                       const SizedBox(
@@ -673,12 +702,16 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
           ),
 
           //Cancellation Details
-          widget.getBookingServiceItem.isCancelled
+          widget.getBookingServiceItem.isCancelled &&
+                  widget.getBookingServiceItem.bookingServiceItemType !=
+                      "REWORK"
               ? cancellationDetails(widget.getBookingServiceItem.cancelDetails!)
               : const SizedBox(),
           //Payment details---
-          paymentDetailsSection(widget.getBookingServiceItem.chargedPrice,
-              widget.getBookingServiceItem.additionalWorks),
+          widget.getBookingServiceItem.bookingServiceItemType == "REWORK"
+              ? const SizedBox()
+              : paymentDetailsSection(widget.getBookingServiceItem.chargedPrice,
+                  widget.getBookingServiceItem.additionalWorks),
         ],
       ),
     );

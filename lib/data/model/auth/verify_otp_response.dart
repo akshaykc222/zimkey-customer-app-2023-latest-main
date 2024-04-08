@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-VerifyOtpResponse verifyOtpResponseFromJson(String str) => VerifyOtpResponse.fromJson(json.decode(str));
+VerifyOtpResponse verifyOtpResponseFromJson(String str) =>
+    VerifyOtpResponse.fromJson(json.decode(str));
 
-String verifyOtpResponseToJson(VerifyOtpResponse data) => json.encode(data.toJson());
+String verifyOtpResponseToJson(VerifyOtpResponse data) =>
+    json.encode(data.toJson());
 
 class VerifyOtpResponse {
   final VerifyOtp verifyOtp;
@@ -15,7 +17,8 @@ class VerifyOtpResponse {
     required this.verifyOtp,
   });
 
-  factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) => VerifyOtpResponse(
+  factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) =>
+      VerifyOtpResponse(
         verifyOtp: VerifyOtp.fromJson(json["verifyOtp"]),
       );
 
@@ -77,20 +80,22 @@ class User {
   final String name;
   final String phone;
   final String email;
+  final bool? disableAccount;
 
   User({
     required this.id,
     required this.name,
     required this.phone,
     required this.email,
+    this.disableAccount,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"],
-        name: json["name"],
-        phone: json["phone"],
-        email: json["email"],
-      );
+      id: json["id"],
+      name: json["name"],
+      phone: json["phone"],
+      email: json["email"],
+      disableAccount: json['disableAccount']);
 
   Map<String, dynamic> toJson() => {
         "id": id,

@@ -1,6 +1,7 @@
 import 'package:customer/ui/services/widgets/1_build_option/build_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:logger/logger.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -32,12 +33,13 @@ class TotalAndButtonView extends StatefulWidget {
   State<TotalAndButtonView> createState() => _TotalAndButtonViewState();
 }
 
-class _TotalAndButtonViewState extends State<TotalAndButtonView> {
+class _TotalAndButtonViewState extends State<TotalAndButtonView>
+    with WidgetsBindingObserver {
   final _razorpay = Razorpay();
   ValueNotifier<String> orderIdNotifier = ValueNotifier("");
   ValueNotifier<String> bookingIdNotifier = ValueNotifier("");
   ValueNotifier<String> mobNumNotifier = ValueNotifier("");
-
+  final ValueNotifier<bool> isKeyboardOpen = ValueNotifier<bool>(false);
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     // await confirmPaymentMutation(response);
     debugPrint('response success ....... $response');
@@ -72,12 +74,23 @@ class _TotalAndButtonViewState extends State<TotalAndButtonView> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     _razorpay.clear();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bool isKeyboardCurrentlyOpen =
+        MediaQuery.of(context).viewInsets.bottom > 0;
+    isKeyboardOpen.value = isKeyboardCurrentlyOpen;
+    isKeyboardOpen.notifyListeners();
+    super.didChangeMetrics();
   }
 
   @override
@@ -174,116 +187,132 @@ class _TotalAndButtonViewState extends State<TotalAndButtonView> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   if (summaryState is SummaryLoadedState)
-                                    Visibility(
-                                      visible: cubitCalcState.btnName ==
-                                          Strings.makePayment,
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          color: Colors.white,
-                                        ),
-                                        padding:
-                                            const EdgeInsets.only(left: 20),
-                                        margin: const EdgeInsets.only(
-                                            top: 10, left: 10, right: 10),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          // mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 10.0),
-                                              child: SvgPicture.asset(
-                                                Assets.iconCoupon,
-                                                colorFilter:
-                                                    const ColorFilter.mode(
-                                                        AppColors.zimkeyOrange,
-                                                        BlendMode.srcIn),
-                                                width: 20,
+                                    KeyboardVisibilityBuilder(
+                                        builder: (context, data) {
+                                      return data
+                                          ? const SizedBox()
+                                          : Visibility(
+                                              visible: cubitCalcState.btnName ==
+                                                  Strings.makePayment,
+                                              child: Container(
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: Colors.white,
+                                                ),
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                margin: const EdgeInsets.only(
+                                                    top: 10,
+                                                    left: 10,
+                                                    right: 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  // mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 10.0),
+                                                      child: SvgPicture.asset(
+                                                        Assets.iconCoupon,
+                                                        colorFilter:
+                                                            const ColorFilter
+                                                                .mode(
+                                                                AppColors
+                                                                    .zimkeyOrange,
+                                                                BlendMode
+                                                                    .srcIn),
+                                                        width: 20,
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                        flex: 3,
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            if (summaryState
+                                                                .bookingSummary
+                                                                .isZpointsApplied) {
+                                                              HelperWidgets.showTopSnackBar(
+                                                                  context:
+                                                                      context,
+                                                                  message:
+                                                                      "Please remove Redeemed points to use this feature !!",
+                                                                  isError: true,
+                                                                  title:
+                                                                      "Oops..");
+                                                            } else {
+                                                              BlocProvider.of<
+                                                                          CalculatedServiceCostCubit>(
+                                                                      context)
+                                                                  .showCouponListingScreen(
+                                                                      show:
+                                                                          true);
+                                                            }
+                                                          },
+                                                          child: Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          20),
+                                                              // color: Colors.red,
+                                                              child: Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerLeft,
+                                                                  child: HelperWidgets.buildText(
+                                                                      text: summaryState
+                                                                              .bookingSummary
+                                                                              .isCouponApplied
+                                                                          ? "${summaryState.bookingSummary.appliedCoupon} ${Strings.couponApplied}"
+                                                                          : Strings
+                                                                              .chooseCoupon))),
+                                                        )),
+                                                    summaryState.bookingSummary
+                                                            .isCouponApplied
+                                                        ? Expanded(
+                                                            flex: 1,
+                                                            child: InkWell(
+                                                                onTap: () => HelperDialog
+                                                                    .confirmActionDialog(
+                                                                        title:
+                                                                            "Remove Coupon",
+                                                                        msg:
+                                                                            "Do you really want to remove coupon",
+                                                                        context:
+                                                                            context,
+                                                                        btn1Text:
+                                                                            "Cancel",
+                                                                        btn2Text:
+                                                                            "Remove",
+                                                                        btn1Pressed: () =>
+                                                                            Navigator.pop(
+                                                                                context),
+                                                                        btn2Pressed:
+                                                                            () {
+                                                                          BlocProvider.of<SummaryBloc>(context).add(LoadCheckoutSummary(
+                                                                              serviceBillingOptionId: cubitCalcState.selectedBillingId,
+                                                                              units: cubitCalcState.selectedUnit,
+                                                                              addressId: BlocProvider.of<OverviewDataCubit>(context).cubitState.customerAddress.id));
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        }),
+                                                                child: SizedBox(
+                                                                    child: Center(
+                                                                        child: HelperWidgets.buildText(
+                                                                            text:
+                                                                                "Remove",
+                                                                            color:
+                                                                                AppColors.zimkeyOrange)))))
+                                                        : const SizedBox(),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Expanded(
-                                                flex: 3,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    if (summaryState
-                                                        .bookingSummary
-                                                        .isZpointsApplied) {
-                                                      HelperWidgets.showTopSnackBar(
-                                                          context: context,
-                                                          message:
-                                                              "Please remove Redeemed points to use this feature !!",
-                                                          isError: true,
-                                                          title: "Oops..");
-                                                    } else {
-                                                      BlocProvider.of<
-                                                                  CalculatedServiceCostCubit>(
-                                                              context)
-                                                          .showCouponListingScreen(
-                                                              show: true);
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 20),
-                                                      // color: Colors.red,
-                                                      child: Align(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          child: HelperWidgets.buildText(
-                                                              text: summaryState
-                                                                      .bookingSummary
-                                                                      .isCouponApplied
-                                                                  ? "${summaryState.bookingSummary.appliedCoupon} ${Strings.couponApplied}"
-                                                                  : Strings
-                                                                      .chooseCoupon))),
-                                                )),
-                                            summaryState.bookingSummary
-                                                    .isCouponApplied
-                                                ? Expanded(
-                                                    flex: 1,
-                                                    child: InkWell(
-                                                        onTap: () => HelperDialog
-                                                            .confirmActionDialog(
-                                                                title:
-                                                                    "Remove Coupon",
-                                                                msg:
-                                                                    "Do you really want to remove coupon",
-                                                                context:
-                                                                    context,
-                                                                btn1Text:
-                                                                    "Cancel",
-                                                                btn2Text:
-                                                                    "Remove",
-                                                                btn1Pressed: () =>
-                                                                    Navigator.pop(
-                                                                        context),
-                                                                btn2Pressed:
-                                                                    () {
-                                                                  BlocProvider.of<SummaryBloc>(context).add(LoadCheckoutSummary(
-                                                                      serviceBillingOptionId:
-                                                                          cubitCalcState
-                                                                              .selectedBillingId,
-                                                                      units: cubitCalcState
-                                                                          .selectedUnit));
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                }),
-                                                        child: SizedBox(
-                                                            child: Center(
-                                                                child: HelperWidgets.buildText(
-                                                                    text:
-                                                                        "Remove",
-                                                                    color: AppColors
-                                                                        .zimkeyOrange)))))
-                                                : const SizedBox(),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                            );
+                                    }),
                                   Padding(
                                     padding: const EdgeInsets.only(
                                         bottom: 20,
@@ -422,7 +451,11 @@ class _TotalAndButtonViewState extends State<TotalAndButtonView> {
           .changeButtonName(btnName: Strings.makePayment);
       BlocProvider.of<SummaryBloc>(context).add(LoadCheckoutSummary(
           serviceBillingOptionId: cubitCalcState.selectedBillingId,
-          units: cubitCalcState.selectedUnit));
+          units: cubitCalcState.selectedUnit,
+          addressId: BlocProvider.of<OverviewDataCubit>(context)
+              .cubitState
+              .customerAddress
+              .id));
     } else if (!overviewDataCubitState.selectedSlotTiming.available) {
       HelperWidgets.showTopSnackBar(
           context: context,

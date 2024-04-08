@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,8 +6,8 @@ import 'package:keyboard_actions/keyboard_actions.dart';
 import '../../constants/assets.dart';
 import '../../constants/colors.dart';
 import '../../constants/strings.dart';
-import '../../utils/helper/helper_functions.dart';
 import '../../utils/buttons/animated_button.dart';
+import '../../utils/helper/helper_functions.dart';
 import '../../utils/helper/helper_widgets.dart';
 import '../../utils/object_factory.dart';
 import 'bloc/auth_bloc.dart';
@@ -24,7 +23,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   TextEditingController nameTextController = TextEditingController();
   TextEditingController mailTextController = TextEditingController();
   // TextEditingController referralTextController = TextEditingController();
-
+  final _formKey = GlobalKey<FormState>();
   final FocusNode mailFocusNode = FocusNode();
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode referralFocusNode = FocusNode();
@@ -66,8 +65,11 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
         (index) => KeyboardActionsItem(
           focusNode: focusNodeList[index],
           onTapAction: () {
-            if(mailTextController.text.isNotEmpty){
-            HelperFunctions.isValidEmail(mailTextController.text) ? validEmail.value = true : validEmail.value = false;}
+            if (mailTextController.text.isNotEmpty) {
+              HelperFunctions.isValidEmail(mailTextController.text)
+                  ? validEmail.value = true
+                  : validEmail.value = false;
+            }
             checkButtonEnabled();
           },
         ),
@@ -77,8 +79,10 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
 
   void checkButtonEnabled() {
     if (nameTextController.text.isNotEmpty && mailTextController.text.isEmpty) {
-      isButtonEnabled.value = true;}
-    else if (nameTextController.text.isNotEmpty && mailTextController.text.isNotEmpty && validEmail.value) {
+      isButtonEnabled.value = true;
+    } else if (nameTextController.text.isNotEmpty &&
+        mailTextController.text.isNotEmpty &&
+        validEmail.value) {
       isButtonEnabled.value = true;
     } else {
       isButtonEnabled.value = false;
@@ -90,19 +94,22 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: SafeArea(
-          child: BlocConsumer<AuthBloc, AuthState>(
-            listener: (context, state) {
-              if(state is UserRegistrationSuccessState){
-                ObjectFactory().prefs.setIsLoggedIn(true);
-                HelperFunctions.setupInitialNavigation(context);
-              }
-            },
-            builder: (context, state) {
-              return Stack(
-                children: [buildRegBody(context), buildStaticScreen()],
-              );
-            },
+        body: Form(
+          key: _formKey,
+          child: SafeArea(
+            child: BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is UserRegistrationSuccessState) {
+                  ObjectFactory().prefs.setIsLoggedIn(true);
+                  HelperFunctions.setupInitialNavigation(context);
+                }
+              },
+              builder: (context, state) {
+                return Stack(
+                  children: [buildRegBody(context), buildStaticScreen()],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -138,7 +145,8 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
         return value
             ? Container(
                 height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.height,color: Colors.transparent,
+                width: MediaQuery.of(context).size.height,
+                color: Colors.transparent,
               )
             : const SizedBox();
       },
@@ -150,10 +158,14 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        HelperWidgets.buildText(text: Strings.registrationTitle, fontSize: 24, fontWeight: FontWeight.w700),
+        HelperWidgets.buildText(
+            text: Strings.registrationTitle,
+            fontSize: 24,
+            fontWeight: FontWeight.w700),
         const SizedBox(height: 5),
         HelperWidgets.buildText(
-            text: Strings.registrationSubTitle, color: AppColors.zimkeyDarkGrey.withOpacity(0.6)),
+            text: Strings.registrationSubTitle,
+            color: AppColors.zimkeyDarkGrey.withOpacity(0.6)),
         const SizedBox(height: 10),
         Container(
           color: AppColors.zimkeyDarkGrey.withOpacity(0.3),
@@ -161,6 +173,17 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
         ),
       ],
     );
+  }
+
+  bool isEmail(String email) {
+    // Regular expression for email validation
+    // This regex pattern covers most of the valid email formats
+    final RegExp regex = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return regex.hasMatch(email);
   }
 
   ValueListenableBuilder<bool> buildButton() {
@@ -172,16 +195,16 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
           builder: (BuildContext context, buttonValue, Widget? child) {
             return AnimatedButton(
               onTap: () {
-                if(buttonValue) {
+                if (_formKey.currentState?.validate() == true) {
                   isLoading.value = true;
                   BlocProvider.of<AuthBloc>(context).add(RegisterUser(
                       name: nameTextController.text,
                       mail: mailTextController.text,
                       referral: ""
                       // referral: referralTextController.text
-                  ));
+                      ));
                 }
-                },
+              },
               btnName: Strings.next,
               isEnabled: buttonValue,
               isLoading: loadingValue,
@@ -223,7 +246,8 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -233,7 +257,12 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                   controller: nameTextController,
                   icon: Assets.iconUser,
                   hintText: Strings.nameHintText,
-                  focusNodePosition: 0),
+                  focusNodePosition: 0,
+                  onValidate: (val) {
+                    if (val.isEmpty || val.length < 2) {
+                      return "Enter valid name!";
+                    }
+                  }),
               const SizedBox(height: 10),
               //email----
               buildTextField(
@@ -241,7 +270,12 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                   controller: mailTextController,
                   icon: Assets.iconRegMail,
                   hintText: Strings.mailHintText,
-                  focusNodePosition: 1),
+                  focusNodePosition: 1,
+                  onValidate: (val) {
+                    if (!HelperFunctions.isValidEmail(val)) {
+                      return "Enter valid email!";
+                    }
+                  }),
               buildEmailValidator(),
               const SizedBox(height: 2),
               //referral code------
@@ -264,12 +298,14 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     );
   }
 
-  Container buildTextField(
-      {required BuildContext context,
-      required String icon,
-      required String hintText,
-      required TextEditingController controller,
-      required int focusNodePosition}) {
+  Container buildTextField({
+    required BuildContext context,
+    required String icon,
+    required String hintText,
+    required TextEditingController controller,
+    required int focusNodePosition,
+    Function(String)? onValidate,
+  }) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -285,21 +321,32 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: SvgPicture.asset(
               icon,
-              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),),
+              colorFilter:
+                  const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+            ),
           ),
           Expanded(
             child: TextFormField(
               controller: controller,
+              validator: (val) =>
+                  onValidate == null ? null : onValidate(val ?? ""),
               focusNode: focusNodeList[focusNodePosition],
-              textCapitalization: focusNodePosition != 2 ? TextCapitalization.words : TextCapitalization.characters,
+              textCapitalization: focusNodePosition != 2
+                  ? TextCapitalization.words
+                  : TextCapitalization.characters,
               maxLength: focusNodePosition == 2 ? 6 : 45,
-              textInputAction: focusNodePosition == 2 ? TextInputAction.done : TextInputAction.next,
-              keyboardType: focusNodePosition == 1 ? TextInputType.emailAddress : TextInputType.text,
+              textInputAction: focusNodePosition == 2
+                  ? TextInputAction.done
+                  : TextInputAction.next,
+              keyboardType: focusNodePosition == 1
+                  ? TextInputType.emailAddress
+                  : TextInputType.text,
               onEditingComplete: () {
                 if (focusNodePosition == 2) {
                   focusNodeList[focusNodePosition].unfocus();
                 } else {
-                  FocusScope.of(context).requestFocus(focusNodeList[focusNodePosition++]);
+                  FocusScope.of(context)
+                      .requestFocus(focusNodeList[focusNodePosition++]);
                 }
                 checkButtonEnabled();
               },

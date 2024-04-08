@@ -53,6 +53,7 @@ class _BuildServiceOptionsState extends State<BuildServiceOptions> {
 
   @override
   void initState() {
+    acceptTerms.value = false;
     initValues();
     super.initState();
   }

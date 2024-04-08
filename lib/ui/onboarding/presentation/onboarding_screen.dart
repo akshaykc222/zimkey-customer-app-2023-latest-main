@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/colors.dart';
 import '../../../utils/helper/helper_functions.dart';
 import '../../../utils/object_factory.dart';
-
-
 
 class Onboarding extends StatefulWidget {
   const Onboarding({Key? key}) : super(key: key);
@@ -26,7 +22,6 @@ class _OnboardingState extends State<Onboarding> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
 
   @override
@@ -34,9 +29,6 @@ class _OnboardingState extends State<Onboarding> {
     _controller.dispose();
     super.dispose();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,65 +66,65 @@ class _OnboardingState extends State<Onboarding> {
               bottom: 40.0,
               left: 0.0,
               right: 0.0,
-              child: Container(
-                child: Column(
-                  children: [
-                    HelperFunctions.customPageViewIndicators(_controller, 5, false, 8),
-                    const SizedBox(
-                      height: 100,
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        ObjectFactory().prefs.setIsOnboardViewed(true);
-                        HelperFunctions.checkNavigation(context);
-                        // Get.toNamed('/login');
-                        // Navigator.push(
-                        //   context,
-                        //   PageTransition(
-                        //     type: PageTransitionType.rightToLeftWithFade,
-                        //     child: Login(),
-                        //     duration: const Duration(milliseconds: 200),
-                        //   ),
-                        // );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            alignment: Alignment.center,
-                            width: 120,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 15),
-                            decoration: BoxDecoration(
-                              color: AppColors.zimkeyWhite,
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.zimkeyLightGrey.withOpacity(0.1),
-                                  blurRadius: 7.0, // soften the shadow
-                                  spreadRadius: 2.0, //extend the shadow
-                                  offset: const Offset(
-                                    1.0, // Move to right 10  horizontally
-                                    4.0, // Move to bottom 10 Vertically
-                                  ),
-                                )
-                              ],
-                            ),
-                            child: Text(
-                              'Get Started',
-                              style: TextStyle(
-                                // fontSize: 16,
-                                color: AppColors.zimkeyBlack,
-                                fontFamily: 'Inter',
-                                // fontWeight: FontWeight.bold,
-                              ),
+              child: Column(
+                children: [
+                  HelperFunctions.customPageViewIndicators(
+                      _controller, 5, false, 8),
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      ObjectFactory().prefs.setIsOnboardViewed(true);
+                      HelperFunctions.checkNavigation(context);
+                      // Get.toNamed('/login');
+                      // Navigator.push(
+                      //   context,
+                      //   PageTransition(
+                      //     type: PageTransitionType.rightToLeftWithFade,
+                      //     child: Login(),
+                      //     duration: const Duration(milliseconds: 200),
+                      //   ),
+                      // );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          width: 120,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 15),
+                          decoration: BoxDecoration(
+                            color: AppColors.zimkeyWhite,
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    AppColors.zimkeyLightGrey.withOpacity(0.1),
+                                blurRadius: 7.0, // soften the shadow
+                                spreadRadius: 2.0, //extend the shadow
+                                offset: const Offset(
+                                  1.0, // Move to right 10  horizontally
+                                  4.0, // Move to bottom 10 Vertically
+                                ),
+                              )
+                            ],
+                          ),
+                          child: Text(
+                            'Get Started',
+                            style: TextStyle(
+                              // fontSize: 16,
+                              color: AppColors.zimkeyBlack,
+                              fontFamily: 'Inter',
+                              // fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -171,7 +163,7 @@ class _OnboardingState extends State<Onboarding> {
           padding: const EdgeInsets.symmetric(horizontal: 25.0),
           child: Text(
             descText,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.zimkeyDarkGrey,
               fontSize: 16,
             ),

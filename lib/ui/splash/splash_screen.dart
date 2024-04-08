@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:customer/ui/splash/data/bloc/app_config_bloc.dart';
 import 'package:customer/utils/helper/helper_widgets.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../app_services/push_notification/notification.dart';
 import '../../constants/assets.dart';
 import '../../utils/helper/helper_functions.dart';
 
@@ -16,7 +18,6 @@ class SplashScreen extends StatefulWidget {
   @override
   State<SplashScreen> createState() => SplashScreenState();
 }
-
 
 // ValueNotifier<double>  currentVersionNotifier = ValueNotifier(0.0);
 // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -57,35 +58,55 @@ class SplashScreen extends StatefulWidget {
 //   super.initState();
 //   fetchPlatFormInfo();
 
-
-class SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late VideoPlayerController _controller;
   ValueNotifier<bool> loadOneTime = ValueNotifier(false);
   ValueNotifier<bool> maintenanceMode = ValueNotifier(false);
   ValueNotifier<bool> forceUpdate = ValueNotifier(false);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  checkFcmMessages() async {
+    final RemoteMessage? _message =
+        await FirebaseMessaging.instance.getInitialMessage();
+    if (_message != null) {
+      Future.delayed(Duration.zero, () {
+        NotificationService.handleNavigation(_message, context, () {
+          HelperFunctions.setupInitialNavigation(_scaffoldKey.currentContext!);
+        });
+      });
+    } else {
+      HelperFunctions.setupInitialNavigation(_scaffoldKey.currentContext!);
+    }
+  }
 
-
-  void checkAppConfig(AppConfigDataLoadedState appConfigState, BuildContext context) async {
+  void checkAppConfig(
+      AppConfigDataLoadedState appConfigState, BuildContext context) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      double currentVersion = double.parse(packageInfo.version.trim().replaceAll(".", ""));
-      double newIosVersion =
-      double.parse(appConfigState.appConfigResponse.getAppConfig.iosVersion.trim().replaceAll(".", ""));
-      double newAndroidVersion =
-      double.parse(appConfigState.appConfigResponse.getAppConfig.androidVersion.trim().replaceAll(".", ""));
+      double currentVersion =
+          double.parse(packageInfo.version.trim().replaceAll(".", ""));
+      double newIosVersion = double.parse(appConfigState
+          .appConfigResponse.getAppConfig.iosVersion
+          .trim()
+          .replaceAll(".", ""));
+      double newAndroidVersion = double.parse(appConfigState
+          .appConfigResponse.getAppConfig.androidVersion
+          .trim()
+          .replaceAll(".", ""));
 
       if ((Platform.isIOS && currentVersion < newIosVersion) ||
           (Platform.isAndroid && currentVersion < newAndroidVersion)) {
         forceUpdate.value = true;
-      } else if (Platform.isAndroid && appConfigState.appConfigResponse.getAppConfig.androidMMode) {
+      } else if (Platform.isAndroid &&
+          appConfigState.appConfigResponse.getAppConfig.androidMMode) {
         maintenanceMode.value = true;
-      } else if (Platform.isIOS && appConfigState.appConfigResponse.getAppConfig.iosMMode) {
+      } else if (Platform.isIOS &&
+          appConfigState.appConfigResponse.getAppConfig.iosMMode) {
         maintenanceMode.value = true;
       } else {
         maintenanceMode.value = false;
         // Capture the BuildContext within this async function.
-        HelperFunctions.setupInitialNavigation(_scaffoldKey.currentContext!);
+        checkFcmMessages();
       }
     } catch (e) {
       // Handle any exceptions that occur during async operations.
@@ -97,7 +118,8 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(Assets.logoAnimation);
+    _controller = VideoPlayerController.asset(Assets.logoAnimation,
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
     _controller.initialize();
     _controller.play();
     _controller.addListener(() {
@@ -119,11 +141,11 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key:  _scaffoldKey,
+      key: _scaffoldKey,
       backgroundColor: Colors.white, // Set the desired background color
       body: BlocConsumer<AppConfigBloc, AppConfigState>(
         listener: (context, appConfigState) async {
-          if (appConfigState is AppConfigDataLoadedState)  {
+          if (appConfigState is AppConfigDataLoadedState) {
             checkAppConfig(appConfigState, context);
           }
         },
@@ -133,7 +155,8 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
             builder: (BuildContext context, forceUpdate, Widget? child) {
               return ValueListenableBuilder(
                 valueListenable: maintenanceMode,
-                builder: (BuildContext context, maintenanceMode, Widget? child) {
+                builder:
+                    (BuildContext context, maintenanceMode, Widget? child) {
                   return Stack(
                     children: [
                       Positioned.fill(
@@ -151,43 +174,42 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
                       ),
                       appConfigState is AppConfigLoadingState
                           ? Positioned(
-                          right: 20,
-                          bottom: 20,
-                          child: SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: Center(
-                                child: HelperWidgets.progressIndicator(),
-                              )))
+                              right: 20,
+                              bottom: 20,
+                              child: SizedBox(
+                                  height: 25,
+                                  width: 25,
+                                  child: Center(
+                                    child: HelperWidgets.progressIndicator(),
+                                  )))
                           : Container(
-                        color: Colors.transparent,
-                      ),
+                              color: Colors.transparent,
+                            ),
                       maintenanceMode
                           ? Positioned.fill(
-                          child: Container(
-                              color: Colors.white,
-                              child: const Center(
-                                child: Text("Maintenance Mode"),
-                              )))
+                              child: Container(
+                                  color: Colors.white,
+                                  child: const Center(
+                                    child: Text("Maintenance Mode"),
+                                  )))
                           : Container(
-                        color: Colors.transparent,
-                      ),
-
-                      forceUpdate ? Positioned.fill(
-                          child: Container(
-                              color: Colors.white,
-                              child: const Center(
-                                child: Text("force update"),
-                              )))
+                              color: Colors.transparent,
+                            ),
+                      forceUpdate
+                          ? Positioned.fill(
+                              child: Container(
+                                  color: Colors.white,
+                                  child: const Center(
+                                    child: Text("force update"),
+                                  )))
                           : Container(
-                        color: Colors.transparent,
-                      ),
+                              color: Colors.transparent,
+                            ),
                     ],
                   );
                 },
               );
             },
-
           );
         },
       ),

@@ -9,7 +9,10 @@ import '../../../cubit/overview_data_cubit.dart';
 import '../bloc/schedule_bloc.dart';
 
 class MonthAndDateView extends StatefulWidget {
-  const MonthAndDateView({Key? key}) : super(key: key);
+  final String? id;
+  final bool? isReschedule;
+  const MonthAndDateView({Key? key, this.id, this.isReschedule})
+      : super(key: key);
 
   @override
   State<MonthAndDateView> createState() => _MonthAndDateViewState();
@@ -90,23 +93,34 @@ class _MonthAndDateViewState extends State<MonthAndDateView> {
   Widget buildDatePicker() {
     return BlocBuilder<OverviewDataCubit, OverviewDataCubitState>(
       builder: (context, state) {
+        print("selected day");
         print(state.selectedDay);
+        // if (state.slotTimingList.isEmpty) {
+        //   if (state.selectedBillingOption.isNotEmpty) {
+        //     BlocProvider.of<ScheduleBloc>(context).add(LoadTimeSlots(
+        //         billingId: state.selectedBillingOption.first.id,
+        //         date: state.daysList.first.toString()));
+        //   }
+        // }
         return HelperWidgets.buildHorizontalListView(
             length: state.daysList.length,
             itemBuilder: ({required int index}) {
               return InkWell(
                 onTap: () async {
-                  if (!checkDate(
-                      selectedDay: state.selectedDay,
-                      listedDay: state.daysList[index])) {
-                    BlocProvider.of<OverviewDataCubit>(context)
-                        .addSelectedDay(state.daysList[index]);
-                    print("biiling id :${state.selectedBillingOption.length}");
-
+                  // if (!checkDate(
+                  //     selectedDay: state.selectedDay,
+                  //     listedDay: state.daysList[index])) {
+                  BlocProvider.of<OverviewDataCubit>(context)
+                      .addSelectedDay(state.daysList[index]);
+                  print("biiling id :${state.selectedBillingOption.length}");
+                  if (state.selectedBillingOption.isNotEmpty) {
                     BlocProvider.of<ScheduleBloc>(context).add(LoadTimeSlots(
                         billingId: state.selectedBillingOption.first.id,
-                        date: state.daysList[index].toString()));
+                        date: state.daysList[index].toString(),
+                        isReschedule: widget.isReschedule,
+                        bookingServiceItemId: widget.id));
                   }
+                  // }
                 },
                 child: Container(
                   width: 50,

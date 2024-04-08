@@ -82,6 +82,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       child: GestureDetector(
         onTap: () => HelperFunctions.hideKeyboard(),
         child: Scaffold(
+          resizeToAvoidBottomInset: true,
           body: BlocConsumer<ServicesBloc, ServicesState>(
             listener: (context, state) {
               if (state is SingleServiceLoaded) {

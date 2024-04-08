@@ -101,7 +101,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     id: authState.userDetailsResponse.me.id,
                     name: authState.userDetailsResponse.me.name,
                     phone: authState.userDetailsResponse.me.phone,
-                    email: authState.userDetailsResponse.me.email);
+                    email: authState.userDetailsResponse.me.email,
+                    disableAccount: authState
+                        .userDetailsResponse.me.customerDetails.disableAccount);
                 analyticsInfoNotifier.value =
                     authState.userDetailsResponse.me.analytics;
               }
@@ -240,104 +242,146 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       valueListenable: analyticsInfoNotifier,
                                       builder: (BuildContext context, analytics,
                                           Widget? child) {
-                                        return Column(
-                                          children: [
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 20),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 20),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.zimkeyGreen
-                                                    .withOpacity(0.05),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
+                                        return authState
+                                                    .userDetailsResponse
+                                                    .me
+                                                    .customerDetails
+                                                    .disableAccount ==
+                                                true
+                                            ? Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  overviewTiles(
-                                                      title: 'Zimkey \nPoints',
-                                                      value: analytics
-                                                          .rewardPointBalance
-                                                          .toString(),
-                                                      isinfo: true,
-                                                      description: authState
-                                                          .userDetailsResponse
-                                                          .me
-                                                          .zpointsDescription),
-                                                  overviewTiles(
-                                                    title: 'Open \nOrders',
-                                                    value:
-                                                        analytics.openBookings,
-                                                    isinfo: false,
+                                                  const Text(
+                                                    'General',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppColors
+                                                          .zimkeyDarkGrey,
+                                                    ),
                                                   ),
-                                                  overviewTiles(
-                                                    title: 'Total \nOrders',
-                                                    value:
-                                                        analytics.totalBookings,
-                                                    isinfo: false,
-                                                  ),
-                                                  overviewTiles(
-                                                    title: 'Pending \nPayments',
-                                                    value: analytics
-                                                        .pendingPaymentsCounts,
-                                                    isinfo: false,
+                                                  profileMenuItem(
+                                                    menuTitle:
+                                                        'Customer Support',
+                                                    icon:
+                                                        'assets/images/icons/newIcons/support.svg',
+                                                    context: context,
+                                                    screenName: RouteGenerator
+                                                        .customerSupportScreen,
                                                   ),
                                                 ],
-                                              ),
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const Text(
-                                                  'General',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors
-                                                        .zimkeyDarkGrey,
+                                              )
+                                            : Column(
+                                                children: [
+                                                  Container(
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 20),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 20),
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors
+                                                          .zimkeyGreen
+                                                          .withOpacity(0.05),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        overviewTiles(
+                                                            title:
+                                                                'Zimkey \nPoints',
+                                                            value: analytics
+                                                                .rewardPointBalance
+                                                                .toString(),
+                                                            isinfo: true,
+                                                            description: authState
+                                                                .userDetailsResponse
+                                                                .me
+                                                                .zpointsDescription),
+                                                        overviewTiles(
+                                                          title:
+                                                              'Open \nOrders',
+                                                          value: analytics
+                                                              .openBookings,
+                                                          isinfo: false,
+                                                        ),
+                                                        overviewTiles(
+                                                          title:
+                                                              'Total \nOrders',
+                                                          value: analytics
+                                                              .totalBookings,
+                                                          isinfo: false,
+                                                        ),
+                                                        overviewTiles(
+                                                          title:
+                                                              'Pending \nPayments',
+                                                          value: analytics
+                                                              .pendingPaymentsCounts,
+                                                          isinfo: false,
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 7,
-                                                ),
-                                                profileMenuItem(
-                                                  menuTitle: 'Edit Profile',
-                                                  icon:
-                                                      'assets/images/user.svg',
-                                                  context: context,
-                                                  screenName: RouteGenerator
-                                                      .editProfileScreen,
-                                                ),
-                                                profileMenuItem(
-                                                  menuTitle: 'Address Book',
-                                                  icon:
-                                                      'assets/images/icons/newIcons/book.svg',
-                                                  context: context,
-                                                  screenName: RouteGenerator
-                                                      .addressListScreen,
-                                                ),
-                                                // profileMenuItem(
-                                                //     'Refer & Earn', 'assets/images/icons/newIcons/money-recive.svg', context, Container()),
-                                                profileMenuItem(
-                                                  menuTitle: 'Customer Support',
-                                                  icon:
-                                                      'assets/images/icons/newIcons/support.svg',
-                                                  context: context,
-                                                  screenName: RouteGenerator
-                                                      .customerSupportScreen,
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        );
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const Text(
+                                                        'General',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: AppColors
+                                                              .zimkeyDarkGrey,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 7,
+                                                      ),
+                                                      profileMenuItem(
+                                                        menuTitle:
+                                                            'Edit Profile',
+                                                        icon:
+                                                            'assets/images/user.svg',
+                                                        context: context,
+                                                        screenName: RouteGenerator
+                                                            .editProfileScreen,
+                                                      ),
+                                                      profileMenuItem(
+                                                        menuTitle:
+                                                            'Address Book',
+                                                        icon:
+                                                            'assets/images/icons/newIcons/book.svg',
+                                                        context: context,
+                                                        screenName: RouteGenerator
+                                                            .addressListScreen,
+                                                      ),
+                                                      // profileMenuItem(
+                                                      //     'Refer & Earn', 'assets/images/icons/newIcons/money-recive.svg', context, Container()),
+                                                      profileMenuItem(
+                                                        menuTitle:
+                                                            'Customer Support',
+                                                        icon:
+                                                            'assets/images/icons/newIcons/support.svg',
+                                                        context: context,
+                                                        screenName: RouteGenerator
+                                                            .customerSupportScreen,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
                                       },
                                     )
                                   : const SizedBox(),

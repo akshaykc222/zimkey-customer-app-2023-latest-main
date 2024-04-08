@@ -39,12 +39,14 @@ class _DetailsBodyState extends State<DetailsBody> {
   TextEditingController reviewTextController = TextEditingController();
 
   ValueNotifier<bool> showRescheduleView = ValueNotifier(false);
-  ValueNotifier<List<AdditionalWork>> addonListNotifier = ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<AdditionalWork>> addonListNotifier =
+      ValueNotifier(List.empty(growable: true));
   ValueNotifier<bool> pendingPaymentNotifier = ValueNotifier(false);
   ValueNotifier<String> orderIdNotifier = ValueNotifier("");
   ValueNotifier<String> bookingStatusNotifier = ValueNotifier("");
-  ValueNotifier<GetServiceBookingSlot> serviceWorkTimeNotifier =
-      ValueNotifier(GetServiceBookingSlot(start: DateTime.now(), end: DateTime.now(), available: false));
+  ValueNotifier<GetServiceBookingSlot> serviceWorkTimeNotifier = ValueNotifier(
+      GetServiceBookingSlot(
+          start: DateTime.now(), end: DateTime.now(), available: false));
   final screenshotController = ScreenshotController();
 
   final _razorpay = Razorpay();
@@ -69,6 +71,7 @@ class _DetailsBodyState extends State<DetailsBody> {
     // Do something when an external wallet was selected
     debugPrint('response wallet ....... $response');
   }
+
   void handleReviewBlocState(ReviewState reviewState) {
     if (reviewState is ReviewAddedState) {
       showReviewOption.value = false;
@@ -107,37 +110,43 @@ class _DetailsBodyState extends State<DetailsBody> {
         handleReviewBlocState(reviewState);
       },
       builder: (context, reviewState) {
-    return BlocConsumer<BookingDetailsBloc, BookingDetailsState>(
-      listener: (context, bookingState) {
-        if (bookingState is BookingDetailsLoadedState) {
-          showReviewOption.value = bookingState.getBookingServiceItem.canRateBooking;
-          bookingStatusNotifier.value = bookingState.getBookingServiceItem.bookingServiceItemStatus;
-          addonListNotifier.value = bookingState.getBookingServiceItem.additionalWorks;
-          pendingPaymentNotifier.value = bookingState.getBookingServiceItem.isPaymentPending;
-          serviceWorkTimeNotifier.value = GetServiceBookingSlot(
-              start: bookingState.getBookingServiceItem.startDateTime,
-              end: bookingState.getBookingServiceItem.endDateTime,
-              available: true);
-          if (bookingState.getBookingServiceItem.isRescheduleByPartnerPending) {
-            showRescheduleView.value = true;
-          }
-        }
-      },
-      builder: (context, bookingState) {
-        if (bookingState is BookingDetailsLoadedState) {
-          return bookingDetailsLoadedView(context, bookingState);
-        } else if (bookingState is BookingDetailsLoadingState) {
-          return Center(child: HelperWidgets.progressIndicator());
-        } else {
-          return Container();
-        }
+        return BlocConsumer<BookingDetailsBloc, BookingDetailsState>(
+          listener: (context, bookingState) {
+            if (bookingState is BookingDetailsLoadedState) {
+              showReviewOption.value =
+                  bookingState.getBookingServiceItem.canRateBooking;
+              bookingStatusNotifier.value =
+                  bookingState.getBookingServiceItem.bookingServiceItemStatus;
+              addonListNotifier.value =
+                  bookingState.getBookingServiceItem.additionalWorks;
+              pendingPaymentNotifier.value =
+                  bookingState.getBookingServiceItem.isPaymentPending;
+              serviceWorkTimeNotifier.value = GetServiceBookingSlot(
+                  start: bookingState.getBookingServiceItem.startDateTime,
+                  end: bookingState.getBookingServiceItem.endDateTime,
+                  available: true);
+              if (bookingState
+                  .getBookingServiceItem.isRescheduleByPartnerPending) {
+                showRescheduleView.value = true;
+              }
+            }
+          },
+          builder: (context, bookingState) {
+            if (bookingState is BookingDetailsLoadedState) {
+              return bookingDetailsLoadedView(context, bookingState);
+            } else if (bookingState is BookingDetailsLoadingState) {
+              return Center(child: HelperWidgets.progressIndicator());
+            } else {
+              return Container();
+            }
+          },
+        );
       },
     );
-  },
-);
   }
 
-  Stack bookingDetailsLoadedView(BuildContext context, BookingDetailsLoadedState bookingState) {
+  Stack bookingDetailsLoadedView(
+      BuildContext context, BookingDetailsLoadedState bookingState) {
     return Stack(
       children: [
         SizedBox(
@@ -155,7 +164,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                     Screenshot(
                         controller: screenshotController,
                         child: BookingDetailsItem(
-                          getBookingServiceItem: bookingState.getBookingServiceItem,
+                          getBookingServiceItem:
+                              bookingState.getBookingServiceItem,
                           bookingStatusNotifier: bookingStatusNotifier,
                           serviceWorkTimeNotifier: serviceWorkTimeNotifier,
                           showRescheduleView: showRescheduleView,
@@ -193,7 +203,9 @@ class _DetailsBodyState extends State<DetailsBody> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                ReCase(bookingState.getBookingServiceItem.bookingService.service.name).originalText,
+                ReCase(bookingState
+                        .getBookingServiceItem.bookingService.service.name)
+                    .originalText,
                 style: const TextStyle(
                   // color: AppColors.zimkeyWhite,
                   fontSize: 15,
@@ -204,17 +216,21 @@ class _DetailsBodyState extends State<DetailsBody> {
           ),
         ),
         FavoriteButton(
-          serviceId: bookingState.getBookingServiceItem.bookingService.service.id,
-          isFavourite: bookingState.getBookingServiceItem.bookingService.service.isFavorite,
+          serviceId:
+              bookingState.getBookingServiceItem.bookingService.service.id,
+          isFavourite: bookingState
+              .getBookingServiceItem.bookingService.service.isFavorite,
         ),
         const SizedBox(
           width: 10,
         ),
         InkWell(
-          onTap: () => HelperFunctions.takeScreenShot(screenshotController, bookingState.getBookingServiceItem.id),
+          onTap: () => HelperFunctions.takeScreenShot(
+              screenshotController, bookingState.getBookingServiceItem.id),
           child: SvgPicture.asset(
             'assets/images/icons/newIcons/share.svg',
-            colorFilter: const ColorFilter.mode(AppColors.zimkeyDarkGrey, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(
+                AppColors.zimkeyDarkGrey, BlendMode.srcIn),
           ),
         ),
       ],
@@ -224,8 +240,10 @@ class _DetailsBodyState extends State<DetailsBody> {
   Widget bookAgain(BookingDetailsLoadedState bookingState) {
     return bookingState.getBookingServiceItem.canBookAgain
         ? InkWell(
-            onTap: () => Navigator.pushNamed(context, RouteGenerator.serviceDetailsScreen,
-                arguments: bookingState.getBookingServiceItem.bookingService.service.id),
+            onTap: () => Navigator.pushNamed(
+                context, RouteGenerator.serviceDetailsScreen,
+                arguments: bookingState
+                    .getBookingServiceItem.bookingService.service.id),
             child: Container(
               alignment: Alignment.center,
               width: double.infinity,
@@ -325,7 +343,9 @@ class _DetailsBodyState extends State<DetailsBody> {
             child: Container(
               decoration: const BoxDecoration(
                   color: AppColors.zimkeyWhite,
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(12), topLeft: Radius.circular(12))),
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(12),
+                      topLeft: Radius.circular(12))),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -368,11 +388,17 @@ class _DetailsBodyState extends State<DetailsBody> {
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                        color: AppColors.zimkeyWhite, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 10),
+                        color: AppColors.zimkeyWhite,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20))),
+                    padding: const EdgeInsets.only(
+                        left: 5, right: 5, bottom: 10, top: 10),
                     child: SingleChildScrollView(
                       child: Padding(
-                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 10, right: 10),
+                        padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                            left: 10,
+                            right: 10),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,7 +415,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                             ),
                             ValueListenableBuilder(
                               valueListenable: starRating,
-                              builder: (BuildContext context, int value, Widget? child) {
+                              builder: (BuildContext context, int value,
+                                  Widget? child) {
                                 return Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -424,7 +451,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                                   Expanded(
                                     child: TextFormField(
                                       controller: reviewTextController,
-                                      textCapitalization: TextCapitalization.sentences,
+                                      textCapitalization:
+                                          TextCapitalization.sentences,
                                       maxLength: 300,
                                       maxLines: 4,
                                       style: const TextStyle(
@@ -456,24 +484,30 @@ class _DetailsBodyState extends State<DetailsBody> {
                               child: InkWell(
                                 onTap: () {
                                   if (starRating.value != -1) {
+                                    debugPrint(
+                                        "star rating :${starRating.value + 1}");
                                     final request = <String, dynamic>{
                                       "type": "BOOKING",
                                       "bookingServiceItemId": id,
-                                      "rating": starRating.value,
+                                      "rating": starRating.value + 1,
                                       "review": reviewTextController.text,
                                     };
-                                    BlocProvider.of<ReviewBloc>(context).add(AddFirstBookingReview(request: request));
+                                    BlocProvider.of<ReviewBloc>(context).add(
+                                        AddFirstBookingReview(
+                                            request: request));
                                     showReviewBottomView.value = false;
                                     starRating.value = -1;
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 10),
                                   decoration: BoxDecoration(
                                     color: AppColors.zimkeyOrange,
                                     borderRadius: BorderRadius.circular(25),
                                   ),
-                                  width: MediaQuery.of(context).size.width - 250,
+                                  width:
+                                      MediaQuery.of(context).size.width - 250,
                                   alignment: Alignment.center,
                                   child: const Text(
                                     'Submit',
@@ -503,13 +537,15 @@ class _DetailsBodyState extends State<DetailsBody> {
     );
   }
 
-  BlocConsumer<AcceptOrDeclineCubit, AcceptOrDeclineState> rescheduleServiceAcceptOrDecline(
-      GetBookingServiceItem getBookingServiceItem) {
+  BlocConsumer<AcceptOrDeclineCubit, AcceptOrDeclineState>
+      rescheduleServiceAcceptOrDecline(
+          GetBookingServiceItem getBookingServiceItem) {
     return BlocConsumer<AcceptOrDeclineCubit, AcceptOrDeclineState>(
       listener: (context, state) {
         if (state is AcceptOrDeclineSuccessState) {
           showRescheduleView.value = false;
-          bookingStatusNotifier.value = state.acceptOrDeclineResponse.approveJob.bookingServiceItemStatus;
+          bookingStatusNotifier.value =
+              state.acceptOrDeclineResponse.approveJob.bookingServiceItemStatus;
           serviceWorkTimeNotifier.value = GetServiceBookingSlot(
               start: state.acceptOrDeclineResponse.approveJob.startDateTime,
               end: state.acceptOrDeclineResponse.approveJob.endDateTime,
@@ -524,21 +560,28 @@ class _DetailsBodyState extends State<DetailsBody> {
                 visible: value,
                 child: Container(
                   width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
                   decoration: BoxDecoration(
                     color: AppColors.zimkeyLightGrey,
                     borderRadius: BorderRadius.circular(7),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      HelperWidgets.buildText(text: "Reschedule Request", fontSize: 14, fontWeight: FontWeight.bold),
+                      HelperWidgets.buildText(
+                          text: "Reschedule Request",
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
                       const SizedBox(
                         height: 10,
                       ),
                       HelperWidgets.buildText(
-                          text: getBookingServiceItem.pendingRescheduleByPartner != null
+                          text: getBookingServiceItem
+                                      .pendingRescheduleByPartner !=
+                                  null
                               ? "Partner want to reschedule this work to \n${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.day}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.month}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: getBookingServiceItem.pendingRescheduleByPartner!.startDateTime, end: getBookingServiceItem.pendingRescheduleByPartner!.endDateTime, available: true))}"
                               : "",
                           overflow: TextOverflow.visible,
@@ -558,19 +601,24 @@ class _DetailsBodyState extends State<DetailsBody> {
                                   btn2Text: Strings.confirmText,
                                   btn1Text: Strings.cancel,
                                   btn2Pressed: () {
-                                    BlocProvider.of<AcceptOrDeclineCubit>(context)
-                                        .acceptOrDeclineRequest(id: getBookingServiceItem.id, status: false);
+                                    BlocProvider.of<AcceptOrDeclineCubit>(
+                                            context)
+                                        .acceptOrDeclineRequest(
+                                            id: getBookingServiceItem.id,
+                                            status: false);
                                     Navigator.pop(context);
                                   },
                                   btn1Pressed: () => Navigator.pop(context)),
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 5),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 decoration: BoxDecoration(
                                   color: AppColors.zimkeyWhite,
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.zimkeyDarkGrey.withOpacity(0.1),
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.1),
                                       blurRadius: 5.0, // soften the shadow
                                       spreadRadius: 1.0, //extend the shadow
                                       offset: const Offset(
@@ -581,7 +629,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                                   ],
                                 ),
                                 alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 13),
                                 child: const Text(
                                   'Decline',
                                   style: TextStyle(
@@ -603,13 +652,17 @@ class _DetailsBodyState extends State<DetailsBody> {
                                   btn2Text: Strings.confirmText,
                                   btn1Text: Strings.cancel,
                                   btn2Pressed: () {
-                                    BlocProvider.of<AcceptOrDeclineCubit>(context)
-                                        .acceptOrDeclineRequest(id: getBookingServiceItem.id, status: true);
+                                    BlocProvider.of<AcceptOrDeclineCubit>(
+                                            context)
+                                        .acceptOrDeclineRequest(
+                                            id: getBookingServiceItem.id,
+                                            status: true);
                                     Navigator.pop(context);
                                   },
                                   btn1Pressed: () => Navigator.pop(context)),
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 5),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 decoration: BoxDecoration(
                                   color: AppColors.zimkeyWhite,
                                   // color: AppColors.buttonColor,
@@ -619,7 +672,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.zimkeyDarkGrey.withOpacity(0.1),
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.1),
                                       blurRadius: 5.0, // soften the shadow
                                       spreadRadius: 1.0, //extend the shadow
                                       offset: const Offset(
@@ -630,7 +684,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                                   ],
                                 ),
                                 alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 13),
                                 child: const Text(
                                   'Accept',
                                   style: TextStyle(

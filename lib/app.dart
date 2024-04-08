@@ -25,9 +25,10 @@ import 'ui/profile/widgets/address/bloc/address_bloc.dart';
 import 'ui/search_services/data/cubit/search_service_cubit.dart';
 import 'ui/services/cubit/calculate_service_cost_cubit.dart';
 import 'ui/services/cubit/overview_data_cubit.dart';
-import 'ui/services/widgets/2_build_schedule/bloc/schedule_bloc.dart';
 import 'ui/services/widgets/3_build_payment/bloc/checkout_bloc/checkout_bloc.dart';
 import 'ui/services/widgets/3_build_payment/bloc/summary_bloc/summary_bloc.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class App extends StatelessWidget {
   /// {@macro app}
@@ -55,28 +56,47 @@ class App extends StatelessWidget {
           BlocProvider(create: (_) => OverviewDataCubit()),
           BlocProvider(create: (_) => CalculatedServiceCostCubit()),
           BlocProvider(
-              create: (context) =>
-                  SearchServiceCubit(servicesProvider: RepositoryProvider.of<ServicesProvider>(context))),
+              create: (context) => SearchServiceCubit(
+                  servicesProvider:
+                      RepositoryProvider.of<ServicesProvider>(context))),
           BlocProvider(
-              create: (context) =>
-                  PendingPaymentCubit(bookingsProvider: RepositoryProvider.of<BookingsProvider>(context))),
+              create: (context) => PendingPaymentCubit(
+                  bookingsProvider:
+                      RepositoryProvider.of<BookingsProvider>(context))),
           BlocProvider(
-              create: (context) => FavouriteCubit(profileProvider: RepositoryProvider.of<ProfileProvider>(context))),
+              create: (context) => FavouriteCubit(
+                  profileProvider:
+                      RepositoryProvider.of<ProfileProvider>(context))),
           BlocProvider(
-              create: (context) => AppConfigBloc(appConfigProvider: RepositoryProvider.of<AppConfigProvider>(context))),
-          BlocProvider(create: (context) => AuthBloc(authProvider: RepositoryProvider.of<AuthProvider>(context))),
+              create: (context) => AppConfigBloc(
+                  appConfigProvider:
+                      RepositoryProvider.of<AppConfigProvider>(context))),
           BlocProvider(
-              create: (context) => AddressBloc(addressProvider: RepositoryProvider.of<AddressProvider>(context))),
+              create: (context) => AuthBloc(
+                  authProvider: RepositoryProvider.of<AuthProvider>(context))),
           BlocProvider(
-              create: (context) =>
-                  ConnectivityBloc(connectivityService: RepositoryProvider.of<ConnectivityService>(context))),
-          BlocProvider(create: (context) => HomeBloc(homeProvider: RepositoryProvider.of<HomeProvider>(context))),
+              create: (context) => AddressBloc(
+                  addressProvider:
+                      RepositoryProvider.of<AddressProvider>(context))),
           BlocProvider(
-              create: (context) => BookingsBloc(bookingsProvider: RepositoryProvider.of<BookingsProvider>(context))),
+              create: (context) => ConnectivityBloc(
+                  connectivityService:
+                      RepositoryProvider.of<ConnectivityService>(context))),
           BlocProvider(
-              create: (context) => CheckoutBloc(checkoutProvider: RepositoryProvider.of<CheckoutProvider>(context))),
+              create: (context) => HomeBloc(
+                  homeProvider: RepositoryProvider.of<HomeProvider>(context))),
           BlocProvider(
-              create: (context) => SummaryBloc(checkoutProvider: RepositoryProvider.of<CheckoutProvider>(context))),
+              create: (context) => BookingsBloc(
+                  bookingsProvider:
+                      RepositoryProvider.of<BookingsProvider>(context))),
+          BlocProvider(
+              create: (context) => CheckoutBloc(
+                  checkoutProvider:
+                      RepositoryProvider.of<CheckoutProvider>(context))),
+          BlocProvider(
+              create: (context) => SummaryBloc(
+                  checkoutProvider:
+                      RepositoryProvider.of<CheckoutProvider>(context))),
         ],
         child: const AppView(),
       ),
@@ -98,11 +118,15 @@ class AppView extends StatelessWidget {
       builder: (_, theme) {
         return MaterialApp(
           theme: theme,
+          navigatorKey: navigatorKey,
           builder: (context, child) {
             return MediaQuery(
               // Set the default textScaleFactor to 1.0 for the whole subtree.
-              data: MediaQuery.of(context)
-                  .copyWith(textScaleFactor: MediaQuery.of(context).size.shortestSide < 600 ? 0.85 : 1.5),
+              data: MediaQuery.of(context).copyWith(
+                  textScaleFactor:
+                      MediaQuery.of(context).size.shortestSide < 600
+                          ? 0.85
+                          : 1.5),
               child: child!,
             );
           },

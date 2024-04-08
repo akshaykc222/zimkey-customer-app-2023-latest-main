@@ -19,30 +19,28 @@ import '../booking_list/bookings_list_screen.dart';
 class BookingsTab extends StatefulWidget {
   final String status;
 
-  const BookingsTab({Key? key ,required this.status }) : super(key: key);
+  const BookingsTab({Key? key, required this.status}) : super(key: key);
 
   @override
   State<BookingsTab> createState() => _BookingsTabState();
 }
 
 class _BookingsTabState extends State<BookingsTab> {
-
-
-
-
-
-
-
   final List<GlobalKey> _keys = List.empty(growable: true);
 
   final Color _backgroundOn = AppColors.zimkeyBodyOrange;
   final Color _backgroundOff = AppColors.zimkeyWhite;
 
-  ValueNotifier<List<Datum>> openBookingListNotifier = ValueNotifier(List.empty(growable: true));
-  ValueNotifier<List<Datum>> bookingListNotifier = ValueNotifier(List.empty(growable: true));
-  ValueNotifier<List<Datum>> completedBookingListNotifier = ValueNotifier(List.empty(growable: true));
-  ValueNotifier<List<Datum>> pendingBookingListNotifier = ValueNotifier(List.empty(growable: true));
-  ValueNotifier<List<Datum>> cancelledBookingListNotifier = ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<Datum>> openBookingListNotifier =
+      ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<Datum>> bookingListNotifier =
+      ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<Datum>> completedBookingListNotifier =
+      ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<Datum>> pendingBookingListNotifier =
+      ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<Datum>> cancelledBookingListNotifier =
+      ValueNotifier(List.empty(growable: true));
   ValueNotifier<int> currentIndexNotifier = ValueNotifier(0);
   ValueNotifier<int> pageNumber = ValueNotifier(1);
   ValueNotifier<bool> fullPageLoaded = ValueNotifier(false);
@@ -52,16 +50,23 @@ class _BookingsTabState extends State<BookingsTab> {
   void initState() {
     super.initState();
     BlocProvider.of<BookingsBloc>(context).add(LoadBookingList(
-        bookingListArg: BookingListArg(pageNumber: pageNumber.value, pageSize: 10, status: widget.status)));
+        bookingListArg: BookingListArg(
+            pageNumber: pageNumber.value,
+            pageSize: 10,
+            status: widget.status)));
 
     listViewScrollController.addListener(() {
       if (listViewScrollController.position.pixels ==
           listViewScrollController.position.maxScrollExtent) {
-        if(!fullPageLoaded.value) {
+        if (!fullPageLoaded.value) {
           BlocProvider.of<BookingsBloc>(context).add(LoadBookingList(
-              bookingListArg: BookingListArg(pageNumber: pageNumber.value, pageSize: 10, status: widget.status)));
-        }}});
-
+              bookingListArg: BookingListArg(
+                  pageNumber: pageNumber.value,
+                  pageSize: 10,
+                  status: widget.status)));
+        }
+      }
+    });
   }
 
   // _getForegroundColor(int index) {
@@ -77,35 +82,39 @@ class _BookingsTabState extends State<BookingsTab> {
 
   @override
   Widget build(BuildContext context) {
-    return  BlocConsumer<BookingsBloc, BookingsState>(
-          listener: (BuildContext context, BookingsState bookingsState) {
-            if (bookingsState is BookingListLoadedState) {
+    return BlocConsumer<BookingsBloc, BookingsState>(
+      listener: (BuildContext context, BookingsState bookingsState) {
+        if (bookingsState is BookingListLoadedState) {
+          bookingListNotifier.value = List.empty(growable: true);
+          if (bookingsState.bookingListResponse.getUserBookingServiceItems
+              .pageInfo.hasNextPage) {
+            pageNumber.value = bookingsState.bookingListResponse
+                .getUserBookingServiceItems.pageInfo.nextPage;
+          } else {
+            fullPageLoaded.value = true;
+          }
 
-              bookingListNotifier.value = List.empty(growable: true);
-              if(bookingsState.bookingListResponse.getUserBookingServiceItems.pageInfo.hasNextPage){
-                pageNumber.value=bookingsState.bookingListResponse.getUserBookingServiceItems.pageInfo.nextPage;
-              }else{
-                fullPageLoaded.value = true;
-              }
-
-              debugPrint(bookingsState.bookingListResponse.getUserBookingServiceItems.data.length.toString());
-              for (var element in bookingsState.bookingListResponse.getUserBookingServiceItems.data) {
-                bookingListNotifier.value.add(element);
-              }
-            }
-          },
-          builder: (context, bookingsState) {
-            if (bookingsState is BookingsLoadingState) {
-              return Center(
-                child: HelperWidgets.progressIndicator(),
-              );
-            } else if (bookingsState is BookingListLoadedState) {
-              return bookingWidget(status: widget.status);
-            } else {
-              return Container();
-            }
-          },
-        );
+          debugPrint(bookingsState
+              .bookingListResponse.getUserBookingServiceItems.data.length
+              .toString());
+          for (var element in bookingsState
+              .bookingListResponse.getUserBookingServiceItems.data) {
+            bookingListNotifier.value.add(element);
+          }
+        }
+      },
+      builder: (context, bookingsState) {
+        if (bookingsState is BookingsLoadingState) {
+          return Center(
+            child: HelperWidgets.progressIndicator(),
+          );
+        } else if (bookingsState is BookingListLoadedState) {
+          return bookingWidget(status: widget.status);
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 
   Widget bookingWidget({required String status}) {
@@ -115,7 +124,8 @@ class _BookingsTabState extends State<BookingsTab> {
       showChildOpacityTransition: false,
       onRefresh: () async {
         BlocProvider.of<BookingsBloc>(context).add(LoadBookingList(
-            bookingListArg: BookingListArg(pageNumber: 1, pageSize: 50, status: status)));
+            bookingListArg:
+                BookingListArg(pageNumber: 1, pageSize: 50, status: status)));
         final Completer<void> completer = Completer<void>();
         Timer(const Duration(seconds: 2), () {
           completer.complete();
@@ -129,26 +139,35 @@ class _BookingsTabState extends State<BookingsTab> {
         builder: (BuildContext context, value, Widget? child) {
           return value.isNotEmpty
               ? Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: ListView(
-              children: [
-                for (Datum item in value) bookingItemWidget(status, item),
-              ],
-            ),
-          )
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView(
+                    children: [
+                      for (Datum item in value) bookingItemWidget(status, item),
+                    ],
+                  ),
+                )
               : ListView(
-            children: [
-              emptyBookingWidget(status),
-            ],
-          );
+                  children: [
+                    emptyBookingWidget(status),
+                  ],
+                );
         },
       ),
     );
   }
 
   Widget bookingItemWidget(String status, Datum item) {
-    return InkWell(onTap: ()=>Navigator.pushNamed(context, RouteGenerator.singleBookingDetailScreen,arguments: BookingDetailScreenArg(id: item.id, fromPaymentPending: false,)).then((value) => BlocProvider.of<BookingsBloc>(context).add(LoadBookingList(
-        bookingListArg: BookingListArg(pageNumber: 1, pageSize: 50, status: status)))),
+    return InkWell(
+      onTap: () =>
+          Navigator.pushNamed(context, RouteGenerator.singleBookingDetailScreen,
+                  arguments: BookingDetailScreenArg(
+                    id: item.id,
+                    fromPaymentPending: false,
+                  ))
+              .then((value) => BlocProvider.of<BookingsBloc>(context).add(
+                  LoadBookingList(
+                      bookingListArg: BookingListArg(
+                          pageNumber: 1, pageSize: 50, status: status)))),
       child: Container(
         margin: const EdgeInsets.only(bottom: 5),
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 7),
@@ -164,16 +183,16 @@ class _BookingsTabState extends State<BookingsTab> {
               margin: const EdgeInsets.only(right: 6),
               child: item.bookingService.service.icon.url.isEmpty
                   ? SvgPicture.asset(
-                'assets/images/icons/img_icon.svg',
-                height: 35,
-                width: 35,
-              )
+                      'assets/images/icons/img_icon.svg',
+                      height: 35,
+                      width: 35,
+                    )
                   : Image.network(
-                Strings.mediaUrl + item.bookingService.service.icon.url,
-                height: 35,
-                width: 35,
-                fit: BoxFit.cover,
-              ),
+                      Strings.mediaUrl + item.bookingService.service.icon.url,
+                      height: 35,
+                      width: 35,
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(
               width: 5,
@@ -273,7 +292,29 @@ class _BookingsTabState extends State<BookingsTab> {
             //       ),
             //     ),
             //   ),
-            if(item.bookingServiceItemStatus=="CLOSED")
+
+            if (item.bookingServiceItemStatus == "CUSTOMER_APPROVAL_PENDING")
+              const Text("Reschedule",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.zimkeyOrange,
+                    fontWeight: FontWeight.bold,
+                  ))
+            else
+              SizedBox(),
+            item.bookingServiceItemType == "REWORK"
+                ? Container(
+                    margin: const EdgeInsets.only(left: 4),
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.zimkeyOrange),
+                    child: HelperWidgets.buildText(
+                        text: item.bookingServiceItemType, fontSize: 13),
+                  )
+                : SizedBox(),
+
+            if (item.bookingServiceItemStatus == "CLOSED")
               GestureDetector(
                 onTap: () async {
                   // Navigator.push(
@@ -288,6 +329,9 @@ class _BookingsTabState extends State<BookingsTab> {
                   //     duration: Duration(milliseconds: 400),
                   //   ),
                   // );
+                  Navigator.pushNamed(
+                      context, RouteGenerator.serviceDetailsScreen,
+                      arguments: item.bookingService.service.id);
                 },
                 child: const Text(
                   'Book Again',
@@ -514,5 +558,3 @@ class _BookingsTabState extends State<BookingsTab> {
     );
   }
 }
-
-

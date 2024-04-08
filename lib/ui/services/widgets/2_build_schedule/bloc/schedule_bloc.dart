@@ -13,28 +13,26 @@ part 'schedule_state.dart';
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   final ScheduleProvider scheduleProvider;
   ScheduleBloc({required this.scheduleProvider}) : super(ScheduleInitial()) {
-    on<ScheduleEvent>((event, emit) {
-    });
+    on<ScheduleEvent>((event, emit) {});
 
-    on<LoadTimeSlots> ((event,emit) async {
+    on<LoadTimeSlots>((event, emit) async {
       emit(ScheduleLoading());
       final QueryOptions options = QueryOptions(
         document: gql(Queries.getTimeSlots),
         variables: <String, dynamic>{
           "date": event.date,
           "billingOptionId": event.billingId,
-          "partnerId": ""
+          "partnerId": "",
+          "isReschedule": event.isReschedule,
+          "bookingServiceItemId": event.bookingServiceItemId
         },
       );
       ResponseModel stateModel = await scheduleProvider.getTimeSlots(options);
-      if(stateModel is SuccessResponse){
+      if (stateModel is SuccessResponse) {
         emit(ScheduleTimeSlotLoaded(bookingSlotsResponse: stateModel.value));
-      }
-      else{
+      } else {
         emit(ScheduleTimeSlotError());
       }
-
-      
     });
   }
 }

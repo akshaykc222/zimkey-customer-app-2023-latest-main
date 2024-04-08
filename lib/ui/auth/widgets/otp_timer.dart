@@ -61,11 +61,13 @@ class OtpTimerState extends State<OtpTimer> {
         ValueListenableBuilder<int>(
           valueListenable: _secondsRemaining,
           builder: (BuildContext context, int value, Widget? child) {
-            return HelperWidgets.buildText(
-                text: _getFormattedTime(),
-                fontSize: 16,
-                color: AppColors.zimkeyDarkGrey,
-                fontWeight: FontWeight.w700);
+            return value == 0
+                ? const SizedBox()
+                : HelperWidgets.buildText(
+                    text: _getFormattedTime(),
+                    fontSize: 16,
+                    color: AppColors.zimkeyDarkGrey,
+                    fontWeight: FontWeight.w700);
           },
         ),
         const SizedBox(
@@ -77,16 +79,14 @@ class OtpTimerState extends State<OtpTimer> {
             return value
                 ? GestureDetector(
                     onTap: () async {
-                      BlocProvider.of<AuthBloc>(context).add(ReSendOtp(phoneNum: widget.mobileNum));
+                      BlocProvider.of<AuthBloc>(context)
+                          .add(ReSendOtp(phoneNum: widget.mobileNum));
                       _startTimer();
                       HelperWidgets.showTopSnackBar(
                           context: context,
+                          title: "Alert",
                           message: "OTP sent",
-                          isError: false,
-                          icon: Icon(
-                            Icons.check_box_outlined,
-                            color: Colors.green,
-                          ));
+                          isError: false);
                     },
                     child: HelperWidgets.buildText(
                         text: 'Resend Code ',

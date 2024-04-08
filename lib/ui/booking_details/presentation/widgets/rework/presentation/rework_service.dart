@@ -1,4 +1,3 @@
-
 import 'package:customer/navigation/route_generator.dart';
 import 'package:customer/ui/booking_details/presentation/widgets/rework/cubit/rework_cubit.dart';
 import 'package:customer/ui/services/cubit/overview_data_cubit.dart';
@@ -19,17 +18,18 @@ import '../../../../../services/widgets/2_build_schedule/widgets/2_booking_slots
 import '../../../../../services/widgets/3_build_payment/bloc/checkout_bloc/checkout_bloc.dart';
 import '../../../../model/single_booking_details_response.dart';
 
-
 class ReworkService extends StatefulWidget {
   final GetBookingServiceItem serviceItem;
-  const ReworkService({Key? key, required this.serviceItem,}) : super(key: key);
+  const ReworkService({
+    Key? key,
+    required this.serviceItem,
+  }) : super(key: key);
 
   @override
   State<ReworkService> createState() => _ReworkServiceState();
 }
 
 class _ReworkServiceState extends State<ReworkService> {
-
   DateTime? fullBookingDate;
   TimeOfDay selectedTime = const TimeOfDay(hour: 00, minute: 00);
   double? bottom;
@@ -50,8 +50,28 @@ class _ReworkServiceState extends State<ReworkService> {
 
   @override
   void initState() {
-    billingOption =BillingOption(id: widget.serviceItem.bookingService.serviceBillingOptionId, code: "code", name: "name", description: "description", recurring: false, recurringPeriod: "recurringPeriod", autoAssignPartner: false, unitPrice: UnitPrice(commission: 0, partnerPrice: 0, unitPrice: 0, commissionTax: 0, partnerTax: 0, total: 0, totalTax: 0), unit: "unit", minUnit: 1, maxUnit: 1, serviceAdditionalPayments: []);
-    BlocProvider.of<OverviewDataCubit>(context).setSelectedBillingOption(billingOption);
+    billingOption = BillingOption(
+        id: widget.serviceItem.bookingService.serviceBillingOptionId,
+        code: "code",
+        name: "name",
+        description: "description",
+        recurring: false,
+        recurringPeriod: "recurringPeriod",
+        autoAssignPartner: false,
+        unitPrice: UnitPrice(
+            commission: 0,
+            partnerPrice: 0,
+            unitPrice: 0,
+            commissionTax: 0,
+            partnerTax: 0,
+            total: 0,
+            totalTax: 0),
+        unit: "unit",
+        minUnit: 1,
+        maxUnit: 1,
+        serviceAdditionalPayments: []);
+    BlocProvider.of<OverviewDataCubit>(context)
+        .setSelectedBillingOption(billingOption);
 
     _commentMsgNode.addListener(() {
       bool hasFocus = _commentMsgNode.hasFocus;
@@ -68,11 +88,12 @@ class _ReworkServiceState extends State<ReworkService> {
     super.initState();
   }
 
-  void clearCubit(){
-    if(mounted) {
+  void clearCubit() {
+    if (mounted) {
       BlocProvider.of<CheckoutBloc>(context).add(ChangeStateToInitial());
       BlocProvider.of<OverviewDataCubit>(context).clearAllSelection();
-      BlocProvider.of<CalculatedServiceCostCubit>(context).clearTotalCalculation();
+      BlocProvider.of<CalculatedServiceCostCubit>(context)
+          .clearTotalCalculation();
     }
   }
 
@@ -82,10 +103,14 @@ class _ReworkServiceState extends State<ReworkService> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => ScheduleBloc(scheduleProvider: RepositoryProvider.of<ScheduleProvider>(context)),
+          create: (_) => ScheduleBloc(
+              scheduleProvider:
+                  RepositoryProvider.of<ScheduleProvider>(context)),
         ),
         BlocProvider(
-            create: (context) => ReworkCubit(bookingsProvider: RepositoryProvider.of<BookingsProvider>(context))),
+            create: (context) => ReworkCubit(
+                bookingsProvider:
+                    RepositoryProvider.of<BookingsProvider>(context))),
       ],
       child: Stack(
         children: [
@@ -109,7 +134,12 @@ class _ReworkServiceState extends State<ReworkService> {
                 ),
                 onPressed: () {
                   clearCubit();
-                  Navigator.pushReplacementNamed(context, RouteGenerator.singleBookingDetailScreen,arguments:BookingDetailScreenArg(id: widget.serviceItem.id, fromPaymentPending: false,));
+                  Navigator.pushReplacementNamed(
+                      context, RouteGenerator.singleBookingDetailScreen,
+                      arguments: BookingDetailScreenArg(
+                        id: widget.serviceItem.id,
+                        fromPaymentPending: false,
+                      ));
                 },
               ),
               shape: const RoundedRectangleBorder(
@@ -121,16 +151,19 @@ class _ReworkServiceState extends State<ReworkService> {
             backgroundColor: AppColors.zimkeyWhite,
             body: BlocConsumer<ReworkCubit, ReworkState>(
               listener: (context, reworkState) {
-
-                if(reworkState is ReworkRequestedState){
-                  Navigator.pushReplacementNamed(context, RouteGenerator.singleBookingDetailScreen,arguments: BookingDetailScreenArg(id: widget.serviceItem.id, fromPaymentPending: false,));
+                if (reworkState is ReworkRequestedState) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, RouteGenerator.homeScreen, (route) => false,
+                      arguments: HomeNavigationArg(bottomNavIndex: 2));
                 }
               },
               builder: (context, reworkState) {
-                if(reworkState is ReworkLoadingState){
-                  return SizedBox(height: MediaQuery.sizeOf(context).height,
+                if (reworkState is ReworkLoadingState) {
+                  return SizedBox(
+                    height: MediaQuery.sizeOf(context).height,
                     width: MediaQuery.sizeOf(context).width,
-                    child: Center(child: HelperWidgets.progressIndicator()),);
+                    child: Center(child: HelperWidgets.progressIndicator()),
+                  );
                 }
                 return SingleChildScrollView(
                   child: SafeArea(
@@ -150,10 +183,13 @@ class _ReworkServiceState extends State<ReworkService> {
                                 height: 15,
                               ),
                               Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: BoxDecoration(
-                                    color: AppColors.zimkeyBodyOrange, borderRadius: BorderRadius.circular(5)),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                    color: AppColors.zimkeyBodyOrange,
+                                    borderRadius: BorderRadius.circular(5)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 10),
                                 child: Column(
                                   children: [
                                     Row(
@@ -162,16 +198,19 @@ class _ReworkServiceState extends State<ReworkService> {
                                           child: Text(
                                             'Booking Service ',
                                             style: TextStyle(
-                                              color: AppColors.zimkeyDarkGrey.withOpacity(1.0),
+                                              color: AppColors.zimkeyDarkGrey
+                                                  .withOpacity(1.0),
                                               fontSize: 13,
                                               // fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ),
                                         Text(
-                                          widget.serviceItem.bookingService.service.name,
+                                          widget.serviceItem.bookingService
+                                              .service.name,
                                           style: TextStyle(
-                                            color: AppColors.zimkeyDarkGrey.withOpacity(1),
+                                            color: AppColors.zimkeyDarkGrey
+                                                .withOpacity(1),
                                             fontSize: 13,
                                             // fontWeight: FontWeight.bold,
                                           ),
@@ -187,7 +226,8 @@ class _ReworkServiceState extends State<ReworkService> {
                                           child: Text(
                                             'Date & Time ',
                                             style: TextStyle(
-                                              color: AppColors.zimkeyDarkGrey.withOpacity(1.0),
+                                              color: AppColors.zimkeyDarkGrey
+                                                  .withOpacity(1.0),
                                               fontSize: 13,
                                               // fontWeight: FontWeight.bold,
                                             ),
@@ -195,7 +235,7 @@ class _ReworkServiceState extends State<ReworkService> {
                                         ),
                                         HelperWidgets.buildText(
                                           text:
-                                          '${widget.serviceItem.startDateTime.day}-${widget.serviceItem.startDateTime.month}-${widget.serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: widget.serviceItem.startDateTime, end: widget.serviceItem.endDateTime, available: false))}',
+                                              '${widget.serviceItem.startDateTime.day}-${widget.serviceItem.startDateTime.month}-${widget.serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: widget.serviceItem.startDateTime, end: widget.serviceItem.endDateTime, available: false))}',
                                           color: AppColors.zimkeyDarkGrey,
                                           fontSize: 13,
                                         )
@@ -205,11 +245,13 @@ class _ReworkServiceState extends State<ReworkService> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
+                                padding: const EdgeInsets.only(
+                                    top: 20.0, left: 20, right: 20),
                                 child: Text(
                                   'Select date',
                                   style: TextStyle(
-                                    color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                                    color: AppColors.zimkeyDarkGrey
+                                        .withOpacity(0.7),
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -221,11 +263,13 @@ class _ReworkServiceState extends State<ReworkService> {
                                 height: 25,
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0),
                                 child: Text(
                                   'Additional comments, if any',
                                   style: TextStyle(
-                                    color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                                    color: AppColors.zimkeyDarkGrey
+                                        .withOpacity(0.7),
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -239,12 +283,15 @@ class _ReworkServiceState extends State<ReworkService> {
                                   color: AppColors.zimkeyLightGrey,
                                   borderRadius: BorderRadius.circular(5),
                                 ),
-                                margin: const EdgeInsets.symmetric(horizontal: 20),
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 child: TextFormField(
                                   controller: commentTextController,
                                   focusNode: _commentMsgNode,
-                                  textCapitalization: TextCapitalization.sentences,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
                                   // scrollPadding: EdgeInsets.only(bottom: bottom),
                                   maxLength: 300,
                                   maxLines: 5,
@@ -275,59 +322,71 @@ class _ReworkServiceState extends State<ReworkService> {
                           builder: (context, overViewState) {
                             return Center(
                                 child: InkWell(
-                                  onTap: () {
-                                    if (overViewState.selectedSlotTiming.available) {
-                                      BlocProvider.of<ReworkCubit>(context).requestRework(
-                                          bookingServiceItemId: widget.serviceItem.id,
-                                          scheduleTime: overViewState.selectedSlotTiming.start,
-                                          scheduleEndDateTime: overViewState.selectedSlotTiming.end,
-                                          modificationReason: commentTextController.text);
-                                    } else {
-                                      HelperWidgets.showTopSnackBar(
-                                          context: context,
-                                          title: "Oops",
-                                          message: "Please select Time slot to continue",
-                                          icon: const Icon(
-                                            Icons.error,
-                                            color: Colors.red,
-                                            size: 28,
-                                          ),
-                                          isError: false);
-                                    }
-                                  },
-                                  child: Container(
-                                      alignment: Alignment.center,
-                                      width: MediaQuery.of(context).size.width - 190,
-                                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.zimkeyOrange,
-                                        borderRadius: BorderRadius.circular(30),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.zimkeyLightGrey.withOpacity(0.1),
-                                            blurRadius: 5.0, // soften the shadow
-                                            spreadRadius: 2.0, //extend the shadow
-                                            offset: const Offset(
-                                              1.0, // Move to right 10  horizontally
-                                              1.0, // Move to bottom 10 Vertically
-                                            ),
-                                          )
-                                        ],
+                              onTap: () {
+                                if (overViewState
+                                    .selectedSlotTiming.available) {
+                                  BlocProvider.of<ReworkCubit>(context)
+                                      .requestRework(
+                                          bookingServiceItemId:
+                                              widget.serviceItem.id,
+                                          scheduleTime: overViewState
+                                              .selectedSlotTiming.start,
+                                          scheduleEndDateTime: overViewState
+                                              .selectedSlotTiming.end,
+                                          modificationReason:
+                                              commentTextController.text);
+                                } else {
+                                  HelperWidgets.showTopSnackBar(
+                                      context: context,
+                                      title: "Oops",
+                                      message:
+                                          "Please select Time slot to continue",
+                                      icon: const Icon(
+                                        Icons.error,
+                                        color: Colors.red,
+                                        size: 28,
                                       ),
-                                      child: const Text(
-                                        'Confirm',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.zimkeyWhite,
-                                          fontFamily: 'Inter',
-                                          // fontWeight: FontWeight.bold,
+                                      isError: false);
+                                }
+                              },
+                              child: Container(
+                                  alignment: Alignment.center,
+                                  width:
+                                      MediaQuery.of(context).size.width - 190,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 20),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.zimkeyOrange,
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.zimkeyLightGrey
+                                            .withOpacity(0.1),
+                                        blurRadius: 5.0, // soften the shadow
+                                        spreadRadius: 2.0, //extend the shadow
+                                        offset: const Offset(
+                                          1.0, // Move to right 10  horizontally
+                                          1.0, // Move to bottom 10 Vertically
                                         ),
-                                      )),
-                                ));
+                                      )
+                                    ],
+                                  ),
+                                  child: const Text(
+                                    'Confirm',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.zimkeyWhite,
+                                      fontFamily: 'Inter',
+                                      // fontWeight: FontWeight.bold,
+                                    ),
+                                  )),
+                            ));
                           },
                         ),
                         SizedBox(
-                          height: addheight ? MediaQuery.of(context).size.height / 4.5 : 40,
+                          height: addheight
+                              ? MediaQuery.of(context).size.height / 4.5
+                              : 40,
                         ),
                       ],
                     ),

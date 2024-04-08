@@ -1,7 +1,8 @@
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../app_services/push_notification/notification.dart';
 import '../../constants/colors.dart';
 import '../../utils/helper/helper_widgets.dart';
 import 'bloc/home_bloc.dart';
@@ -18,6 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    FirebaseMessaging.onMessageOpenedApp.listen((event) {
+      print(event.data);
+      NotificationService.handleNavigation(event, context, () {});
+    });
     BlocProvider.of<HomeBloc>(context).add(LoadHome());
   }
 

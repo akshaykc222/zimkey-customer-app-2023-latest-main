@@ -9,7 +9,6 @@ import 'package:customer/utils/helper/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 import '../../../../constants/colors.dart';
@@ -35,7 +34,8 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ServiceCategoryBloc(servicesProvider: RepositoryProvider.of<ServicesProvider>(context))
+      create: (context) => ServiceCategoryBloc(
+          servicesProvider: RepositoryProvider.of<ServicesProvider>(context))
         ..add(LoadServiceCategories()),
       child: Scaffold(
         appBar: AppBar(
@@ -77,9 +77,11 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
                         ),
                         onTap: () {
                           if (value) {
-                            BlocProvider.of<ServiceCategoryBloc>(context).add(LoadServiceCategories());
+                            BlocProvider.of<ServiceCategoryBloc>(context)
+                                .add(LoadServiceCategories());
                           } else {
-                            BlocProvider.of<AuthBloc>(context).add(GetUserDetails());
+                            BlocProvider.of<AuthBloc>(context)
+                                .add(GetUserDetails());
                           }
                           showFavourites.value = !value;
                         })
@@ -104,16 +106,19 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
             return BlocBuilder<ServiceCategoryBloc, ServiceCategoryState>(
               builder: (context, serviceCategoryState) {
                 if (serviceCategoryState is ServiceCategoryLoadedState) {
-                  var categoryList = serviceCategoryState.serviceCategoryResponse.getServiceCategories;
+                  var categoryList = serviceCategoryState
+                      .serviceCategoryResponse.getServiceCategories;
                   return ValueListenableBuilder(
                     valueListenable: showFavourites,
-                    builder: (BuildContext context, bool showFav, Widget? child) {
+                    builder:
+                        (BuildContext context, bool showFav, Widget? child) {
                       return LiquidPullToRefresh(
                         // key: refreshIndicatorKey,
                         color: AppColors.zimkeyOrange,
                         showChildOpacityTransition: false,
                         onRefresh: () async {
-                          BlocProvider.of<ServiceCategoryBloc>(context).add(LoadServiceCategories());
+                          BlocProvider.of<ServiceCategoryBloc>(context)
+                              .add(LoadServiceCategories());
                           final Completer<void> completer = Completer<void>();
                           Timer(const Duration(seconds: 2), () {
                             completer.complete();
@@ -132,7 +137,8 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
                                 showFav
                                     ? const SizedBox()
                                     : Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: List.generate(
                                             categoryList.length,
                                             (index) => serviceSection(
@@ -142,75 +148,118 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
                                                 ))),
                                 authState is AuthUserDataLoadedState && showFav
                                     ? SizedBox(
-                                        height: MediaQuery.of(context).size.height / 3,
-                                        child: authState.userDetailsResponse.me.customerDetails.favoriteServices.isEmpty
-                                            ? InkWell(
-                                                onTap: () {
-                                                  // widget.updateFav(!widget.isFav);
-                                                },
-                                                child: Container(
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                3,
+                                        child:
+                                            authState
+                                                    .userDetailsResponse
+                                                    .me
+                                                    .customerDetails
+                                                    .favoriteServices
+                                                    .isEmpty
+                                                ? InkWell(
+                                                    onTap: () {
+                                                      // widget.updateFav(!widget.isFav);
+                                                    },
+                                                    child: Container(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          SvgPicture.asset(
+                                                            'assets/images/icons/newIcons/heart-add.svg',
+                                                            color: AppColors
+                                                                .zimkeyOrange,
+                                                            height: 50,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          const Text(
+                                                            'No favourite services added.',
+                                                            style: TextStyle(
+                                                                // color: AppColors.zimkeyOrange,
+                                                                // fontSize: 16,
+                                                                // fontWeight: FontWeight.bold,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      SvgPicture.asset(
-                                                        'assets/images/icons/newIcons/heart-add.svg',
-                                                        color: AppColors.zimkeyOrange,
-                                                        height: 50,
-                                                      ),
                                                       const SizedBox(
-                                                        height: 10,
+                                                        height: 20,
                                                       ),
-                                                      const Text(
-                                                        'No favourite services added.',
-                                                        style: TextStyle(
-                                                            // color: AppColors.zimkeyOrange,
-                                                            // fontSize: 16,
-                                                            // fontWeight: FontWeight.bold,
+                                                      authState
+                                                                  .userDetailsResponse
+                                                                  .me
+                                                                  .customerDetails
+                                                                  .favoriteServices
+                                                                  .length <=
+                                                              3
+                                                          ? Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          15.0),
+                                                              child: Row(
+                                                                children: List
+                                                                    .generate(
+                                                                        authState
+                                                                            .userDetailsResponse
+                                                                            .me
+                                                                            .customerDetails
+                                                                            .favoriteServices
+                                                                            .length,
+                                                                        (index) =>
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(
+                                                                                right: 5.0,
+                                                                              ),
+                                                                              child: serviceTile(context, authState.userDetailsResponse.me.customerDetails.favoriteServices[index], true),
+                                                                            )),
+                                                              ),
+                                                            )
+                                                          : Wrap(
+                                                              spacing: 5,
+                                                              runSpacing: 5,
+                                                              alignment:
+                                                                  WrapAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  WrapCrossAlignment
+                                                                      .start,
+                                                              runAlignment:
+                                                                  WrapAlignment
+                                                                      .start,
+                                                              children:
+                                                                  List.generate(
+                                                                authState
+                                                                    .userDetailsResponse
+                                                                    .me
+                                                                    .customerDetails
+                                                                    .favoriteServices
+                                                                    .length,
+                                                                (index) => serviceTile(
+                                                                    context,
+                                                                    authState
+                                                                        .userDetailsResponse
+                                                                        .me
+                                                                        .customerDetails
+                                                                        .favoriteServices[index],
+                                                                    true),
+                                                              ),
                                                             ),
-                                                      ),
                                                     ],
                                                   ),
-                                                ),
-                                              )
-                                            : Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),authState.userDetailsResponse.me.customerDetails.favoriteServices
-                                                      .length<=3?
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                                                        child: Row(
-                                                          children: List.generate(authState.userDetailsResponse.me.customerDetails.favoriteServices
-                                                            .length, (index) => Padding(
-                                                              padding: const EdgeInsets.only(right: 5.0,),
-                                                              child: serviceTile(
-                                                              context,
-                                                              authState.userDetailsResponse.me.customerDetails
-                                                                  .favoriteServices[index],
-                                                              true),
-                                                            )),),
-                                                      )
-                                                      :
-                                                  Wrap(
-                                                    spacing: 5,
-                                                    runSpacing: 5,
-                                                    alignment: WrapAlignment.start,
-                                                    crossAxisAlignment: WrapCrossAlignment.start,
-                                                    runAlignment: WrapAlignment.start,
-                                                    children: List.generate(
-                                                      authState.userDetailsResponse.me.customerDetails.favoriteServices
-                                                          .length,
-                                                      (index) => serviceTile(
-                                                          context,
-                                                          authState.userDetailsResponse.me.customerDetails
-                                                              .favoriteServices[index],
-                                                          true),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
                                       )
                                     : Container()
                               ],
@@ -220,7 +269,8 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
                       );
                     },
                   );
-                } else if (serviceCategoryState is ServiceCategoryLoadingState) {
+                } else if (serviceCategoryState
+                    is ServiceCategoryLoadingState) {
                   return Center(
                     child: HelperWidgets.progressIndicator(),
                   );
@@ -241,6 +291,7 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
     List<Service> services,
   ) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -261,12 +312,16 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
         const SizedBox(
           height: 15,
         ),
-        Wrap(
-            spacing: 5,
-            runSpacing: 5,
-            alignment: WrapAlignment.start,
-            runAlignment: WrapAlignment.center,
-            children: List.generate(services.length, (index) => serviceTile(context, services[index], false))),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Wrap(
+              spacing: 5,
+              runSpacing: 5,
+              alignment: WrapAlignment.start,
+              runAlignment: WrapAlignment.start,
+              children: List.generate(services.length,
+                  (index) => serviceTile(context, services[index], false))),
+        ),
         const SizedBox(
           height: 15,
         ),
@@ -274,11 +329,15 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
     );
   }
 
-  Widget serviceTile(BuildContext context, dynamic service, bool fromFavourite) {
+  Widget serviceTile(
+      BuildContext context, dynamic service, bool fromFavourite) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, RouteGenerator.serviceDetailsScreen, arguments: service.id).then(
-          (value) => !fromFavourite
-              ? BlocProvider.of<ServiceCategoryBloc>(context).add(LoadServiceCategories())
+      onTap: () => Navigator.pushNamed(
+              context, RouteGenerator.serviceDetailsScreen,
+              arguments: service.id)
+          .then((value) => !fromFavourite
+              ? BlocProvider.of<ServiceCategoryBloc>(context)
+                  .add(LoadServiceCategories())
               : BlocProvider.of<AuthBloc>(context).add(GetUserDetails())),
       child: Container(
         decoration: BoxDecoration(
@@ -306,7 +365,8 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
                     height: 30,
                     width: 30,
                   )
-                : Image.network(Strings.mediaUrl + service.icon.url, height: 30, width: 30),
+                : Image.network(Strings.mediaUrl + service.icon.url,
+                    height: 30, width: 30),
             const SizedBox(
               height: 7,
             ),

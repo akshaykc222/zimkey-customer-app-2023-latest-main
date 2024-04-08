@@ -6,9 +6,11 @@ import 'dart:convert';
 
 import '../../../ui/service_categories/model/service_category_response.dart';
 
-UserDetailsResponse userDetailsResponseFromJson(String str) => UserDetailsResponse.fromJson(json.decode(str));
+UserDetailsResponse userDetailsResponseFromJson(String str) =>
+    UserDetailsResponse.fromJson(json.decode(str));
 
-String userDetailsResponseToJson(UserDetailsResponse data) => json.encode(data.toJson());
+String userDetailsResponseToJson(UserDetailsResponse data) =>
+    json.encode(data.toJson());
 
 class UserDetailsResponse {
   final Me me;
@@ -17,13 +19,14 @@ class UserDetailsResponse {
     required this.me,
   });
 
-  factory UserDetailsResponse.fromJson(Map<String, dynamic> json) => UserDetailsResponse(
-    me: Me.fromJson(json["me"]),
-  );
+  factory UserDetailsResponse.fromJson(Map<String, dynamic> json) =>
+      UserDetailsResponse(
+        me: Me.fromJson(json["me"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "me": me.toJson(),
-  };
+        "me": me.toJson(),
+      };
 }
 
 class Me {
@@ -46,26 +49,24 @@ class Me {
   });
 
   factory Me.fromJson(Map<String, dynamic> json) => Me(
-    id: json["id"],
-    name: json["name"],
-    email: json["email"],
-    phone: json["phone"],
-    zpointsDescription: json["zpointsDescription"],
-    analytics: Analytics.fromJson(json["analytics"]),
-    customerDetails: CustomerDetails.fromJson(json["customerDetails"]),
-
-
-  );
+        id: json["id"],
+        name: json["name"],
+        email: json["email"],
+        phone: json["phone"],
+        zpointsDescription: json["zpointsDescription"],
+        analytics: Analytics.fromJson(json["analytics"]),
+        customerDetails: CustomerDetails.fromJson(json["customerDetails"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "email": email,
-    "phone": phone,
-    "zpointsDescription": zpointsDescription,
-    "analytics": analytics.toJson(),
-    "customerDetails": customerDetails.toJson(),
-  };
+        "id": id,
+        "name": name,
+        "email": email,
+        "phone": phone,
+        "zpointsDescription": zpointsDescription,
+        "analytics": analytics.toJson(),
+        "customerDetails": customerDetails.toJson(),
+      };
 }
 
 class Analytics {
@@ -82,33 +83,37 @@ class Analytics {
   });
 
   factory Analytics.fromJson(Map<String, dynamic> json) => Analytics(
-    openBookings: json["openBookings"],
-    rewardPointBalance: json["rewardPointBalance"],
-    totalBookings: json["totalBookings"],
-    pendingPaymentsCounts: json["pendingPaymentsCounts"],
-  );
+        openBookings: json["openBookings"],
+        rewardPointBalance: json["rewardPointBalance"],
+        totalBookings: json["totalBookings"],
+        pendingPaymentsCounts: json["pendingPaymentsCounts"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "openBookings": openBookings,
-    "rewardPointBalance": rewardPointBalance,
-    "totalBookings": totalBookings,
-    "pendingPaymentsCounts": pendingPaymentsCounts,
-  };
+        "openBookings": openBookings,
+        "rewardPointBalance": rewardPointBalance,
+        "totalBookings": totalBookings,
+        "pendingPaymentsCounts": pendingPaymentsCounts,
+      };
 }
+
 class CustomerDetails {
   final List<Service> favoriteServices;
+  final bool disableAccount;
+  CustomerDetails(
+      {required this.favoriteServices, required this.disableAccount});
 
-  CustomerDetails({
-    required this.favoriteServices,
-  });
-
-  factory CustomerDetails.fromJson(Map<String, dynamic> json) => CustomerDetails(
-    favoriteServices: List<Service>.from(json["favoriteServices"].map((x) => Service.fromJson(x))),
-  );
+  factory CustomerDetails.fromJson(Map<String, dynamic> json) =>
+      CustomerDetails(
+        favoriteServices: List<Service>.from(
+            json["favoriteServices"].map((x) => Service.fromJson(x))),
+        disableAccount: json['disableAccount'],
+      );
 
   Map<String, dynamic> toJson() => {
-    "favoriteServices": List<dynamic>.from(favoriteServices.map((x) => x.toJson())),
-  };
+        "favoriteServices":
+            List<dynamic>.from(favoriteServices.map((x) => x.toJson())),
+      };
 }
 
 // class FavoriteService {

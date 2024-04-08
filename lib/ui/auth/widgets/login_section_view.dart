@@ -28,6 +28,14 @@ class _LoginSectionState extends State<LoginSection> {
   final String _countryCode = "+91";
 
   @override
+  void initState() {
+    if (widget.textEditingController.text.isNotEmpty) {
+      showClearIcon.value = true;
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => HelperFunctions.hideKeyboard(),

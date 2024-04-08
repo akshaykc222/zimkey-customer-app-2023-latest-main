@@ -95,7 +95,7 @@ class HelperWidgets {
       TextCapitalization textCapitalization = TextCapitalization.none,
       List<TextInputFormatter> inputFormatters = const [],
       EdgeInsets scrollPadding = const EdgeInsets.only(bottom: 20.0)}) {
-    return TextField(
+    return TextFormField(
       textAlign: textAlign,
       textAlignVertical: textAlignVertical,
       scrollPadding: scrollPadding,
@@ -135,22 +135,19 @@ class HelperWidgets {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0)),
             content: Text(
               Strings.loginOutConfirmationText,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge!
-                  .copyWith(fontSize: 18.0, color: Theme.of(context).primaryColor),
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontSize: 18.0, color: Theme.of(context).primaryColor),
             ),
             actions: <Widget>[
               TextButton(
                   child: Text(
                     Strings.cancel,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(color: Theme.of(context).primaryColor, fontSize: 16),
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: Theme.of(context).primaryColor, fontSize: 16),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
@@ -158,7 +155,10 @@ class HelperWidgets {
               TextButton(
                   child: Text(
                     Strings.logoutText,
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(color: AppColors.buttonColor, fontSize: 16),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: AppColors.buttonColor, fontSize: 16),
                   ),
                   onPressed: () async {
                     /// clearing prefs  and   navigate to login page
@@ -192,30 +192,31 @@ class HelperWidgets {
   }
 
   static Widget errorWidget() {
-    return buildText(text: Strings.somethingWentWrong, color: Colors.red, fontSize: 16);
+    return buildText(
+        text: Strings.somethingWentWrong, color: Colors.red, fontSize: 16);
   }
 
-  static void alertDialog(context, {required String text, required VoidCallback func, required String buttonText}) {
+  static void alertDialog(context,
+      {required String text,
+      required VoidCallback func,
+      required String buttonText}) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0)),
             content: Text(
               text,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge!
-                  .copyWith(fontSize: 16.0, color: Theme.of(context).primaryColor),
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontSize: 16.0, color: Theme.of(context).primaryColor),
             ),
             actions: <Widget>[
               TextButton(
                   child: Text(
                     Strings.cancel,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(color: Theme.of(context).primaryColor, fontSize: 16),
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: Theme.of(context).primaryColor, fontSize: 16),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
@@ -224,7 +225,10 @@ class HelperWidgets {
                   onPressed: func,
                   child: Text(
                     buttonText,
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(color: AppColors.buttonColor, fontSize: 16),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: AppColors.buttonColor, fontSize: 16),
                   )),
             ],
           );
@@ -269,7 +273,8 @@ class HelperWidgets {
     );
   }
 
-  static Widget customPageViewIndicators(PageController controller, int count, bool isDots, double size,
+  static Widget customPageViewIndicators(
+      PageController controller, int count, bool isDots, double size,
       {Color dotColor = AppColors.zimkeyOrange}) {
     return SmoothPageIndicator(
       controller: controller, // PageController

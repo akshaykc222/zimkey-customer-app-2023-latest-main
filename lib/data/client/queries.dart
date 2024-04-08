@@ -31,11 +31,11 @@ query GetUser {
         zpointsDescription
         analytics {
             openBookings
-            rewardPointBalance
             totalBookings
             pendingPaymentsCounts
+            rewardPointBalance
         }
-       customerDetails {
+        customerDetails {
             favoriteServices {
                 id
                 name
@@ -43,9 +43,12 @@ query GetUser {
                     url
                 }
             }
+            disableAccount
         }
     }
 }
+
+
   """
       .replaceAll('\n', '');
 
@@ -422,11 +425,13 @@ query GetServices(\$search:String!){
       .replaceAll('\n', '');
   // schedule provider
   static String getTimeSlots = '''
-query getServiceBookingSlots(\$date: DateTime!, \$billingOptionId: String!, \$partnerId: String){
+query getServiceBookingSlots(\$date: DateTime!, \$billingOptionId: String!, \$partnerId: String,\$isReschedule:Boolean,\$bookingServiceItemId:String){
   getServiceBookingSlots(
     date: \$date,
     billingOptionId: \$billingOptionId
     partnerId: \$partnerId
+    isReschedule:\$isReschedule
+    bookingServiceItemId:\$bookingServiceItemId
   ) {
     start
     end
@@ -454,9 +459,9 @@ query GetCmsContent {
 
   // checkout provider
   static String getBookingSummary = '''
-query GetBookingSummary(\$serviceBillingOptionId: String!,\$units:Int!,\$couponCode:String!,\$redeemPoints:Float!) {
+query GetBookingSummary(\$serviceBillingOptionId: String!,\$units:Int!,\$couponCode:String!,\$redeemPoints:Float!,\$addressId:String!) {
     getBookingSummary(
-        data: {couponCode: \$couponCode, redeemPoints: \$redeemPoints, serviceBillingOptionId: \$serviceBillingOptionId, units: \$units}
+        data: {couponCode: \$couponCode, redeemPoints: \$redeemPoints, serviceBillingOptionId: \$serviceBillingOptionId, units: \$units,addressId:\$addressId}
     ) {
         partnerRate
         partnerDiscount
@@ -506,8 +511,10 @@ query getUserBookingServiceItems(\$pageNumber:Int,\$pageSize:Int,\$status: UserB
     data {
       id
       bookingServiceItemStatus
+      bookingServiceItemType
       bookingService {
         service {
+        id
           name
           icon {
             url

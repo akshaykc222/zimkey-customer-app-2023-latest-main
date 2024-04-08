@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recase/recase.dart';
 
-
 import '../../../../constants/colors.dart';
 import '../../../../constants/strings.dart';
 import '../../../../data/model/address/address_list_response.dart';
@@ -22,7 +21,8 @@ class BuildPayment extends StatefulWidget {
   final GetService service;
   final void Function({required int pageNo}) goToPage;
 
-  const BuildPayment({Key? key, required this.service, required this.goToPage}) : super(key: key);
+  const BuildPayment({Key? key, required this.service, required this.goToPage})
+      : super(key: key);
 
   @override
   State<BuildPayment> createState() => _BuildPaymentState();
@@ -30,13 +30,33 @@ class BuildPayment extends StatefulWidget {
 
 class _BuildPaymentState extends State<BuildPayment> {
   FocusNode customerNoteNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
   TextEditingController customerNoteController = TextEditingController();
   ValueNotifier<String> cancellationPolicyNotifier = ValueNotifier("");
 
   @override
   void initState() {
     super.initState();
+    // customerNoteNode.addListener(_scrollToTextField);
+
     BlocProvider.of<OverviewDataCubit>(context).fetchAllSelectedValues();
+  }
+
+  void _scrollToBottom() {
+    if (customerNoteNode.hasFocus) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    customerNoteNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,23 +68,29 @@ class _BuildPaymentState extends State<BuildPayment> {
         }
       },
       builder: (context, cubitState) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              buildBookingOverViewText(),
-              buildCancellationPolicy(cancellationPolicyNotifier),
-              const SizedBox(height: 5),
-              buildServiceDetails(cubitState),
-              buildPaymentDetailsView(),
-              const SizedBox(height: 10),
-              buildCustomerNote(cubitState, context),
-              const SizedBox(height: 10),
-              const RedeemPointView(),
-              SizedBox(height: MediaQuery.sizeOf(context).height * .25)
-            ],
+        return SingleChildScrollView(
+          controller: _scrollController,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                buildBookingOverViewText(),
+                buildCancellationPolicy(cancellationPolicyNotifier),
+                const SizedBox(height: 5),
+                buildServiceDetails(cubitState),
+                buildPaymentDetailsView(),
+                const SizedBox(height: 10),
+                buildCustomerNote(
+                  cubitState,
+                  context,
+                ),
+                const SizedBox(height: 10),
+                const RedeemPointView(),
+                SizedBox(height: MediaQuery.sizeOf(context).height * .25)
+              ],
+            ),
           ),
         );
       },
@@ -94,7 +120,8 @@ class _BuildPaymentState extends State<BuildPayment> {
           child: GestureDetector(
             onTap: () {
               Navigator.pushNamed(context, RouteGenerator.htmlViewerScreen,
-                  arguments: HtmlViewerScreenArg(htmlData: notifier.value, title: "Cancellation Policy"));
+                  arguments: HtmlViewerScreenArg(
+                      htmlData: notifier.value, title: "Cancellation Policy"));
             },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -127,17 +154,25 @@ class _BuildPaymentState extends State<BuildPayment> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               HelperWidgets.buildText(
-                  text: widget.service.name, fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.zimkeyOrange),
+                  text: widget.service.name,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.zimkeyOrange),
               InkWell(
                 onTap: () {
                   widget.goToPage(pageNo: 0);
-                  BlocProvider.of<CalculatedServiceCostCubit>(context).calculateTotalCost(
-                      unitPrice: cubitState.selectedBillingOption.first.unitPrice.unitPrice,
-                      billingId: cubitState.selectedBillingOption.first.id,
-                      minPrice: cubitState.selectedBillingOption.first.unitPrice.partnerPrice,
-                      minUnit: cubitState.selectedBillingOption.first.minUnit);
+                  BlocProvider.of<CalculatedServiceCostCubit>(context)
+                      .calculateTotalCost(
+                          unitPrice: cubitState
+                              .selectedBillingOption.first.unitPrice.unitPrice,
+                          billingId: cubitState.selectedBillingOption.first.id,
+                          minPrice: cubitState.selectedBillingOption.first
+                              .unitPrice.partnerPrice,
+                          minUnit:
+                              cubitState.selectedBillingOption.first.minUnit);
 
-                  BlocProvider.of<CalculatedServiceCostCubit>(context).changeButtonName(btnName: Strings.book);
+                  BlocProvider.of<CalculatedServiceCostCubit>(context)
+                      .changeButtonName(btnName: Strings.book);
                 },
                 child: HelperWidgets.buildText(
                   text: Strings.edit,
@@ -158,11 +193,16 @@ class _BuildPaymentState extends State<BuildPayment> {
               runSpacing: 5,
               children: List.generate(
                 cubitState.selectedRequirementList.length,
-                (index) => cubitState.selectedRequirementList[index].title != Strings.other
+                (index) => cubitState.selectedRequirementList[index].title !=
+                        Strings.other
                     ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                        margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 0),
-                        decoration: BoxDecoration(color: AppColors.zimkeyWhite, borderRadius: BorderRadius.circular(3)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 3),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 1, vertical: 0),
+                        decoration: BoxDecoration(
+                            color: AppColors.zimkeyWhite,
+                            borderRadius: BorderRadius.circular(3)),
                         child: HelperWidgets.buildText(
                           text: cubitState.selectedRequirementList[index].title,
                           color: AppColors.zimkeyDarkGrey,
@@ -182,8 +222,10 @@ class _BuildPaymentState extends State<BuildPayment> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 15),
-                    buildSummaryText(text: Strings.dateAndTime, fontSize: 13, bold: true),
-                    buildSummaryText(text: buildSelectedTime(cubitState), fontSize: 12),
+                    buildSummaryText(
+                        text: Strings.dateAndTime, fontSize: 13, bold: true),
+                    buildSummaryText(
+                        text: buildSelectedTime(cubitState), fontSize: 12),
                   ],
                 ),
                 Expanded(
@@ -191,10 +233,15 @@ class _BuildPaymentState extends State<BuildPayment> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       const SizedBox(height: 15),
-                      buildSummaryText(text: Strings.billingOption, fontSize: 13, bold: true),
+                      buildSummaryText(
+                          text: Strings.billingOption,
+                          fontSize: 13,
+                          bold: true),
                       Wrap(
                         children: [
-                          buildSummaryText(text: cubitState.selectedBillingOption.first.name, fontSize: 13),
+                          buildSummaryText(
+                              text: cubitState.selectedBillingOption.first.name,
+                              fontSize: 13),
                         ],
                       ),
                     ],
@@ -213,19 +260,37 @@ class _BuildPaymentState extends State<BuildPayment> {
                   children: [
                     Wrap(
                       children: [
-                        buildSummaryText(text: Strings.address, fontSize: 13, bold: true),
                         buildSummaryText(
-                            text: addressTypeSelected(cubitState.customerAddress), fontSize: 13, bold: true),
+                            text: Strings.address, fontSize: 13, bold: true),
+                        buildSummaryText(
+                            text:
+                                addressTypeSelected(cubitState.customerAddress),
+                            fontSize: 13,
+                            bold: true),
                       ],
                     ),
                     Wrap(
                       children: [
-                        buildSummaryText(text: cubitState.customerAddress.buildingName, fontSize: 12, comma: true),
-                        buildSummaryText(text: cubitState.customerAddress.locality, fontSize: 12, comma: true),
-                        buildSummaryText(text: cubitState.customerAddress.landmark, fontSize: 12, comma: true),
-                        buildSummaryText(text: cubitState.customerAddress.area.name, fontSize: 12, comma: true),
                         buildSummaryText(
-                            text: "${cubitState.customerAddress.postalCode} - ${Strings.kochi}", fontSize: 12),
+                            text: cubitState.customerAddress.buildingName,
+                            fontSize: 12,
+                            comma: true),
+                        buildSummaryText(
+                            text: cubitState.customerAddress.locality,
+                            fontSize: 12,
+                            comma: true),
+                        buildSummaryText(
+                            text: cubitState.customerAddress.landmark,
+                            fontSize: 12,
+                            comma: true),
+                        buildSummaryText(
+                            text: cubitState.customerAddress.area.name,
+                            fontSize: 12,
+                            comma: true),
+                        buildSummaryText(
+                            text:
+                                "${cubitState.customerAddress.postalCode} - ${Strings.kochi}",
+                            fontSize: 12),
                       ],
                     ),
                   ],
@@ -235,7 +300,8 @@ class _BuildPaymentState extends State<BuildPayment> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  buildSummaryText(text: Strings.bookingPhoneNum, fontSize: 13, bold: true),
+                  buildSummaryText(
+                      text: Strings.bookingPhoneNum, fontSize: 13, bold: true),
                   buildSummaryText(text: cubitState.mobileNum, fontSize: 13),
                 ],
               ),
@@ -245,15 +311,24 @@ class _BuildPaymentState extends State<BuildPayment> {
               ? Container(
                   width: double.infinity,
                   margin: const EdgeInsets.only(top: 20),
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 7),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 7),
                   decoration: BoxDecoration(
                     color: AppColors.zimkeyWhite,
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    buildSummaryText(text: Strings.otherRequirement, fontSize: 13, bold: true),
-                    buildSummaryText(text: ReCase(cubitState.otherRequirementText).sentenceCase, fontSize: 12),
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildSummaryText(
+                            text: Strings.otherRequirement,
+                            fontSize: 13,
+                            bold: true),
+                        buildSummaryText(
+                            text: ReCase(cubitState.otherRequirementText)
+                                .sentenceCase,
+                            fontSize: 12),
+                      ]),
                 )
               : Container(),
         ],
@@ -265,11 +340,13 @@ class _BuildPaymentState extends State<BuildPayment> {
     return BlocConsumer<SummaryBloc, SummaryState>(
       listener: (context, state) {
         if (state is SummaryLoadedState) {
+          BlocProvider.of<CalculatedServiceCostCubit>(context).setTotalCost(
+              totalCost: state.bookingSummary.grandTotal.round().toString());
           BlocProvider.of<CalculatedServiceCostCubit>(context)
-              .setTotalCost(totalCost: state.bookingSummary.grandTotal.round().toString());
-          BlocProvider.of<CalculatedServiceCostCubit>(context).setCouponList(couponList: state.bookingSummary.coupons);
+              .setCouponList(couponList: state.bookingSummary.coupons);
 
-          cancellationPolicyNotifier.value = state.bookingSummary.cancellationPolicyCustomer;
+          cancellationPolicyNotifier.value =
+              state.bookingSummary.cancellationPolicyCustomer;
         }
       },
       builder: (context, state) {
@@ -285,17 +362,27 @@ class _BuildPaymentState extends State<BuildPayment> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildSummaryText(text: Strings.paymentDetails, fontSize: 13, bold: true),
-                const SizedBox(height: 3),
-                buildPaymentRow(title: Strings.subTotal, subText: "\u20B9 ${state.bookingSummary.subTotal.round()}"),
-                const SizedBox(height: 3),
-                buildPaymentRow(
-                    title: Strings.discount, subText: "- \u20B9 ${state.bookingSummary.totalDiscount.round()}"),
+                buildSummaryText(
+                    text: Strings.paymentDetails, fontSize: 13, bold: true),
                 const SizedBox(height: 3),
                 buildPaymentRow(
-                    title: Strings.totalTax, subText: "\u20B9 ${state.bookingSummary.totalGstAmount.round()}"),
+                    title: Strings.subTotal,
+                    subText: "\u20B9 ${state.bookingSummary.subTotal.round()}"),
                 const SizedBox(height: 3),
-                buildPaymentRow(title: Strings.total, subText: "\u20B9 ${state.bookingSummary.grandTotal.round()}"),
+                buildPaymentRow(
+                    title: Strings.discount,
+                    subText:
+                        "- \u20B9 ${state.bookingSummary.totalDiscount.round()}"),
+                const SizedBox(height: 3),
+                buildPaymentRow(
+                    title: Strings.totalTax,
+                    subText:
+                        "\u20B9 ${state.bookingSummary.totalGstAmount.round()}"),
+                const SizedBox(height: 3),
+                buildPaymentRow(
+                    title: Strings.total,
+                    subText:
+                        "\u20B9 ${state.bookingSummary.grandTotal.round()}"),
                 const SizedBox(height: 3),
               ],
             ),
@@ -320,7 +407,11 @@ class _BuildPaymentState extends State<BuildPayment> {
     );
   }
 
-  Widget buildSummaryText({required String text, required double fontSize, bool comma = false, bool bold = false}) {
+  Widget buildSummaryText(
+      {required String text,
+      required double fontSize,
+      bool comma = false,
+      bool bold = false}) {
     return HelperWidgets.buildText(
         text: '${ReCase(text).originalText}${comma ? ", " : ""}',
         fontSize: fontSize,
@@ -337,7 +428,9 @@ class _BuildPaymentState extends State<BuildPayment> {
     return '${cubitState.selectedDay.day}-${cubitState.selectedMonth.substring(0, 3)}-${cubitState.selectedDay.year} | ${HelperFunctions.filterTimeSlot(cubitState.selectedSlotTiming)}';
   }
 
-  Widget buildCustomerNote(OverviewDataCubitState cubitState, BuildContext context) {
+  Widget buildCustomerNote(
+      OverviewDataCubitState cubitState, BuildContext context,
+      {Function? onTap}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
@@ -350,12 +443,16 @@ class _BuildPaymentState extends State<BuildPayment> {
         children: [
           Expanded(
               child: HelperWidgets.buildTextField(
-                  scrollPadding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 100.0),
+                  scrollPadding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 100.0),
                   maxLines: 4,
                   inputFormatters: [LengthLimitingTextInputFormatter(200)],
                   contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  onTap: onTap == null ? null : onTap(),
                   onChanged: (val) {
-                    BlocProvider.of<OverviewDataCubit>(context).addCustomerNote(val);
+                    BlocProvider.of<OverviewDataCubit>(context)
+                        .addCustomerNote(val);
+                    _scrollToBottom();
                   },
                   controller: customerNoteController,
                   hintText: Strings.customerNote,

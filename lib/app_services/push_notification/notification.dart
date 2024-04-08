@@ -1,8 +1,12 @@
+import 'package:customer/app.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../navigation/route_generator.dart';
 
 class NotificationService {
   Future<void> _firebaseMessagingBackgroundHandler(
@@ -60,7 +64,7 @@ class NotificationService {
         .then((value) => debugPrint("FCM TOKEN:$value"));
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
-      print("Notification received $message");
+      print("Notification received ${message.data.toString()}");
       AndroidNotification? android = message.notification?.android;
       if (message.notification?.android?.imageUrl == null) {
         if (notification != null && android != null && !kIsWeb) {
@@ -89,16 +93,16 @@ class NotificationService {
             htmlFormatSummaryText: true,
           );
           flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(channel.id, channel.name,
-                  icon: 'launch_background',
-                  largeIcon: FilePathAndroidBitmap(attachmentPicturePath),
-                  styleInformation: bigPictureStyleInformation),
-            ),
-          );
+              notification.hashCode,
+              notification.title,
+              notification.body,
+              NotificationDetails(
+                android: AndroidNotificationDetails(channel.id, channel.name,
+                    icon: 'launch_background',
+                    largeIcon: FilePathAndroidBitmap(attachmentPicturePath),
+                    styleInformation: bigPictureStyleInformation),
+              ),
+              payload: message.data.toString());
         }
       }
     });
@@ -110,5 +114,68 @@ class NotificationService {
     await Dio().download(url, filePath);
 
     return filePath;
+  }
+
+  static handleNavigation(
+      RemoteMessage message, BuildContext context, Function defaultFun) {
+    print("data: ${message.data}");
+    switch (message.data["type"]) {
+      case "NEW_JOB":
+        try {
+          Navigator.pushNamed(navigatorKey.currentState!.context,
+              RouteGenerator.singleBookingDetailScreen,
+              arguments: BookingDetailScreenArg(
+                id: message.data['bookingServiceItemId'],
+                fromPaymentPending: false,
+              ));
+        } catch (e) {}
+        break;
+      case "RESCHEDULE_JOB":
+        try {
+          Navigator.pushNamed(navigatorKey.currentState!.context,
+              RouteGenerator.singleBookingDetailScreen,
+              arguments: BookingDetailScreenArg(
+                id: message.data['bookingServiceItemId'],
+                fromPaymentPending: false,
+              ));
+        } catch (e) {}
+        break;
+
+      case "PARTNER_ASSIGNED":
+        try {
+          Navigator.pushNamed(navigatorKey.currentState!.context,
+              RouteGenerator.singleBookingDetailScreen,
+              arguments: BookingDetailScreenArg(
+                id: message.data['bookingServiceItemId'],
+                fromPaymentPending: false,
+              ));
+        } catch (e) {}
+        break;
+      case "PARTNER_UNASSIGNED":
+        try {
+          Navigator.pushNamed(navigatorKey.currentState!.context,
+              RouteGenerator.singleBookingDetailScreen,
+              arguments: BookingDetailScreenArg(
+                id: message.data['bookingServiceItemId'],
+                fromPaymentPending: false,
+              ));
+        } catch (e) {}
+
+        break;
+
+      default:
+        if (message.data.containsKey('bookingServiceItemId')) {
+          try {
+            Navigator.pushNamed(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,
+                arguments: BookingDetailScreenArg(
+                  id: message.data['bookingServiceItemId'],
+                  fromPaymentPending: false,
+                ));
+          } catch (e) {}
+        }
+        defaultFun();
+        break;
+    }
   }
 }

@@ -174,7 +174,7 @@ class HelperFunctions {
   static String filterTimeSlot(GetServiceBookingSlot serviceBookingSlot) {
     DateFormat format = DateFormat.Hm();
     String output =
-        '${format.format(serviceBookingSlot.start.toLocal())} - ${format.format(serviceBookingSlot.end.toLocal())}';
+        '${format.format(serviceBookingSlot.start.toLocal())} - ${format.format(serviceBookingSlot.start.add(const Duration(hours: 1)).toLocal())}';
     return output;
   }
 

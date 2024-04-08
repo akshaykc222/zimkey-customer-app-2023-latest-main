@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-
 import '../../../../../constants/colors.dart';
 import '../../../../../data/model/checkout/checkout_summary_response.dart';
 import '../../../../../utils/helper/helper_widgets.dart';
 import '../../../cubit/calculate_service_cost_cubit.dart';
+import '../../../cubit/overview_data_cubit.dart';
 import '../bloc/summary_bloc/summary_bloc.dart';
 
 class CouponListingScreen extends StatefulWidget {
@@ -14,16 +14,20 @@ class CouponListingScreen extends StatefulWidget {
   final String selectedBillingId;
   final int selectedUnit;
 
-  const CouponListingScreen(
-      {Key? key, required this.couponList, required this.selectedUnit, required this.selectedBillingId})
-      : super(key: key);
+  const CouponListingScreen({
+    Key? key,
+    required this.couponList,
+    required this.selectedUnit,
+    required this.selectedBillingId,
+  }) : super(key: key);
 
   @override
   State<CouponListingScreen> createState() => _CouponListingScreenState();
 }
 
 class _CouponListingScreenState extends State<CouponListingScreen> {
-  ValueNotifier<List<Coupon>> couponListNotifier = ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<Coupon>> couponListNotifier =
+      ValueNotifier(List.empty(growable: true));
 
   @override
   void initState() {
@@ -59,7 +63,8 @@ class _CouponListingScreenState extends State<CouponListingScreen> {
                 color: AppColors.zimkeyWhite,
                 size: 18,
               ),
-              onTap: () => BlocProvider.of<CalculatedServiceCostCubit>(context).showCouponListingScreen(show: false),
+              onTap: () => BlocProvider.of<CalculatedServiceCostCubit>(context)
+                  .showCouponListingScreen(show: false),
             ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
@@ -82,12 +87,14 @@ class _CouponListingScreenState extends State<CouponListingScreen> {
                           ? SingleChildScrollView(
                               child: Column(
                                 children: List.generate(
-                                    list.length, (index) => couponWidgetItem(list[index], context, index)),
+                                    list.length,
+                                    (index) => couponWidgetItem(
+                                        list[index], context, index)),
                               ),
                             )
                           : const Center(
                               child: Text(
-                                'Empty',
+                                'Coupon Code Not Available',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
@@ -118,7 +125,9 @@ class _CouponListingScreenState extends State<CouponListingScreen> {
         child: Column(
           children: [
             Container(
-              decoration: BoxDecoration(color: AppColors.zimkeyLightGrey, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: AppColors.zimkeyLightGrey,
+                  borderRadius: BorderRadius.circular(12)),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,17 +208,29 @@ class _CouponListingScreenState extends State<CouponListingScreen> {
                         child: InkWell(
                           onTap: () {
                             if (coupon.canApply) {
-                              BlocProvider.of<SummaryBloc>(context).add(LoadCheckoutSummary(
-                                  serviceBillingOptionId: widget.selectedBillingId,
-                                  units: widget.selectedUnit,
-                                  couponCode: coupon.code));
-                              BlocProvider.of<CalculatedServiceCostCubit>(context).showCouponListingScreen(show: false);
+                              BlocProvider.of<SummaryBloc>(context).add(
+                                  LoadCheckoutSummary(
+                                      serviceBillingOptionId:
+                                          widget.selectedBillingId,
+                                      units: widget.selectedUnit,
+                                      couponCode: coupon.code,
+                                      addressId:
+                                          BlocProvider.of<OverviewDataCubit>(
+                                                  context)
+                                              .cubitState
+                                              .customerAddress
+                                              .id));
+                              BlocProvider.of<CalculatedServiceCostCubit>(
+                                      context)
+                                  .showCouponListingScreen(show: false);
                             }
                           },
                           child: SizedBox(
                             child: Center(
                               child: HelperWidgets.buildText(
-                                text: coupon.couponApplied ? 'Coupon Applied' : 'Apply',
+                                text: coupon.couponApplied
+                                    ? 'Coupon Applied'
+                                    : 'Apply',
                                 color: coupon.canApply || coupon.couponApplied
                                     ? AppColors.zimkeyOrange
                                     : AppColors.zimkeyDarkGrey.withOpacity(0.7),
