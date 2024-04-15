@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../constants/colors.dart';
 import '../../../../constants/strings.dart';
 import '../../../../data/model/services/single_service_response.dart';
-import '../../../../utils/helper/helper_functions.dart';
 
 class ServiceThumbnail extends StatelessWidget {
   final List<Media> medias;
@@ -15,7 +14,6 @@ class ServiceThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     if (medias.isNotEmpty) {
       if (medias.first.url.contains('.svg')) {
         return SvgPicture.network(
@@ -37,6 +35,7 @@ class ServiceThumbnail extends StatelessWidget {
               ),
             ),
           ),
+          width: MediaQuery.of(context).size.width,
           imageUrl: Strings.mediaUrl + medias.first.url,
           fadeInCurve: Curves.easeIn,
           fadeOutCurve: Curves.easeInOutBack,

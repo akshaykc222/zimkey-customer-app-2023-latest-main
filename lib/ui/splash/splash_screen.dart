@@ -174,8 +174,9 @@ class SplashScreenState extends State<SplashScreen>
                       ),
                       appConfigState is AppConfigLoadingState
                           ? Positioned(
-                              right: 20,
-                              bottom: 20,
+                              bottom: MediaQuery.of(context).size.height * 0.4,
+                              left: 0,
+                              right: 0,
                               child: SizedBox(
                                   height: 25,
                                   width: 25,

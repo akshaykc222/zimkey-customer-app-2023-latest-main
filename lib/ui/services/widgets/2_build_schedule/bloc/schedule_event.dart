@@ -8,12 +8,14 @@ class LoadTimeSlots extends ScheduleEvent {
   final String billingId;
   final String date;
   final bool? isReschedule;
+  final String? addressId;
   final String? bookingServiceItemId;
 
   const LoadTimeSlots({
     required this.billingId,
     required this.date,
     this.isReschedule,
+    this.addressId,
     this.bookingServiceItemId,
   });
 

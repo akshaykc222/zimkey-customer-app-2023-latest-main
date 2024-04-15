@@ -11,7 +11,8 @@ import '../bloc/schedule_bloc.dart';
 class MonthAndDateView extends StatefulWidget {
   final String? id;
   final bool? isReschedule;
-  const MonthAndDateView({Key? key, this.id, this.isReschedule})
+  final bool? booking;
+  const MonthAndDateView({Key? key, this.id, this.isReschedule, this.booking})
       : super(key: key);
 
   @override
@@ -118,6 +119,9 @@ class _MonthAndDateViewState extends State<MonthAndDateView> {
                         billingId: state.selectedBillingOption.first.id,
                         date: state.daysList[index].toString(),
                         isReschedule: widget.isReschedule,
+                        addressId: widget.booking == true
+                            ? state.customerAddress.id
+                            : null,
                         bookingServiceItemId: widget.id));
                   }
                   // }

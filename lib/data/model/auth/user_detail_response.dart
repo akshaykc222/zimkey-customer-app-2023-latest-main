@@ -50,7 +50,7 @@ class Me {
 
   factory Me.fromJson(Map<String, dynamic> json) => Me(
         id: json["id"],
-        name: json["name"],
+        name: json["name"] ?? "",
         email: json["email"],
         phone: json["phone"],
         zpointsDescription: json["zpointsDescription"],

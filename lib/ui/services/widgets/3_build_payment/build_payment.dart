@@ -425,7 +425,7 @@ class _BuildPaymentState extends State<BuildPayment> {
   }
 
   String buildSelectedTime(OverviewDataCubitState cubitState) {
-    return '${cubitState.selectedDay.day}-${cubitState.selectedMonth.substring(0, 3)}-${cubitState.selectedDay.year} | ${HelperFunctions.filterTimeSlot(cubitState.selectedSlotTiming)}';
+    return '${cubitState.selectedDay.day.toString().padLeft(2, '0')}-${cubitState.selectedMonth.substring(0, 3)}-${cubitState.selectedDay.year} | ${HelperFunctions.filterTimeSlot(cubitState.selectedSlotTiming)}';
   }
 
   Widget buildCustomerNote(

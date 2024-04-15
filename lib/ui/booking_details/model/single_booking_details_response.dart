@@ -419,9 +419,11 @@ class StatusTracker {
 }
 
 class AdditionalWork {
+  final String? modificationReason;
   final List<BookingAddon> bookingAddons;
   final int? additionalHoursUnits;
   final String bookingAdditionalWorkStatus;
+
   final bool isPaid;
   final Amount? additionalHoursAmount;
   final TotalAdditionalWorkAmount? totalAdditionalWorkAmount;
@@ -429,6 +431,7 @@ class AdditionalWork {
   AdditionalWork({
     required this.bookingAddons,
     this.additionalHoursUnits,
+    this.modificationReason,
     required this.bookingAdditionalWorkStatus,
     required this.isPaid,
     this.additionalHoursAmount,
@@ -436,6 +439,7 @@ class AdditionalWork {
   });
 
   factory AdditionalWork.fromJson(Map<String, dynamic> json) => AdditionalWork(
+        modificationReason: json['modificationReason'],
         bookingAddons: json["bookingAddons"] == null
             ? []
             : List<BookingAddon>.from(
@@ -464,14 +468,14 @@ class AdditionalWork {
 }
 
 class Amount {
-  final int? grandTotal;
+  final double? grandTotal;
 
   Amount({
     this.grandTotal,
   });
 
   factory Amount.fromJson(Map<String, dynamic> json) => Amount(
-        grandTotal: json["grandTotal"],
+        grandTotal: json["grandTotal"].toDouble(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -499,17 +503,20 @@ class TotalAdditionalWorkAmount {
 class BookingAddon {
   final String name;
   final int units;
+  final String unit;
   final Amount amount;
 
   BookingAddon({
     required this.name,
     required this.units,
+    required this.unit,
     required this.amount,
   });
 
   factory BookingAddon.fromJson(Map<String, dynamic> json) => BookingAddon(
         name: json["name"],
         units: json["units"],
+        unit: json['unit'],
         amount: Amount.fromJson(json["amount"]),
       );
 

@@ -17,12 +17,21 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
     on<LoadTimeSlots>((event, emit) async {
       emit(ScheduleLoading());
+      print({
+        "date": event.date,
+        "billingOptionId": event.billingId,
+        "partnerId": "",
+        "addressId": event.addressId,
+        "isReschedule": event.isReschedule,
+        "bookingServiceItemId": event.bookingServiceItemId
+      });
       final QueryOptions options = QueryOptions(
         document: gql(Queries.getTimeSlots),
         variables: <String, dynamic>{
           "date": event.date,
           "billingOptionId": event.billingId,
           "partnerId": "",
+          "addressId": event.addressId,
           "isReschedule": event.isReschedule,
           "bookingServiceItemId": event.bookingServiceItemId
         },

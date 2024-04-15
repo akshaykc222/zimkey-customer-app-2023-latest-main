@@ -275,7 +275,7 @@ class _RescheduleBookingState extends State<RescheduleBooking> {
                                         ),
                                         HelperWidgets.buildText(
                                           text:
-                                              '${widget.serviceItem.startDateTime.day}-${widget.serviceItem.startDateTime.month}-${widget.serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: widget.serviceItem.startDateTime, end: widget.serviceItem.endDateTime, available: false))}',
+                                              '${widget.serviceItem.startDateTime.day.toString().padLeft(2, '0')}-${widget.serviceItem.startDateTime.month.toString().padLeft(2, '0')}-${widget.serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: widget.serviceItem.startDateTime, end: widget.serviceItem.endDateTime, available: false))}',
                                           color: AppColors.zimkeyDarkGrey,
                                           fontSize: 13,
                                         )

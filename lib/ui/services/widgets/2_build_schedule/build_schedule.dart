@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:customer/data/model/services/single_service_response.dart';
 import 'package:customer/ui/profile/widgets/address/bloc/address_bloc.dart';
 import 'package:customer/ui/services/widgets/2_build_schedule/widgets/1_month_and_date_view.dart';
 import 'package:customer/utils/helper/helper_widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../constants/strings.dart';
 import 'widgets/2_booking_slots_view.dart';
@@ -15,7 +14,9 @@ class BuildSchedule extends StatefulWidget {
   // final GetService service;
 
   // const BuildSchedule({Key? key, required this.service}) : super(key: key);
-  const BuildSchedule({Key? key,}) : super(key: key);
+  const BuildSchedule({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<BuildSchedule> createState() => _BuildScheduleState();
@@ -34,7 +35,9 @@ class _BuildScheduleState extends State<BuildSchedule> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         HelperWidgets.buildTitle(Strings.selectDate),
-        const MonthAndDateView(),
+        const MonthAndDateView(
+          booking: true,
+        ),
         const BookingSlotView(),
         const AddressListView(),
         const MobileNumUpdateView(),

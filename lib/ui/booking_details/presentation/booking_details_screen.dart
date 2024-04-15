@@ -2,6 +2,7 @@ import 'package:customer/ui/booking_details/data/cubit/accept_or_decline_cubit/a
 import 'package:customer/ui/booking_details/data/cubit/call_service_partner/call_partner_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../../constants/colors.dart';
 import '../../../data/provider/bookings_provider.dart';
@@ -17,10 +18,13 @@ import 'widgets/details_body/bookings_details_body.dart';
 class SingleBookingDetailScreen extends StatefulWidget {
   final BookingDetailScreenArg bookingDetailScreenArg;
 
-  const SingleBookingDetailScreen({Key? key, required this.bookingDetailScreenArg}) : super(key: key);
+  const SingleBookingDetailScreen(
+      {Key? key, required this.bookingDetailScreenArg})
+      : super(key: key);
 
   @override
-  State<SingleBookingDetailScreen> createState() => _SingleBookingDetailScreenState();
+  State<SingleBookingDetailScreen> createState() =>
+      _SingleBookingDetailScreenState();
 }
 
 class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
@@ -29,6 +33,7 @@ class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     Future.delayed(
         const Duration(
           seconds: 2,
@@ -36,11 +41,18 @@ class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
         clearCubit);
   }
 
+  @override
+  void dispose() {
+    WakelockPlus.disable();
+    super.dispose();
+  }
+
   void clearCubit() {
     if (mounted) {
       BlocProvider.of<CheckoutBloc>(context).add(ChangeStateToInitial());
       BlocProvider.of<OverviewDataCubit>(context).clearAllSelection();
-      BlocProvider.of<CalculatedServiceCostCubit>(context).clearTotalCalculation();
+      BlocProvider.of<CalculatedServiceCostCubit>(context)
+          .clearTotalCalculation();
     }
   }
 
@@ -50,14 +62,22 @@ class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (context) => BookingDetailsBloc(bookingsProvider: RepositoryProvider.of<BookingsProvider>(context))
-              ..add(LoadSingleBookingEvent(bookingId: widget.bookingDetailScreenArg.id))),
+            create: (context) => BookingDetailsBloc(
+                bookingsProvider:
+                    RepositoryProvider.of<BookingsProvider>(context))
+              ..add(LoadSingleBookingEvent(
+                  bookingId: widget.bookingDetailScreenArg.id))),
         BlocProvider(
-            create: (context) =>
-                AcceptOrDeclineCubit(bookingsProvider: RepositoryProvider.of<BookingsProvider>(context))),
+            create: (context) => AcceptOrDeclineCubit(
+                bookingsProvider:
+                    RepositoryProvider.of<BookingsProvider>(context))),
         BlocProvider(
-            create: (context) => CallPartnerCubit(bookingsProvider: RepositoryProvider.of<BookingsProvider>(context))),
-        BlocProvider(create: (context) => ReviewBloc(reviewProvider: RepositoryProvider.of<ReviewProvider>(context)))
+            create: (context) => CallPartnerCubit(
+                bookingsProvider:
+                    RepositoryProvider.of<BookingsProvider>(context))),
+        BlocProvider(
+            create: (context) => ReviewBloc(
+                reviewProvider: RepositoryProvider.of<ReviewProvider>(context)))
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -84,8 +104,10 @@ class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
             ),
             onPressed: () {
               if (widget.bookingDetailScreenArg.fromPaymentPending) {
-                Navigator.pushNamedAndRemoveUntil(context, RouteGenerator.homeScreen, (route) => false,
-                    arguments: HomeNavigationArg(bottomNavIndex: 2, bookingTabIndex: 2));
+                Navigator.pushNamedAndRemoveUntil(
+                    context, RouteGenerator.homeScreen, (route) => false,
+                    arguments: HomeNavigationArg(
+                        bottomNavIndex: 2, bookingTabIndex: 2));
               } else {
                 Navigator.pop(context);
               }

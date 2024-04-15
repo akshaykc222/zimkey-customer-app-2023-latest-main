@@ -44,8 +44,28 @@ class NotificationService {
 
         importance: Importance.high,
       );
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+      );
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+      flutterLocalNotificationsPlugin.initialize(initializationSettings,
+          onDidReceiveNotificationResponse:
+              (NotificationResponse? payload) async {
+        // Handle notification tap event here
+        print("notification tapping ${payload?.toString()}");
+        try {
+          Navigator.pushNamed(navigatorKey.currentState!.context,
+              RouteGenerator.singleBookingDetailScreen,
+              arguments: BookingDetailScreenArg(
+                id: payload?.payload ?? "",
+                fromPaymentPending: false,
+              ));
+        } catch (e) {}
+      });
 
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
@@ -69,17 +89,19 @@ class NotificationService {
       if (message.notification?.android?.imageUrl == null) {
         if (notification != null && android != null && !kIsWeb) {
           flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                icon: 'launch_background',
+              notification.hashCode,
+              notification.title,
+              notification.body,
+              NotificationDetails(
+                android: AndroidNotificationDetails(
+                  channel.id,
+                  channel.name,
+                  icon: 'launch_background',
+                ),
               ),
-            ),
-          );
+              payload: message.data.containsKey('bookingServiceItemId')
+                  ? message.data['bookingServiceItemId']
+                  : "");
         }
       } else {
         if (notification != null && android != null && !kIsWeb) {
@@ -102,7 +124,9 @@ class NotificationService {
                     largeIcon: FilePathAndroidBitmap(attachmentPicturePath),
                     styleInformation: bigPictureStyleInformation),
               ),
-              payload: message.data.toString());
+              payload: message.data.containsKey('bookingServiceItemId')
+                  ? message.data['bookingServiceItemId']
+                  : "");
         }
       }
     });
@@ -121,45 +145,53 @@ class NotificationService {
     print("data: ${message.data}");
     switch (message.data["type"]) {
       case "NEW_JOB":
-        try {
-          Navigator.pushNamed(navigatorKey.currentState!.context,
-              RouteGenerator.singleBookingDetailScreen,
-              arguments: BookingDetailScreenArg(
-                id: message.data['bookingServiceItemId'],
-                fromPaymentPending: false,
-              ));
-        } catch (e) {}
+        if (message.data.containsKey('bookingServiceItemId')) {
+          try {
+            Navigator.pushNamed(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,
+                arguments: BookingDetailScreenArg(
+                  id: message.data['bookingServiceItemId'],
+                  fromPaymentPending: false,
+                ));
+          } catch (e) {}
+        }
         break;
       case "RESCHEDULE_JOB":
-        try {
-          Navigator.pushNamed(navigatorKey.currentState!.context,
-              RouteGenerator.singleBookingDetailScreen,
-              arguments: BookingDetailScreenArg(
-                id: message.data['bookingServiceItemId'],
-                fromPaymentPending: false,
-              ));
-        } catch (e) {}
+        if (message.data.containsKey('bookingServiceItemId')) {
+          try {
+            Navigator.pushNamed(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,
+                arguments: BookingDetailScreenArg(
+                  id: message.data['bookingServiceItemId'],
+                  fromPaymentPending: false,
+                ));
+          } catch (e) {}
+        }
         break;
 
       case "PARTNER_ASSIGNED":
-        try {
-          Navigator.pushNamed(navigatorKey.currentState!.context,
-              RouteGenerator.singleBookingDetailScreen,
-              arguments: BookingDetailScreenArg(
-                id: message.data['bookingServiceItemId'],
-                fromPaymentPending: false,
-              ));
-        } catch (e) {}
+        if (message.data.containsKey('bookingServiceItemId')) {
+          try {
+            Navigator.pushNamed(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,
+                arguments: BookingDetailScreenArg(
+                  id: message.data['bookingServiceItemId'],
+                  fromPaymentPending: false,
+                ));
+          } catch (e) {}
+        }
         break;
       case "PARTNER_UNASSIGNED":
-        try {
-          Navigator.pushNamed(navigatorKey.currentState!.context,
-              RouteGenerator.singleBookingDetailScreen,
-              arguments: BookingDetailScreenArg(
-                id: message.data['bookingServiceItemId'],
-                fromPaymentPending: false,
-              ));
-        } catch (e) {}
+        if (message.data.containsKey('bookingServiceItemId')) {
+          try {
+            Navigator.pushNamed(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,
+                arguments: BookingDetailScreenArg(
+                  id: message.data['bookingServiceItemId'],
+                  fromPaymentPending: false,
+                ));
+          } catch (e) {}
+        }
 
         break;
 

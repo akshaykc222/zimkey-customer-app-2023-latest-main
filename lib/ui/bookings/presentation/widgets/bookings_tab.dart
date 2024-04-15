@@ -215,7 +215,7 @@ class _BookingsTabState extends State<BookingsTab> {
                     child: Wrap(
                       children: [
                         Text(
-                          '${item.startDateTime.day}-${item.startDateTime.month}-${item.startDateTime.year}',
+                          '${item.startDateTime.day.toString().padLeft(2, '0')}-${item.startDateTime.month.toString().padLeft(2, '0')}-${item.startDateTime.year}',
                           style: const TextStyle(
                             color: AppColors.zimkeyDarkGrey,
                             fontSize: 12,

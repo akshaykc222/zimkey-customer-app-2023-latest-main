@@ -126,12 +126,28 @@ class HelperFunctions {
     if (ObjectFactory().prefs.isOnboardViewed()!) {
       checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
     } else {
+      checkLoggedIn()
+          ? navigateToLocationSelection(context)
+          : navigateToLogin(context);
+    }
+  }
+
+  static setupInitialNavigationOnBoarding(BuildContext context) {
+    if (ObjectFactory().prefs.isOnboardViewed()!) {
+      checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
+    } else {
       navigateToOnBoarding(context);
     }
   }
 
   static checkNavigation(BuildContext context) {
     checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
+  }
+
+  static checkNavigationWithLocation(BuildContext context) {
+    checkLoggedIn()
+        ? navigateToLocationSelection(context)
+        : navigateToLogin(context);
   }
 
   static navigateToHome(BuildContext context) {

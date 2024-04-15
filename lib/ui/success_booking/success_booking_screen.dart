@@ -8,7 +8,6 @@ import 'package:logger/logger.dart';
 import 'package:recase/recase.dart';
 import 'package:screenshot/screenshot.dart';
 
-
 import '../../constants/colors.dart';
 import '../../constants/strings.dart';
 import '../../data/model/booking_slot/booking_slots_response.dart';
@@ -28,7 +27,8 @@ import 'widgets/rating_star.dart';
 class BookingSuccessScreen extends StatefulWidget {
   final PaymentConfirmGqlInput paymentConfirmGqlInput;
 
-  const BookingSuccessScreen({Key? key, required this.paymentConfirmGqlInput}) : super(key: key);
+  const BookingSuccessScreen({Key? key, required this.paymentConfirmGqlInput})
+      : super(key: key);
 
   @override
   State<BookingSuccessScreen> createState() => _BookingSuccessScreenState();
@@ -40,13 +40,12 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
   TextEditingController reviewTextController = TextEditingController();
   final screenshotController = ScreenshotController();
 
-
   @override
   void initState() {
     super.initState();
     Logger().i(widget.paymentConfirmGqlInput.toJson());
-    BlocProvider.of<CheckoutBloc>(context)
-        .add(UpdatePaymentStatus(paymentConfirmGqlInput: widget.paymentConfirmGqlInput));
+    BlocProvider.of<CheckoutBloc>(context).add(UpdatePaymentStatus(
+        paymentConfirmGqlInput: widget.paymentConfirmGqlInput));
   }
 
   List<String> projectStages = [
@@ -62,7 +61,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
     return WillPopScope(
       onWillPop: () async => false,
       child: BlocProvider(
-        create: (context) => ReviewBloc(reviewProvider: RepositoryProvider.of<ReviewProvider>(context)),
+        create: (context) => ReviewBloc(
+            reviewProvider: RepositoryProvider.of<ReviewProvider>(context)),
         child: BlocConsumer<ReviewBloc, ReviewState>(
           listener: (context, reviewState) {
             handleReviewBlocState(reviewState);
@@ -76,8 +76,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                 if (state is CheckoutLoadingState) {
                   return buildProgressIndicator();
                 } else if (state is CheckoutPaymentUpdatedState) {
-                  var checkoutState = state.paymentUpdatedResponse.confirmPayment;
-                  var booking = state.paymentUpdatedResponse.confirmPayment.booking;
+                  var checkoutState =
+                      state.paymentUpdatedResponse.confirmPayment;
+                  var booking =
+                      state.paymentUpdatedResponse.confirmPayment.booking;
                   return Scaffold(
                     resizeToAvoidBottomInset: false,
                     appBar: buildSuccessScreenAppBar(context),
@@ -85,7 +87,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                       children: [
                         Screenshot(
                             controller: screenshotController,
-                            child: buildSuccessScreenBody(context, checkoutState, booking, state)),
+                            child: buildSuccessScreenBody(
+                                context, checkoutState, booking, state)),
                         buildBackDropFilter(),
                         buildFirstBookingReview(checkoutState)
                       ],
@@ -120,11 +123,17 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            HelperWidgets.buildText(text: "signature: ${widget.paymentConfirmGqlInput.signature}", overflow: null),
-            HelperWidgets.buildText(text: "paymentID: ${widget.paymentConfirmGqlInput.paymentId}", overflow: null),
+            HelperWidgets.buildText(
+                text: "signature: ${widget.paymentConfirmGqlInput.signature}",
+                overflow: null),
+            HelperWidgets.buildText(
+                text: "paymentID: ${widget.paymentConfirmGqlInput.paymentId}",
+                overflow: null),
             Container(
               child: HelperWidgets.buildText(
-                  text: "bookingPaymentId: ${widget.paymentConfirmGqlInput.bookingPaymentId}", overflow: null),
+                  text:
+                      "bookingPaymentId: ${widget.paymentConfirmGqlInput.bookingPaymentId}",
+                  overflow: null),
             ),
             InkWell(
               onTap: () => HelperFunctions.navigateToHome(context),
@@ -137,7 +146,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
             ),
             Expanded(
                 child: ListView(
-              children: [Container(child: HelperWidgets.buildText(text: "${state.error}", overflow: null))],
+              children: [
+                Container(
+                    child: HelperWidgets.buildText(
+                        text: "${state.error}", overflow: null))
+              ],
             ))
           ],
         ),
@@ -158,12 +171,15 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
             child: Container(
               decoration: const BoxDecoration(
                   color: AppColors.zimkeyWhite,
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(12), topLeft: Radius.circular(12))),
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(12),
+                      topLeft: Radius.circular(12))),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     alignment: Alignment.centerRight,
                     color: Colors.transparent,
                     child: InkWell(
@@ -184,11 +200,17 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                        color: AppColors.zimkeyWhite, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20, top: 20),
+                        color: AppColors.zimkeyWhite,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20))),
+                    padding: const EdgeInsets.only(
+                        left: 5, right: 5, bottom: 20, top: 20),
                     child: SingleChildScrollView(
                       child: Padding(
-                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 10, right: 10),
+                        padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                            left: 10,
+                            right: 10),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +227,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                             ),
                             ValueListenableBuilder(
                               valueListenable: starRating,
-                              builder: (BuildContext context, int value, Widget? child) {
+                              builder: (BuildContext context, int value,
+                                  Widget? child) {
                                 return Row(
                                   children: [
                                     for (int i = 0; i < 5; i++)
@@ -238,7 +261,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                                   Expanded(
                                     child: TextFormField(
                                       controller: reviewTextController,
-                                      textCapitalization: TextCapitalization.sentences,
+                                      textCapitalization:
+                                          TextCapitalization.sentences,
                                       maxLength: 300,
                                       maxLines: 4,
                                       style: const TextStyle(
@@ -271,23 +295,31 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                                   if (starRating.value != -1) {
                                     final request = <String, dynamic>{
                                       "type": "FIRST_BOOKING",
-                                      "bookingServiceItemId":
-                                          checkoutState.booking.bookingService.bookingServiceItems.first.id,
+                                      "bookingServiceItemId": checkoutState
+                                          .booking
+                                          .bookingService
+                                          .bookingServiceItems
+                                          .first
+                                          .id,
                                       "rating": starRating.value,
                                       "review": reviewTextController.text,
                                     };
-                                    BlocProvider.of<ReviewBloc>(context).add(AddFirstBookingReview(request: request));
+                                    BlocProvider.of<ReviewBloc>(context).add(
+                                        AddFirstBookingReview(
+                                            request: request));
                                     showReviewBottomView.value = false;
                                     starRating.value = -1;
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 10),
                                   decoration: BoxDecoration(
                                     color: AppColors.zimkeyOrange,
                                     borderRadius: BorderRadius.circular(25),
                                   ),
-                                  width: MediaQuery.of(context).size.width - 250,
+                                  width:
+                                      MediaQuery.of(context).size.width - 250,
                                   alignment: Alignment.center,
                                   child: const Text(
                                     'Submit',
@@ -344,7 +376,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
   }
 
   Container buildSuccessScreenBody(
-      BuildContext context, ConfirmPayment checkoutState, Booking booking, CheckoutPaymentUpdatedState state) {
+      BuildContext context,
+      ConfirmPayment checkoutState,
+      Booking booking,
+      CheckoutPaymentUpdatedState state) {
     return Container(
       color: AppColors.zimkeyWhite,
       height: MediaQuery.of(context).size.height,
@@ -360,7 +395,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
               ),
               child: Text(
                 'Your booking is successful!',
-                style: TextStyle(color: AppColors.zimkeyOrange, fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: AppColors.zimkeyOrange,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(
@@ -386,15 +424,21 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                       ),
                       Row(
                         children: [
-                          FavoriteButton(serviceId: booking.bookingService.service.id,isFavourite:booking.bookingService.service.isFavorite,),
+                          FavoriteButton(
+                            serviceId: booking.bookingService.service.id,
+                            isFavourite:
+                                booking.bookingService.service.isFavorite,
+                          ),
                           const SizedBox(
                             width: 15,
                           ),
                           InkWell(
-                            onTap:()=> HelperFunctions.takeScreenShot(screenshotController,booking.id),
+                            onTap: () => HelperFunctions.takeScreenShot(
+                                screenshotController, booking.id),
                             child: SvgPicture.asset(
                               'assets/images/icons/newIcons/share.svg',
-                              colorFilter: const ColorFilter.mode(AppColors.zimkeyDarkGrey, BlendMode.srcIn),
+                              colorFilter: const ColorFilter.mode(
+                                  AppColors.zimkeyDarkGrey, BlendMode.srcIn),
                             ),
                           ),
                         ],
@@ -434,7 +478,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     ],
                   ),
                   Visibility(
-                    visible: booking.bookingService.serviceRequirements.isNotEmpty,
+                    visible:
+                        booking.bookingService.serviceRequirements.isNotEmpty,
                     child: SizedBox(
                       width: double.infinity,
                       child: Column(
@@ -456,14 +501,21 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                           ),
                           Wrap(
                               children: List.generate(
-                                  booking.bookingService.serviceRequirements.length,
+                                  booking.bookingService.serviceRequirements
+                                      .length,
                                   (index) => Container(
-                                        margin: const EdgeInsets.only(right: 5, bottom: 5),
-                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                                        margin: const EdgeInsets.only(
+                                            right: 5, bottom: 5),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 7, vertical: 5),
                                         decoration: BoxDecoration(
-                                            color: AppColors.zimkeyWhite, borderRadius: BorderRadius.circular(5)),
+                                            color: AppColors.zimkeyWhite,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Text(
-                                          ReCase(booking.bookingService.serviceRequirements[index]).titleCase,
+                                          ReCase(booking.bookingService
+                                                  .serviceRequirements[index])
+                                              .titleCase,
                                           style: const TextStyle(
                                             color: AppColors.zimkeyDarkGrey,
                                             fontSize: 13,
@@ -486,7 +538,9 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                             children: [
                               Icon(
                                 Icons.check_circle,
-                                color: i == 0 ? AppColors.zimkeyOrange : AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                                color: i == 0
+                                    ? AppColors.zimkeyOrange
+                                    : AppColors.zimkeyDarkGrey.withOpacity(0.7),
                                 size: 18,
                               ),
                               AutoSizeText(
@@ -494,17 +548,23 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: i == 0 ? AppColors.zimkeyOrange : AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                                  color: i == 0
+                                      ? AppColors.zimkeyOrange
+                                      : AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.7),
                                 ),
                                 maxFontSize: 12,
                                 minFontSize: 9,
                               ),
                               if (i < projectStages.length - 1)
                                 Container(
-                                  color: i == 0 ? AppColors.zimkeyOrange : AppColors.zimkeyDarkGrey2,
+                                  color: i == 0
+                                      ? AppColors.zimkeyOrange
+                                      : AppColors.zimkeyDarkGrey2,
                                   height: 1.5,
                                   width: 18,
-                                  constraints: const BoxConstraints(maxWidth: 40, minWidth: 2),
+                                  constraints: const BoxConstraints(
+                                      maxWidth: 40, minWidth: 2),
                                 ),
                             ],
                           ),
@@ -613,7 +673,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                                   ),
                                 ),
                                 Text(
-                                  ReCase(booking.bookingAddress.landmark).originalText,
+                                  ReCase(booking.bookingAddress.landmark)
+                                      .originalText,
                                   style: const TextStyle(
                                     color: AppColors.zimkeyDarkGrey,
                                     fontSize: 13,
@@ -655,7 +716,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                         ),
                       ),
                       //date time slot
-                      buildDateAndTimeSlot(booking.bookingService.bookingServiceItems.first),
+                      buildDateAndTimeSlot(
+                          booking.bookingService.bookingServiceItems.first),
                     ],
                   ),
                   //payment details------
@@ -788,8 +850,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
             Container(
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(color: AppColors.zimkeyBodyOrange, borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+              decoration: BoxDecoration(
+                  color: AppColors.zimkeyBodyOrange,
+                  borderRadius: BorderRadius.circular(10)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
               child: const Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -932,7 +997,9 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
               height: 15,
             ),
 
-            PopularService(popularService: state.paymentUpdatedResponse.confirmPayment.getPopularServices!),
+            PopularService(
+                popularService: state
+                    .paymentUpdatedResponse.confirmPayment.getPopularServices!),
             const SizedBox(
               height: 20,
             ),
@@ -1005,7 +1072,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
           height: 3,
         ),
         Text(
-          '${serviceItem.startDateTime.day}-${serviceItem.startDateTime.month}-${serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: serviceItem.startDateTime, end: serviceItem.endDateTime, available: false))}',
+          '${serviceItem.startDateTime.day.toString().padLeft(2, '0')}-${serviceItem.startDateTime.month.toString().padLeft(2, '0')}-${serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: serviceItem.startDateTime, end: serviceItem.endDateTime, available: false))}',
           style: const TextStyle(
             color: AppColors.zimkeyDarkGrey,
             fontSize: 13,

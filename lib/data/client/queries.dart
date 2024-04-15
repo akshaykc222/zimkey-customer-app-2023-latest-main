@@ -425,11 +425,12 @@ query GetServices(\$search:String!){
       .replaceAll('\n', '');
   // schedule provider
   static String getTimeSlots = '''
-query getServiceBookingSlots(\$date: DateTime!, \$billingOptionId: String!, \$partnerId: String,\$isReschedule:Boolean,\$bookingServiceItemId:String){
+query getServiceBookingSlots(\$date: DateTime!, \$billingOptionId: String!, \$partnerId: String,\$isReschedule:Boolean,\$bookingServiceItemId:String,\$addressId:String){
   getServiceBookingSlots(
     date: \$date,
     billingOptionId: \$billingOptionId
     partnerId: \$partnerId
+    addressId:\$addressId
     isReschedule:\$isReschedule
     bookingServiceItemId:\$bookingServiceItemId
   ) {
@@ -604,10 +605,13 @@ query GetBookingServiceItem(\$id:String!) {
             status_value
         }
                 additionalWorks {
+                modificationReason
+                
                 bookingAdditionalWorkStatus
             bookingAddons {
                 name
                 units
+                unit
                 amount {
                     grandTotal
                 }

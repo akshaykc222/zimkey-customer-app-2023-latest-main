@@ -252,7 +252,7 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                                   text: "Date & Time", fontSize: 13),
                               HelperWidgets.buildText(
                                 text:
-                                    '${workTime.start.day}-${workTime.start.month}-${workTime.start.year} | ${HelperFunctions.filterTimeSlot(workTime)}',
+                                    '${workTime.start.day.toString().padLeft(2, '0')}-${workTime.start.month.toString().padLeft(2, '0')}-${workTime.start.year} | ${HelperFunctions.filterTimeSlot(workTime)}',
                                 color: AppColors.zimkeyDarkGrey,
                                 fontSize: 13,
                               )
@@ -700,6 +700,164 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
               ],
             ),
           ),
+          widget.getBookingServiceItem.additionalWorks.isEmpty
+              ? const SizedBox()
+              : const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0, top: 8),
+                      child: Text(
+                        'Additional Works',
+                        style: TextStyle(
+                          color: AppColors.zimkeyDarkGrey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    SizedBox()
+                  ],
+                ),
+          const SizedBox(
+            height: 10,
+          ),
+          ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.getBookingServiceItem.additionalWorks.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) => Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.zimkeyLightGrey,
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            HelperWidgets.buildText(
+                                text: "Status", fontSize: 13),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: AppColors.zimkeyGreen.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              child: HelperWidgets.buildText(
+                                text: widget
+                                    .getBookingServiceItem
+                                    .additionalWorks[index]
+                                    .bookingAdditionalWorkStatus,
+                                color: AppColors.zimkeyDarkGrey,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: widget.getBookingServiceItem
+                                .additionalWorks[index].bookingAddons.length,
+                            itemBuilder: (context, i) => ListTile(
+                                  title: Text(widget
+                                      .getBookingServiceItem
+                                      .additionalWorks[index]
+                                      .bookingAddons[i]
+                                      .name),
+                                  subtitle: Text(
+                                      "${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].units}  ${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].unit}"),
+                                  trailing: Text(
+                                      "₹${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].amount}"),
+                                )),
+                        widget.getBookingServiceItem.additionalWorks[index]
+                                .bookingAddons.isEmpty
+                            ? const SizedBox()
+                            : const SizedBox(
+                                height: 5,
+                              ),
+                        widget.getBookingServiceItem.additionalWorks[index]
+                                    .modificationReason ==
+                                null
+                            ? const SizedBox()
+                            : Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  HelperWidgets.buildText(
+                                      text: "Modification Reason",
+                                      fontSize: 13),
+                                  HelperWidgets.buildText(
+                                    text: widget
+                                            .getBookingServiceItem
+                                            .additionalWorks[index]
+                                            .modificationReason ??
+                                        "",
+                                    color: AppColors.zimkeyDarkGrey,
+                                    fontSize: 13,
+                                  ),
+                                ],
+                              ),
+                        SizedBox(
+                          height: widget
+                                      .getBookingServiceItem
+                                      .additionalWorks[index]
+                                      .modificationReason ==
+                                  null
+                              ? 0
+                              : 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            HelperWidgets.buildText(
+                                text: "Additional Work Hr(s)", fontSize: 13),
+                            HelperWidgets.buildText(
+                              text: widget
+                                      .getBookingServiceItem
+                                      .additionalWorks[index]
+                                      .additionalHoursUnits
+                                      .toString() ??
+                                  "",
+                              color: AppColors.zimkeyDarkGrey,
+                              fontSize: 13,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            HelperWidgets.buildText(
+                                text: "Grand Total", fontSize: 13),
+                            HelperWidgets.buildText(
+                              text: widget
+                                      .getBookingServiceItem
+                                      .additionalWorks[index]
+                                      .additionalHoursAmount
+                                      ?.grandTotal
+                                      ?.toStringAsFixed(2) ??
+                                  "0.0",
+                              color: AppColors.zimkeyDarkGrey,
+                              fontSize: 13,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )),
 
           //Cancellation Details
           widget.getBookingServiceItem.isCancelled &&
@@ -762,7 +920,7 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                           text: getBookingServiceItem
                                       .pendingRescheduleByPartner !=
                                   null
-                              ? "Partner want to reschedule this work to \n${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.day}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.month}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: getBookingServiceItem.pendingRescheduleByPartner!.startDateTime, end: getBookingServiceItem.pendingRescheduleByPartner!.endDateTime, available: true))}"
+                              ? "Partner want to reschedule this work to \n${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.day.toString().padLeft(2, '0')}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.month.toString().padLeft(2, '0')}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: getBookingServiceItem.pendingRescheduleByPartner!.startDateTime, end: getBookingServiceItem.pendingRescheduleByPartner!.endDateTime, available: true))}"
                               : "",
                           overflow: TextOverflow.visible,
                           fontSize: 14,
@@ -958,6 +1116,8 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                 return ValueListenableBuilder(
                   valueListenable: widget.addonListNotifier,
                   builder: (BuildContext context, addonList, Widget? child) {
+                    print(
+                        "add on length ${addonList.length} : pending ${getBookingServiceItem.isPaymentPending}");
                     return Visibility(
                         visible: addonList.isNotEmpty && isPaymentPending ||
                             isPaymentPending,

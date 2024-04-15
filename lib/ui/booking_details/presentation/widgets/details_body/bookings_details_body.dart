@@ -582,7 +582,7 @@ class _DetailsBodyState extends State<DetailsBody> {
                           text: getBookingServiceItem
                                       .pendingRescheduleByPartner !=
                                   null
-                              ? "Partner want to reschedule this work to \n${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.day}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.month}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: getBookingServiceItem.pendingRescheduleByPartner!.startDateTime, end: getBookingServiceItem.pendingRescheduleByPartner!.endDateTime, available: true))}"
+                              ? "Partner want to reschedule this work to \n${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.day.toString().padLeft(2, '0')}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.month.toString().padLeft(2, '0')}-${getBookingServiceItem.pendingRescheduleByPartner!.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: getBookingServiceItem.pendingRescheduleByPartner!.startDateTime, end: getBookingServiceItem.pendingRescheduleByPartner!.endDateTime, available: true))}"
                               : "",
                           overflow: TextOverflow.visible,
                           fontSize: 14,

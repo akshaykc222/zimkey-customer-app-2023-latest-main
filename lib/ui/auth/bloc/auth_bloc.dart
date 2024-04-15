@@ -81,8 +81,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ResponseModel stateModel = await authProvider
           .updateUser({"name": event.name, "email": event.mail});
       if (stateModel is SuccessResponse) {
-        emit(UserUpdateSuccessState(updateUserResponse: stateModel.value));
-      } else {}
+        print("Response is success");
+        add(GetUserDetails());
+      } else if (stateModel is ErrorResponse) {
+        print(stateModel.msg);
+        emit(AuthErrors());
+      }
     });
 
     on<LoadInitialState>((event, emit) async {
