@@ -57,7 +57,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (stateModel is SuccessResponse) {
         emit(OtpVerifySuccessState(verifyOtpResponse: stateModel.value));
       } else if (stateModel is ErrorResponse) {
-        emit(OtpVerifyErrorState(errorMsg: stateModel.msg));
+        emit(OtpVerifyErrorState(errorMsg: stateModel.msg.toString()));
       }
     });
 
@@ -82,6 +82,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           .updateUser({"name": event.name, "email": event.mail});
       if (stateModel is SuccessResponse) {
         print("Response is success");
+        emit(UserUpdateSuccessState(updateUserResponse: stateModel.value));
         add(GetUserDetails());
       } else if (stateModel is ErrorResponse) {
         print(stateModel.msg);
@@ -94,14 +95,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<GetUserDetails>((event, emit) async {
-      emit(AuthLoadingState());
-      ResponseModel stateModel = await authProvider.getUserDetails();
+      try{
+        emit(AuthLoadingState());
+        ResponseModel stateModel = await authProvider.getUserDetails();
 
-      if (stateModel is SuccessResponse) {
-        emit(AuthUserDataLoadedState(userDetailsResponse: stateModel.value));
-      } else if (stateModel is ErrorResponse) {
-        emit(AuthErrors());
+        if (stateModel is SuccessResponse) {
+          emit(AuthUserDataLoadedState(userDetailsResponse: stateModel.value));
+        } else if (stateModel is ErrorResponse) {
+          emit(AuthErrors());
+        }
+      }catch(e){
+
+
       }
+
     });
   }
 }

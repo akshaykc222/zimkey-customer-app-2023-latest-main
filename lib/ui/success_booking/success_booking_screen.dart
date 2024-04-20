@@ -477,6 +477,38 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Work Code',
+                            style: TextStyle(
+                              color: AppColors.zimkeyDarkGrey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 3,
+                          ),
+                          Text(
+                            booking.bookingService.bookingServiceItems.first.workCode??"",
+                            style: const TextStyle(
+                              color: AppColors.zimkeyDarkGrey,
+                              fontSize: 13,
+                              // fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   Visibility(
                     visible:
                         booking.bookingService.serviceRequirements.isNotEmpty,

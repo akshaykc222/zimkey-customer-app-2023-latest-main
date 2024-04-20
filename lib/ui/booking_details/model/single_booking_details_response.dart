@@ -30,10 +30,21 @@ class SingleBookingDetailResponse {
       };
 }
 
+class RefBookingServiceItem {
+  final String activePartnerCalenderId;
+
+  RefBookingServiceItem(this.activePartnerCalenderId);
+
+  factory RefBookingServiceItem.fromJson(Map<String, dynamic> json) {
+    return RefBookingServiceItem(json['id']);
+  }
+}
+
 class GetBookingServiceItem {
   final BookingService bookingService;
   final String id;
   final String bookingServiceItemStatus;
+  final RefBookingServiceItem? refBookingServiceItem;
   final dynamic amountDue;
   final String bookingServiceItemType;
   final DateTime startDateTime;
@@ -58,6 +69,7 @@ class GetBookingServiceItem {
   final PropertyType? propertyType;
   final Room? room;
   final bool? isFurnished;
+  final int? unit;
   GetBookingServiceItem(
       {required this.bookingService,
       required this.id,
@@ -67,6 +79,7 @@ class GetBookingServiceItem {
       required this.startDateTime,
       required this.endDateTime,
       required this.canReschedule,
+      this.refBookingServiceItem,
       required this.canRework,
       required this.canCancel,
       required this.isPaymentPending,
@@ -85,50 +98,57 @@ class GetBookingServiceItem {
       this.propertyArea,
       this.propertyType,
       this.room,
+      this.unit,
       this.isFurnished});
 
-  factory GetBookingServiceItem.fromJson(Map<String, dynamic> json) =>
-      GetBookingServiceItem(
-          bookingService: BookingService.fromJson(json["bookingService"]),
-          id: json["id"],
-          bookingServiceItemStatus: json["bookingServiceItemStatus"],
-          amountDue: json["amountDue"],
-          bookingServiceItemType: json["bookingServiceItemType"],
-          startDateTime: DateTime.parse(json["startDateTime"]),
-          endDateTime: DateTime.parse(json["endDateTime"]),
-          canReschedule: json["canReschedule"],
-          canRework: json["canRework"],
-          isRescheduleByPartnerPending: json["isRescheduleByPartnerPending"],
-          canCancel: json["canCancel"],
-          isPaymentPending: json["isPaymentPending"],
-          canCallPartner: json["canCallPartner"],
-          isCancelled: json["isCancelled"],
-          canBookAgain: json["canBookAgain"],
-          canRateBooking: json["canRateBooking"],
-          chargedPrice: ChargedPrice.fromJson(json["chargedPrice"]),
-          cancelDetails: json["cancelDetails"] == null
-              ? null
-              : CancelDetails.fromJson(json["cancelDetails"]),
-          pendingRescheduleByPartner: json["pendingRescheduleByPartner"] == null
-              ? null
-              : PendingRescheduleByPartner.fromJson(
-                  json["pendingRescheduleByPartner"]),
-          cancellationPolicyCustomer: json["cancellationPolicyCustomer"],
-          statusTracker: List<StatusTracker>.from(
-              json["statusTracker"].map((x) => StatusTracker.fromJson(x))),
-          additionalWorks: List<AdditionalWork>.from(
-              json["additionalWorks"].map((x) => AdditionalWork.fromJson(x))),
-          workCode: json["workCode"],
-          room: json['serviceRoom'] == null
-              ? null
-              : Room.fromJson(json['serviceRoom']),
-          propertyArea: json['servicePropertyArea'] == null
-              ? null
-              : PropertyArea.fromJson(json['servicePropertyArea']),
-          propertyType: json['servicePropertyType'] == null
-              ? null
-              : PropertyType.fromJson(json['servicePropertyType']),
-          isFurnished: json['isFurnished']);
+  factory GetBookingServiceItem.fromJson(Map<String, dynamic> json) {
+    print("units ${json['refBookingServiceItem']}");
+    return GetBookingServiceItem(
+        refBookingServiceItem: json['refBookingServiceItem'] == null
+            ? null
+            : RefBookingServiceItem.fromJson(json['refBookingServiceItem']),
+        bookingService: BookingService.fromJson(json["bookingService"]),
+        id: json["id"],
+        bookingServiceItemStatus: json["bookingServiceItemStatus"],
+        amountDue: json["amountDue"],
+        bookingServiceItemType: json["bookingServiceItemType"],
+        startDateTime: DateTime.parse(json["startDateTime"]),
+        endDateTime: DateTime.parse(json["endDateTime"]),
+        canReschedule: json["canReschedule"],
+        canRework: json["canRework"],
+        isRescheduleByPartnerPending: json["isRescheduleByPartnerPending"],
+        canCancel: json["canCancel"],
+        isPaymentPending: json["isPaymentPending"],
+        canCallPartner: json["canCallPartner"],
+        isCancelled: json["isCancelled"],
+        canBookAgain: json["canBookAgain"],
+        canRateBooking: json["canRateBooking"],
+        chargedPrice: ChargedPrice.fromJson(json["chargedPrice"]),
+        cancelDetails: json["cancelDetails"] == null
+            ? null
+            : CancelDetails.fromJson(json["cancelDetails"]),
+        pendingRescheduleByPartner: json["pendingRescheduleByPartner"] == null
+            ? null
+            : PendingRescheduleByPartner.fromJson(
+                json["pendingRescheduleByPartner"]),
+        cancellationPolicyCustomer: json["cancellationPolicyCustomer"],
+        statusTracker: List<StatusTracker>.from(
+            json["statusTracker"].map((x) => StatusTracker.fromJson(x))),
+        additionalWorks: List<AdditionalWork>.from(
+            json["additionalWorks"].map((x) => AdditionalWork.fromJson(x))),
+        workCode: json["workCode"],
+        room: json['serviceRoom'] == null
+            ? null
+            : Room.fromJson(json['serviceRoom']),
+        unit: json['units'],
+        propertyArea: json['servicePropertyArea'] == null
+            ? null
+            : PropertyArea.fromJson(json['servicePropertyArea']),
+        propertyType: json['servicePropertyType'] == null
+            ? null
+            : PropertyType.fromJson(json['servicePropertyType']),
+        isFurnished: json['isFurnished']);
+  }
 
   Map<String, dynamic> toJson() => {
         "bookingService": bookingService.toJson(),
@@ -418,6 +438,22 @@ class StatusTracker {
       };
 }
 
+// class TotalAdditionalWorkAmount {
+//   final int? grandTotal;
+//
+//   TotalAdditionalWorkAmount({
+//     this.grandTotal,
+//   });
+//
+//   factory TotalAdditionalWorkAmount.fromJson(Map<String, dynamic> json) =>
+//       TotalAdditionalWorkAmount(
+//         grandTotal: json["grandTotal"],
+//       );
+//
+//   Map<String, dynamic> toJson() => {
+//     "grandTotal": grandTotal,
+//   };
+// }
 class AdditionalWork {
   final String? modificationReason;
   final List<BookingAddon> bookingAddons;

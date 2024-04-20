@@ -202,7 +202,7 @@ class _MonthAndDateViewState extends State<MonthAndDateView> {
     if (selectedMonthValue == Strings.months[now.month - 1]) {
       final lastDayDateTime = DateTime(now.year, now.month + 1, 0);
       startDate = now.isAfter(DateTime(now.year, now.month, now.day, 15))
-          ? DateTime(now.year, now.month, now.day + 1)
+          ? DateTime(now.year, now.month, now.day )
           : now;
       endDate = lastDayDateTime;
     } else {

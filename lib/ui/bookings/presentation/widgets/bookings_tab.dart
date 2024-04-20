@@ -304,11 +304,22 @@ class _BookingsTabState extends State<BookingsTab> {
               SizedBox(),
             item.bookingServiceItemType == "REWORK"
                 ? Container(
-                    margin: const EdgeInsets.only(left: 4),
+                    margin: const EdgeInsets.only(right: 5),
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         color: AppColors.zimkeyOrange),
+                    child: HelperWidgets.buildText(
+                        text: item.bookingServiceItemType, fontSize: 13),
+                  )
+                : SizedBox(),
+            item.bookingServiceItemType == "ADDITIONAL"
+                ? Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.zimkeyOrange.withOpacity(0.6)),
                     child: HelperWidgets.buildText(
                         text: item.bookingServiceItemType, fontSize: 13),
                   )

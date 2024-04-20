@@ -117,6 +117,29 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                     fontSize: 15,
                   ),
                 ),
+                widget.getBookingServiceItem.refBookingServiceItem != null
+                    ? GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, RouteGenerator.singleBookingDetailScreen,
+                              arguments: BookingDetailScreenArg(
+                                id: widget
+                                    .getBookingServiceItem
+                                    .refBookingServiceItem!
+                                    .activePartnerCalenderId,
+                                fromPaymentPending: false,
+                              ));
+                        },
+                        child: Text(
+                          'Go to main booking',
+                          style: TextStyle(
+                            color: AppColors.zimkeyOrange.withOpacity(0.7),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
               ],
             ),
           ),
@@ -157,8 +180,10 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                billingOptionSection(widget.getBookingServiceItem.bookingService
-                    .serviceBillingOption.name),
+                billingOptionSection(
+                    widget.getBookingServiceItem.unit ?? 0,
+                    widget.getBookingServiceItem.bookingService
+                        .serviceBillingOption.name),
                 buildAddressView(address),
                 buildServiceReqView(widget.getBookingServiceItem),
                 buildCancellationPolicy(context, widget.getBookingServiceItem),
@@ -230,7 +255,14 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                                 ? BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     color: AppColors.zimkeyOrange)
-                                : null,
+                                : widget.getBookingServiceItem
+                                            .bookingServiceItemType ==
+                                        "ADDITIONAL"
+                                    ? BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: AppColors.zimkeyOrange
+                                            .withOpacity(0.6))
+                                    : null,
                             child: HelperWidgets.buildText(
                                 text: widget.getBookingServiceItem
                                     .bookingServiceItemType,
@@ -723,141 +755,204 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
           const SizedBox(
             height: 10,
           ),
-          ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.getBookingServiceItem.additionalWorks.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) => Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.zimkeyLightGrey,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            HelperWidgets.buildText(
-                                text: "Status", fontSize: 13),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
+          widget.getBookingServiceItem.additionalWorks.isEmpty
+              ? const SizedBox()
+              : Column(
+                  children: [
+                    ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount:
+                            widget.getBookingServiceItem.additionalWorks.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 10),
                               decoration: BoxDecoration(
-                                color: AppColors.zimkeyGreen.withOpacity(0.3),
+                                color: AppColors.zimkeyLightGrey,
                                 borderRadius: BorderRadius.circular(7),
                               ),
-                              child: HelperWidgets.buildText(
-                                text: widget
-                                    .getBookingServiceItem
-                                    .additionalWorks[index]
-                                    .bookingAdditionalWorkStatus,
-                                color: AppColors.zimkeyDarkGrey,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: widget.getBookingServiceItem
-                                .additionalWorks[index].bookingAddons.length,
-                            itemBuilder: (context, i) => ListTile(
-                                  title: Text(widget
-                                      .getBookingServiceItem
-                                      .additionalWorks[index]
-                                      .bookingAddons[i]
-                                      .name),
-                                  subtitle: Text(
-                                      "${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].units}  ${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].unit}"),
-                                  trailing: Text(
-                                      "₹${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].amount}"),
-                                )),
-                        widget.getBookingServiceItem.additionalWorks[index]
-                                .bookingAddons.isEmpty
-                            ? const SizedBox()
-                            : const SizedBox(
-                                height: 5,
-                              ),
-                        widget.getBookingServiceItem.additionalWorks[index]
-                                    .modificationReason ==
-                                null
-                            ? const SizedBox()
-                            : Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              child: Column(
                                 children: [
-                                  HelperWidgets.buildText(
-                                      text: "Modification Reason",
-                                      fontSize: 13),
-                                  HelperWidgets.buildText(
-                                    text: widget
-                                            .getBookingServiceItem
-                                            .additionalWorks[index]
-                                            .modificationReason ??
-                                        "",
-                                    color: AppColors.zimkeyDarkGrey,
-                                    fontSize: 13,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      HelperWidgets.buildText(
+                                          text: "Status", fontSize: 13),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.zimkeyGreen
+                                              .withOpacity(0.3),
+                                          borderRadius:
+                                              BorderRadius.circular(7),
+                                        ),
+                                        child: HelperWidgets.buildText(
+                                          text: widget
+                                                  .getBookingServiceItem
+                                                  .additionalWorks[index]
+                                                  .bookingAdditionalWorkStatus ??
+                                              "",
+                                          color: AppColors.zimkeyDarkGrey,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  widget
+                                          .getBookingServiceItem
+                                          .additionalWorks[index]
+                                          .bookingAddons
+                                          .isNotEmpty
+                                      ? Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: HelperWidgets.buildText(
+                                              text: "Booking Addons",
+                                              color: AppColors.zimkeyDarkGrey,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      : SizedBox(),
+                                  ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: widget
+                                          .getBookingServiceItem
+                                          .additionalWorks[index]
+                                          .bookingAddons
+                                          .length,
+                                      itemBuilder: (context, i) => ListTile(
+                                            title: Text(widget
+                                                    .getBookingServiceItem
+                                                    .additionalWorks[index]
+                                                    .bookingAddons[i]
+                                                    .name ??
+                                                ""),
+                                            subtitle: Text(
+                                                "${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].units}  ${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].unit}"),
+                                            trailing: Text(
+                                                "₹${widget.getBookingServiceItem.additionalWorks[index].bookingAddons[i].amount.grandTotal}"),
+                                          )),
+                                  widget
+                                              .getBookingServiceItem
+                                              .additionalWorks[index]
+                                              .bookingAddons
+                                              .isEmpty ==
+                                          true
+                                      ? const SizedBox()
+                                      : const SizedBox(
+                                          height: 5,
+                                        ),
+                                  widget
+                                              .getBookingServiceItem
+                                              .additionalWorks[index]
+                                              .modificationReason ==
+                                          null
+                                      ? const SizedBox()
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            HelperWidgets.buildText(
+                                                text: "Modification Reason",
+                                                fontSize: 13),
+                                            HelperWidgets.buildText(
+                                              text: widget
+                                                      .getBookingServiceItem
+                                                      .additionalWorks[index]
+                                                      .modificationReason ??
+                                                  "",
+                                              color: AppColors.zimkeyDarkGrey,
+                                              fontSize: 13,
+                                            ),
+                                          ],
+                                        ),
+                                  SizedBox(
+                                    height: widget
+                                                .getBookingServiceItem
+                                                .additionalWorks[index]
+                                                .modificationReason ==
+                                            null
+                                        ? 0
+                                        : 5,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      HelperWidgets.buildText(
+                                          text: "Additional Work Hr(s)",
+                                          fontSize: 13),
+                                      HelperWidgets.buildText(
+                                        text: widget
+                                                .getBookingServiceItem
+                                                .additionalWorks[index]
+                                                .additionalHoursUnits
+                                                .toString() ??
+                                            "",
+                                        color: AppColors.zimkeyDarkGrey,
+                                        fontSize: 13,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      HelperWidgets.buildText(
+                                          text: "Additional Hr Total",
+                                          fontSize: 13),
+                                      HelperWidgets.buildText(
+                                        text:
+                                            "₹${widget.getBookingServiceItem.additionalWorks[index].additionalHoursAmount?.grandTotal?.toStringAsFixed(2) ?? 0}",
+                                        color: AppColors.zimkeyDarkGrey,
+                                        fontSize: 13,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      HelperWidgets.buildText(
+                                          text: "Grand Total",
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.zimkeyOrange
+                                              .withOpacity(0.3),
+                                          borderRadius:
+                                              BorderRadius.circular(7),
+                                        ),
+                                        child: HelperWidgets.buildText(
+                                            text:
+                                                "₹${widget.getBookingServiceItem.additionalWorks[index].totalAdditionalWorkAmount?.grandTotal}" ??
+                                                    "",
+                                            color: AppColors.zimkeyDarkGrey,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  )
                                 ],
                               ),
-                        SizedBox(
-                          height: widget
-                                      .getBookingServiceItem
-                                      .additionalWorks[index]
-                                      .modificationReason ==
-                                  null
-                              ? 0
-                              : 5,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            HelperWidgets.buildText(
-                                text: "Additional Work Hr(s)", fontSize: 13),
-                            HelperWidgets.buildText(
-                              text: widget
-                                      .getBookingServiceItem
-                                      .additionalWorks[index]
-                                      .additionalHoursUnits
-                                      .toString() ??
-                                  "",
-                              color: AppColors.zimkeyDarkGrey,
-                              fontSize: 13,
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            HelperWidgets.buildText(
-                                text: "Grand Total", fontSize: 13),
-                            HelperWidgets.buildText(
-                              text: widget
-                                      .getBookingServiceItem
-                                      .additionalWorks[index]
-                                      .additionalHoursAmount
-                                      ?.grandTotal
-                                      ?.toStringAsFixed(2) ??
-                                  "0.0",
-                              color: AppColors.zimkeyDarkGrey,
-                              fontSize: 13,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  )),
+                            )),
+                  ],
+                ),
 
           //Cancellation Details
           widget.getBookingServiceItem.isCancelled &&
@@ -1219,59 +1314,59 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            HelperWidgets.buildText(
-                                                text: "Booking Addons",
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold),
-                                            const SizedBox(
-                                              height: 4,
-                                            ),
-
-                                            ...List.generate(
-                                                addonList[index]
-                                                    .bookingAddons
-                                                    .length,
-                                                (addOnIndex) =>
-                                                    bookingAddonsSection(
-                                                        addonList[index]
-                                                                .bookingAddons[
-                                                            addOnIndex])),
                                             // HelperWidgets.buildText(
-                                            //     text: "Booking Addons", fontSize: 14, fontWeight: FontWeight.bold),
-
-                                            const Divider(
-                                              thickness: 2,
-                                            ),
+                                            //     text: "Booking Addons",
+                                            //     fontSize: 14,
+                                            //     fontWeight: FontWeight.bold),
                                             // const SizedBox(
                                             //   height: 4,
                                             // ),
-                                            Row(
-                                              children: [
-                                                const Expanded(
-                                                  child: Text(
-                                                    'Grand Total',
-                                                    style: TextStyle(
-                                                        color: AppColors
-                                                            .zimkeyDarkGrey,
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '\u20B9 ${getBookingServiceItem.amountDue}',
-                                                  style: const TextStyle(
-                                                      color: AppColors
-                                                          .zimkeyDarkGrey,
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 8,
-                                            ),
+                                            //
+                                            // ...List.generate(
+                                            //     addonList[index]
+                                            //         .bookingAddons
+                                            //         .length,
+                                            //     (addOnIndex) =>
+                                            //         bookingAddonsSection(
+                                            //             addonList[index]
+                                            //                     .bookingAddons[
+                                            //                 addOnIndex])),
+                                            // // HelperWidgets.buildText(
+                                            // //     text: "Booking Addons", fontSize: 14, fontWeight: FontWeight.bold),
+                                            //
+                                            // const Divider(
+                                            //   thickness: 2,
+                                            // ),
+                                            // // const SizedBox(
+                                            // //   height: 4,
+                                            // // ),
+                                            // Row(
+                                            //   children: [
+                                            //     const Expanded(
+                                            //       child: Text(
+                                            //         'Grand Total',
+                                            //         style: TextStyle(
+                                            //             color: AppColors
+                                            //                 .zimkeyDarkGrey,
+                                            //             fontSize: 13,
+                                            //             fontWeight:
+                                            //                 FontWeight.w700),
+                                            //       ),
+                                            //     ),
+                                            //     Text(
+                                            //       '\u20B9 ${getBookingServiceItem.amountDue}',
+                                            //       style: const TextStyle(
+                                            //           color: AppColors
+                                            //               .zimkeyDarkGrey,
+                                            //           fontSize: 13,
+                                            //           fontWeight:
+                                            //               FontWeight.w700),
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                            // const SizedBox(
+                                            //   height: 8,
+                                            // ),
                                           ],
                                         )),
                                 Row(
@@ -1353,7 +1448,7 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
     );
   }
 
-  Widget billingOptionSection(String name) {
+  Widget billingOptionSection(int unit, String name) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 5),
@@ -1379,7 +1474,7 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
               child: Wrap(
                 children: [
                   Text(
-                    name,
+                    "$unit $name",
                     style: TextStyle(
                       color: AppColors.zimkeyDarkGrey.withOpacity(1),
                       // fontWeight: FontWeight.bold,

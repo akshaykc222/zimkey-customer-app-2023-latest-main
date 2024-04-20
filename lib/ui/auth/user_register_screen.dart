@@ -101,7 +101,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
               listener: (context, state) {
                 if (state is UserRegistrationSuccessState) {
                   ObjectFactory().prefs.setIsLoggedIn(true);
-                  HelperFunctions.setupInitialNavigation(context);
+                  HelperFunctions.setupInitialNavigation(context,isFromReg: true);
                 }
               },
               builder: (context, state) {

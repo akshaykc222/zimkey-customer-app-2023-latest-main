@@ -76,7 +76,7 @@ class _OnboardingState extends State<Onboarding> {
                   GestureDetector(
                     onTap: () async {
                       ObjectFactory().prefs.setIsOnboardViewed(true);
-                      HelperFunctions.checkNavigation(context);
+                      HelperFunctions.checkNavigationWithLocation(context);
                       // Get.toNamed('/login');
                       // Navigator.push(
                       //   context,

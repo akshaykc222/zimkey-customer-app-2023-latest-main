@@ -98,11 +98,11 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
         ),
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, authState) {
-            if (authState is AuthLoadingState) {
-              return Center(
-                child: HelperWidgets.progressIndicator(),
-              );
-            }
+            // if (authState is AuthLoadingState) {
+            //   return Center(
+            //     child: HelperWidgets.progressIndicator(),
+            //   );
+            // }
             return BlocBuilder<ServiceCategoryBloc, ServiceCategoryState>(
               builder: (context, serviceCategoryState) {
                 if (serviceCategoryState is ServiceCategoryLoadedState) {

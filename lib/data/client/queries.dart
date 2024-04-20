@@ -545,6 +545,10 @@ query getUserBookingServiceItems(\$pageNumber:Int,\$pageSize:Int,\$status: UserB
   static String getSingleBookingDetails = '''
 query GetBookingServiceItem(\$id:String!) {
   getBookingServiceItem (id:\$id){
+        units
+       refBookingServiceItem {
+                id
+}
         bookingService {
             service {
             id

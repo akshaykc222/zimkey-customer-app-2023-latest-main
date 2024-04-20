@@ -122,13 +122,12 @@ class HelperFunctions {
         context, RouteGenerator.authScreen, (route) => false);
   }
 
-  static setupInitialNavigation(BuildContext context) {
-    if (ObjectFactory().prefs.isOnboardViewed()!) {
-      checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
+  static setupInitialNavigation(BuildContext context,{bool? isFromReg}) {
+    if (isFromReg==true) {
+      print("navigating to onboarding");
+      navigateToOnBoarding(context);
     } else {
-      checkLoggedIn()
-          ? navigateToLocationSelection(context)
-          : navigateToLogin(context);
+      checkNavigationWithLocation(context);
     }
   }
 
@@ -136,7 +135,8 @@ class HelperFunctions {
     if (ObjectFactory().prefs.isOnboardViewed()!) {
       checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
     } else {
-      navigateToOnBoarding(context);
+
+      checkLoggedIn()?navigateToHome(context) : navigateToOnBoarding(context);
     }
   }
 

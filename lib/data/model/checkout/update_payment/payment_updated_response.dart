@@ -355,6 +355,7 @@ class BookingService {
 }
 
 class BookingServiceItem {
+  final String? workCode;
   final DateTime startDateTime;
   final DateTime endDateTime;
   final String bookingServiceItemStatus;
@@ -362,6 +363,7 @@ class BookingServiceItem {
   final String id;
 
   BookingServiceItem({
+    this.workCode,
     required this.startDateTime,
     required this.endDateTime,
     required this.bookingServiceItemStatus,
@@ -371,6 +373,7 @@ class BookingServiceItem {
 
   factory BookingServiceItem.fromJson(Map<String, dynamic> json) => BookingServiceItem(
     startDateTime: DateTime.parse(json["startDateTime"]),
+    workCode: json['workCode'],
     endDateTime: DateTime.parse(json["endDateTime"]),
     bookingServiceItemStatus: json["bookingServiceItemStatus"],
     bookingServiceItemType: json["bookingServiceItemType"],

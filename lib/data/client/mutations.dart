@@ -412,6 +412,7 @@ confirmPayment(data:\$data) {
                 }
                 serviceRequirements
                 bookingServiceItems {
+                    workCode
                     startDateTime
                     endDateTime
                     bookingServiceItemStatus

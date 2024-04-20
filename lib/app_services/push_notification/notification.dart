@@ -36,7 +36,7 @@ class NotificationService {
     // Set the background messaging handler early on, as a named top-level function
     // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     final notificationSettings =
-        await FirebaseMessaging.instance.requestPermission(provisional: true);
+    await FirebaseMessaging.instance.requestPermission(provisional: true);
     if (!kIsWeb) {
       channel = const AndroidNotificationChannel(
         'high_importance_channel', // id
@@ -45,31 +45,31 @@ class NotificationService {
         importance: Importance.high,
       );
       const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
       const InitializationSettings initializationSettings =
-          InitializationSettings(
+      InitializationSettings(
         android: initializationSettingsAndroid,
       );
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
       flutterLocalNotificationsPlugin.initialize(initializationSettings,
           onDidReceiveNotificationResponse:
               (NotificationResponse? payload) async {
-        // Handle notification tap event here
-        print("notification tapping ${payload?.toString()}");
-        try {
-          Navigator.pushNamed(navigatorKey.currentState!.context,
-              RouteGenerator.singleBookingDetailScreen,
-              arguments: BookingDetailScreenArg(
-                id: payload?.payload ?? "",
-                fromPaymentPending: false,
-              ));
-        } catch (e) {}
-      });
+            // Handle notification tap event here
+            print("notification tapping ${payload?.toString()}");
+            try {
+              Navigator.pushNamed(navigatorKey.currentState!.context,
+                  RouteGenerator.singleBookingDetailScreen,
+                  arguments: BookingDetailScreenArg(
+                    id: payload?.payload ?? "",
+                    fromPaymentPending: false,
+                  ));
+            } catch (e) {}
+          });
 
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
 
       await FirebaseMessaging.instance
@@ -147,8 +147,8 @@ class NotificationService {
       case "NEW_JOB":
         if (message.data.containsKey('bookingServiceItemId')) {
           try {
-            Navigator.pushNamed(navigatorKey.currentState!.context,
-                RouteGenerator.singleBookingDetailScreen,
+            Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,(route)=>false,
                 arguments: BookingDetailScreenArg(
                   id: message.data['bookingServiceItemId'],
                   fromPaymentPending: false,
@@ -159,8 +159,8 @@ class NotificationService {
       case "RESCHEDULE_JOB":
         if (message.data.containsKey('bookingServiceItemId')) {
           try {
-            Navigator.pushNamed(navigatorKey.currentState!.context,
-                RouteGenerator.singleBookingDetailScreen,
+            Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,(route)=>false,
                 arguments: BookingDetailScreenArg(
                   id: message.data['bookingServiceItemId'],
                   fromPaymentPending: false,
@@ -172,8 +172,8 @@ class NotificationService {
       case "PARTNER_ASSIGNED":
         if (message.data.containsKey('bookingServiceItemId')) {
           try {
-            Navigator.pushNamed(navigatorKey.currentState!.context,
-                RouteGenerator.singleBookingDetailScreen,
+            Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,(route)=>false,
                 arguments: BookingDetailScreenArg(
                   id: message.data['bookingServiceItemId'],
                   fromPaymentPending: false,
@@ -184,8 +184,8 @@ class NotificationService {
       case "PARTNER_UNASSIGNED":
         if (message.data.containsKey('bookingServiceItemId')) {
           try {
-            Navigator.pushNamed(navigatorKey.currentState!.context,
-                RouteGenerator.singleBookingDetailScreen,
+            Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,(route)=>false,
                 arguments: BookingDetailScreenArg(
                   id: message.data['bookingServiceItemId'],
                   fromPaymentPending: false,
@@ -198,8 +198,8 @@ class NotificationService {
       default:
         if (message.data.containsKey('bookingServiceItemId')) {
           try {
-            Navigator.pushNamed(navigatorKey.currentState!.context,
-                RouteGenerator.singleBookingDetailScreen,
+            Navigator.pushNamedAndRemoveUntil(navigatorKey.currentState!.context,
+                RouteGenerator.singleBookingDetailScreen,(route)=>false,
                 arguments: BookingDetailScreenArg(
                   id: message.data['bookingServiceItemId'],
                   fromPaymentPending: false,
