@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/model/auth/verify_otp_response.dart';
@@ -31,6 +32,7 @@ class Prefs {
   static const String providerId = "provider_id";
   static const String areaList = "area_list";
   static const String selectedLocation = "selected-location";
+  static const String selectedLocationModel = "selected-location-model";
   static const String onboardViewed = "onboard_viewed";
 
   Prefs();
@@ -76,8 +78,25 @@ class Prefs {
     _sharedPreferences!.setString(selectedLocation, location!);
   }
 
+  void setSelectedLocationModel({GetArea? location}) {
+    _sharedPreferences!
+        .setString(selectedLocationModel, jsonEncode(location?.toJson()));
+  }
+
+  GetArea? getSelectedLocationModel() {
+    String? data = _sharedPreferences!.getString(
+      selectedLocationModel,
+    );
+    if (data != null) {
+      debugPrint("selected Loc $data");
+      return GetArea.fromJson(jsonDecode(data));
+    }
+    return null;
+  }
+
   ///get method  for auth token
-  String? getSelectedLocation() => _sharedPreferences!.getString(selectedLocation);
+  String? getSelectedLocation() =>
+      _sharedPreferences!.getString(selectedLocation);
 
   ///saving  layout id
   void saveLayoutId({String? layoutId}) {
@@ -93,7 +112,8 @@ class Prefs {
   }
 
   ///get method  for auth token
-  String? getCompanyBaseUrl() => _sharedPreferences!.getString(_COMPANY_BASE_URL);
+  String? getCompanyBaseUrl() =>
+      _sharedPreferences!.getString(_COMPANY_BASE_URL);
 
   ///saving  layout id
   void saveCustomerNote({String? customerNote}) {
@@ -117,7 +137,8 @@ class Prefs {
   }
 
   ///get method  for auth token
-  String? getFilterCategoryId() => _sharedPreferences!.getString(_FILTER_CATEGORY_ID);
+  String? getFilterCategoryId() =>
+      _sharedPreferences!.getString(_FILTER_CATEGORY_ID);
 
   ///saving  the auth token as a String
   void setFcmToken({String? token}) async {
@@ -134,18 +155,19 @@ class Prefs {
   }
 
   ///checking that is logged in or not
-  bool? isLoggedIn() =>
-      _sharedPreferences!.getBool(_IS_LOGGED_IN) != null && _sharedPreferences!.getBool(_IS_LOGGED_IN) == true
-          ? true
-          : false;
+  bool? isLoggedIn() => _sharedPreferences!.getBool(_IS_LOGGED_IN) != null &&
+          _sharedPreferences!.getBool(_IS_LOGGED_IN) == true
+      ? true
+      : false;
 
- void setIsOnboardViewed(bool status) {
+  void setIsOnboardViewed(bool status) {
     _sharedPreferences!.setBool(onboardViewed, status);
   }
 
   ///checking that is logged in or not
   bool? isOnboardViewed() =>
-      _sharedPreferences!.getBool(onboardViewed) != null && _sharedPreferences!.getBool(onboardViewed) == true
+      _sharedPreferences!.getBool(onboardViewed) != null &&
+              _sharedPreferences!.getBool(onboardViewed) == true
           ? true
           : false;
 
@@ -154,10 +176,10 @@ class Prefs {
   }
 
   ///checking that is logged in or not
-  bool? isDarkMode() =>
-      _sharedPreferences!.getBool(_IS_DARK_MODE) != null && _sharedPreferences!.getBool(_IS_DARK_MODE) == true
-          ? true
-          : false;
+  bool? isDarkMode() => _sharedPreferences!.getBool(_IS_DARK_MODE) != null &&
+          _sharedPreferences!.getBool(_IS_DARK_MODE) == true
+      ? true
+      : false;
 
   void setBaseUrlFetched(bool status) {
     _sharedPreferences!.setBool(_IS_BASE_FETCHED, status);
@@ -165,7 +187,8 @@ class Prefs {
 
   ///checking that is logged in or not
   bool isBaseUrlFetched() =>
-      _sharedPreferences!.getBool(_IS_BASE_FETCHED) != null && _sharedPreferences!.getBool(_IS_BASE_FETCHED) == true
+      _sharedPreferences!.getBool(_IS_BASE_FETCHED) != null &&
+              _sharedPreferences!.getBool(_IS_BASE_FETCHED) == true
           ? true
           : false;
 
@@ -183,7 +206,8 @@ class Prefs {
 
   /// get user data
   User getUserData() {
-    Map<String, dynamic> resultMap = jsonDecode(_sharedPreferences!.getString(userData)!);
+    Map<String, dynamic> resultMap =
+        jsonDecode(_sharedPreferences!.getString(userData)!);
     var result = User.fromJson(resultMap);
     return result;
   }
@@ -194,8 +218,10 @@ class Prefs {
   }
 
   List<GetArea> getAreaList() {
-    List<dynamic> decodedList = jsonDecode(_sharedPreferences!.getString(areaList)!);
-    List<GetArea> result = decodedList.map((json) => GetArea.fromJson(json)).toList();
+    List<dynamic> decodedList =
+        jsonDecode(_sharedPreferences!.getString(areaList)!);
+    List<GetArea> result =
+        decodedList.map((json) => GetArea.fromJson(json)).toList();
     return result;
   }
 
@@ -219,7 +245,8 @@ class Prefs {
   }
 
   ///get method  for provider Category
-  String? getProviderCategoryId() => _sharedPreferences!.getString(providerCategoryId);
+  String? getProviderCategoryId() =>
+      _sharedPreferences!.getString(providerCategoryId);
 
   ///saving provider  id
   void setProviderId({String? id}) async {

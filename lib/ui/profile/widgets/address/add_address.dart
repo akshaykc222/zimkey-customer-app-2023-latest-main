@@ -3,12 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+
 import '../../../../constants/assets.dart';
 import '../../../../constants/colors.dart';
 import '../../../../constants/strings.dart';
 import '../../../../data/model/home/home_response.dart';
-import '../../../../utils/helper/helper_functions.dart';
 import '../../../../utils/helper/helper_extension.dart';
+import '../../../../utils/helper/helper_functions.dart';
 import '../../../../utils/helper/helper_widgets.dart';
 import '../../../../utils/object_factory.dart';
 import 'address_argument.dart';
@@ -27,7 +28,8 @@ class _AddAddressState extends State<AddAddress> {
   final TextEditingController _locality = TextEditingController();
   final TextEditingController _city = TextEditingController(text: "Kochi");
   final TextEditingController _pinCode = TextEditingController();
-  final TextEditingController _addressType = TextEditingController(text: "HOME");
+  final TextEditingController _addressType =
+      TextEditingController(text: "HOME");
   final TextEditingController _area = TextEditingController();
   final TextEditingController _houseNo = TextEditingController();
   final TextEditingController _landmark = TextEditingController();
@@ -42,24 +44,31 @@ class _AddAddressState extends State<AddAddress> {
   final FocusNode _landmarkNode = FocusNode();
 
   ValueNotifier<CheckTextField> houseNotifier = ValueNotifier(CheckTextField());
-  ValueNotifier<CheckTextField> localityNotifier = ValueNotifier(CheckTextField());
-  ValueNotifier<CheckTextField> landmarkNotifier = ValueNotifier(CheckTextField());
+  ValueNotifier<CheckTextField> localityNotifier =
+      ValueNotifier(CheckTextField());
+  ValueNotifier<CheckTextField> landmarkNotifier =
+      ValueNotifier(CheckTextField());
   ValueNotifier<CheckTextField> areaNotifier = ValueNotifier(CheckTextField());
-  ValueNotifier<CheckTextField> cityNotifier = ValueNotifier(CheckTextField(hasValue: true));
-  ValueNotifier<CheckTextField> pinCodeNotifier = ValueNotifier(CheckTextField());
-  ValueNotifier<CheckTextField> addressTypeNotifier = ValueNotifier(CheckTextField());
+  ValueNotifier<CheckTextField> cityNotifier =
+      ValueNotifier(CheckTextField(hasValue: true));
+  ValueNotifier<CheckTextField> pinCodeNotifier =
+      ValueNotifier(CheckTextField());
+  ValueNotifier<CheckTextField> addressTypeNotifier =
+      ValueNotifier(CheckTextField());
   ValueNotifier<bool> showOtherAddressType = ValueNotifier(false);
   ValueNotifier<bool> makeDefaultNotifier = ValueNotifier(true);
   ValueNotifier<String> addressTypeSelectedNotifier = ValueNotifier("Home");
 
   List<String> addressType = ['Home', 'Office', 'Other'];
-  List<ValueNotifier<CheckTextField>> valueNotifierList = List.empty(growable: true);
+  List<ValueNotifier<CheckTextField>> valueNotifierList =
+      List.empty(growable: true);
   List<FocusNode> focusNodeList = List.empty(growable: true);
 
   ValueNotifier<bool> showSearchLocation = ValueNotifier(false);
   ValueNotifier<String> selectedLoc = ValueNotifier("");
   ValueNotifier<String> selectedAreaId = ValueNotifier("");
-  ValueNotifier<List<PinCode>> pinCodeListNotifier = ValueNotifier(List.empty(growable: true));
+  ValueNotifier<List<PinCode>> pinCodeListNotifier =
+      ValueNotifier(List.empty(growable: true));
 
   void showLocationSelection(bool value) {
     showSearchLocation.value = value;
@@ -83,16 +92,21 @@ class _AddAddressState extends State<AddAddress> {
           }
         }
         if (!isPinCodeInsideArea) {
-          pinCodeNotifier.value =
-              CheckTextField(hasError: true, hasValue: true, errorMsg: "This pin-code is not within the selected area");
+          pinCodeNotifier.value = CheckTextField(
+              hasError: true,
+              hasValue: true,
+              errorMsg: "This pin-code is not within the selected area");
         } else {
-          pinCodeNotifier.value = CheckTextField(hasError: false, hasValue: true, errorMsg: "");
+          pinCodeNotifier.value =
+              CheckTextField(hasError: false, hasValue: true, errorMsg: "");
         }
       } else {
-        pinCodeNotifier.value = CheckTextField(hasError: false, hasValue: true, errorMsg: "");
+        pinCodeNotifier.value =
+            CheckTextField(hasError: false, hasValue: true, errorMsg: "");
       }
     } else {
-      pinCodeNotifier.value = CheckTextField(hasError: false, hasValue: false, errorMsg: "");
+      pinCodeNotifier.value =
+          CheckTextField(hasError: false, hasValue: false, errorMsg: "");
     }
   }
 
@@ -100,6 +114,11 @@ class _AddAddressState extends State<AddAddress> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    if (ObjectFactory().prefs.getSelectedLocationModel() != null) {
+      selectedUserLoc(
+          selectedArea: ObjectFactory().prefs.getSelectedLocationModel()!);
+    }
     valueNotifierList.addAll([
       houseNotifier,
       localityNotifier,
@@ -108,7 +127,8 @@ class _AddAddressState extends State<AddAddress> {
       cityNotifier,
       areaNotifier,
     ]);
-    focusNodeList.addAll([_houseNoNode, _localityNode, _landmarkNode, _pinCodeNode]);
+    focusNodeList
+        .addAll([_houseNoNode, _localityNode, _landmarkNode, _pinCodeNode]);
     if (widget.addressArgument.isUpdate) {
       _houseNo.text = widget.addressArgument.address!.buildingName;
       _locality.text = widget.addressArgument.address!.locality;
@@ -117,8 +137,10 @@ class _AddAddressState extends State<AddAddress> {
       _addressType.text = widget.addressArgument.address!.otherText;
       selectedLoc.value = widget.addressArgument.address!.area.name;
       selectedAreaId.value = widget.addressArgument.address!.areaId;
-      addressTypeSelectedNotifier.value = widget.addressArgument.address!.addressType.capitalize();
-      showOtherAddressType.value = widget.addressArgument.address!.addressType.capitalize() == "Other";
+      addressTypeSelectedNotifier.value =
+          widget.addressArgument.address!.addressType.capitalize();
+      showOtherAddressType.value =
+          widget.addressArgument.address!.addressType.capitalize() == "Other";
       makeDefaultNotifier.value = widget.addressArgument.address!.isDefault;
 
       houseNotifier.value = CheckTextField(hasError: false, hasValue: true);
@@ -129,7 +151,9 @@ class _AddAddressState extends State<AddAddress> {
       areaNotifier.value = CheckTextField(hasError: false, hasValue: true);
       cityNotifier.value = CheckTextField(hasError: false, hasValue: true);
       addressTypeNotifier.value = CheckTextField(
-          hasError: false, hasValue: widget.addressArgument.address!.addressType.capitalize() == "Other");
+          hasError: false,
+          hasValue: widget.addressArgument.address!.addressType.capitalize() ==
+              "Other");
     }
   }
 
@@ -154,10 +178,13 @@ class _AddAddressState extends State<AddAddress> {
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
               buildSliverAppBar(
                   context: context,
-                  title: widget.addressArgument.isUpdate ? Strings.updateAddressTitle : Strings.addAddressTitle),
+                  title: widget.addressArgument.isUpdate
+                      ? Strings.updateAddressTitle
+                      : Strings.addAddressTitle),
             ],
             body: KeyboardActions(
-              config: HelperFunctions.buildConfig(context: context, focusNodeList: focusNodeList),
+              config: HelperFunctions.buildConfig(
+                  context: context, focusNodeList: focusNodeList),
               child: ListView(
                 physics: const BouncingScrollPhysics(),
                 children: [
@@ -180,7 +207,8 @@ class _AddAddressState extends State<AddAddress> {
     );
   }
 
-  SliverAppBar buildSliverAppBar({required BuildContext context, required String title}) {
+  SliverAppBar buildSliverAppBar(
+      {required BuildContext context, required String title}) {
     return SliverAppBar(
       backgroundColor: AppColors.zimkeyOrange,
       expandedHeight: 0.0,
@@ -286,7 +314,8 @@ class _AddAddressState extends State<AddAddress> {
             builder: (BuildContext context, String value, Widget? child) {
               _area.text = value;
               if (value.isNotEmpty) {
-                areaNotifier.value = CheckTextField(hasValue: true, hasError: false);
+                areaNotifier.value =
+                    CheckTextField(hasValue: true, hasError: false);
               }
               return buildAddressTextField(
                   valueNotifier: areaNotifier,
@@ -300,12 +329,14 @@ class _AddAddressState extends State<AddAddress> {
           ),
           ValueListenableBuilder(
             valueListenable: pinCodeListNotifier,
-            builder: (BuildContext context, List<PinCode> pinCodeList, Widget? child) {
+            builder: (BuildContext context, List<PinCode> pinCodeList,
+                Widget? child) {
               return buildAddressTextField(
                   controller: _pinCode,
                   valueNotifier: pinCodeNotifier,
                   focusNode: _pinCodeNode,
-                  onChanged: (val) => checkPinCodeInsideArea(pinCodeList: pinCodeList),
+                  onChanged: (val) =>
+                      checkPinCodeInsideArea(pinCodeList: pinCodeList),
                   icon: Assets.iconPostal,
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(6),
@@ -345,7 +376,10 @@ class _AddAddressState extends State<AddAddress> {
                 Assets.iconTickCircle,
                 height: 20,
                 colorFilter: ColorFilter.mode(
-                    value ? AppColors.zimkeyOrange : AppColors.zimkeyDarkGrey.withOpacity(0.3), BlendMode.srcIn),
+                    value
+                        ? AppColors.zimkeyOrange
+                        : AppColors.zimkeyDarkGrey.withOpacity(0.3),
+                    BlendMode.srcIn),
               ),
               const SizedBox(
                 width: 5,
@@ -368,7 +402,9 @@ class _AddAddressState extends State<AddAddress> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         HelperWidgets.buildText(
-            text: Strings.addressTypeTitle, fontSize: 14, color: AppColors.zimkeyBlack.withOpacity(0.3)),
+            text: Strings.addressTypeTitle,
+            fontSize: 14,
+            color: AppColors.zimkeyBlack.withOpacity(0.3)),
         const SizedBox(
           height: 10,
         ),
@@ -384,13 +420,19 @@ class _AddAddressState extends State<AddAddress> {
                           child: Container(
                             margin: const EdgeInsets.only(right: 3),
                             width: 100,
-                            constraints: const BoxConstraints(maxHeight: 120, minWidth: 90),
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                            constraints: const BoxConstraints(
+                                maxHeight: 120, minWidth: 90),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 10),
                             decoration: BoxDecoration(
-                              color: value == addressType[index] ? AppColors.zimkeyBodyOrange : AppColors.zimkeyWhite,
+                              color: value == addressType[index]
+                                  ? AppColors.zimkeyBodyOrange
+                                  : AppColors.zimkeyWhite,
                               borderRadius: BorderRadius.circular(5),
                               border: Border.all(
-                                color: value == addressType[index] ? AppColors.zimkeyOrange : AppColors.zimkeyLightGrey,
+                                color: value == addressType[index]
+                                    ? AppColors.zimkeyOrange
+                                    : AppColors.zimkeyLightGrey,
                               ),
                             ),
                             child: Row(
@@ -402,7 +444,8 @@ class _AddAddressState extends State<AddAddress> {
                                     fontSize: 14,
                                     color: value == addressType[index]
                                         ? AppColors.zimkeyBlack
-                                        : AppColors.zimkeyDarkGrey.withOpacity(0.5),
+                                        : AppColors.zimkeyDarkGrey
+                                            .withOpacity(0.5),
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
@@ -417,9 +460,11 @@ class _AddAddressState extends State<AddAddress> {
                               showOtherAddressType.value = true;
                             } else {
                               showOtherAddressType.value = false;
-                              _addressType.text = addressType[index].toUpperCase();
+                              _addressType.text =
+                                  addressType[index].toUpperCase();
                             }
-                            addressTypeSelectedNotifier.value = addressType[index];
+                            addressTypeSelectedNotifier.value =
+                                addressType[index];
                           },
                         )));
           },
@@ -469,7 +514,9 @@ class _AddAddressState extends State<AddAddress> {
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: textNotifier.hasError ? AppColors.zimkeyRed : AppColors.zimkeyDarkGrey2.withOpacity(0.1),
+                    color: textNotifier.hasError
+                        ? AppColors.zimkeyRed
+                        : AppColors.zimkeyDarkGrey2.withOpacity(0.1),
                   ),
                 ),
               ),
@@ -494,9 +541,11 @@ class _AddAddressState extends State<AddAddress> {
                         onChanged: onChanged ??
                             (val) {
                               if (val.isNotEmpty) {
-                                valueNotifier.value = CheckTextField(hasError: false, hasValue: true);
+                                valueNotifier.value = CheckTextField(
+                                    hasError: false, hasValue: true);
                               } else if (val.isEmpty) {
-                                valueNotifier.value = CheckTextField(hasError: false, hasValue: false);
+                                valueNotifier.value = CheckTextField(
+                                    hasError: false, hasValue: false);
                               }
                             },
                         readOnly: readOnly,
@@ -513,7 +562,8 @@ class _AddAddressState extends State<AddAddress> {
                       splashColor: Colors.transparent,
                       onPressed: () {
                         controller.clear();
-                        valueNotifier.value = CheckTextField(hasError: false, hasValue: false);
+                        valueNotifier.value =
+                            CheckTextField(hasError: false, hasValue: false);
                       },
                       icon: const Icon(
                         Icons.clear,
@@ -541,7 +591,9 @@ class _AddAddressState extends State<AddAddress> {
             ),
             Visibility(
                 visible: textNotifier.errorMsg.isNotEmpty,
-                child: HelperWidgets.buildText(text: textNotifier.errorMsg, color: AppColors.zimkeyOrange)),
+                child: HelperWidgets.buildText(
+                    text: textNotifier.errorMsg,
+                    color: AppColors.zimkeyOrange)),
           ],
         );
       },
@@ -553,19 +605,25 @@ class _AddAddressState extends State<AddAddress> {
     for (var element in valueNotifierList) {
       if (!element.value.hasValue) {
         readyForUpload = false;
-        element.value =
-            CheckTextField(hasValue: false, hasError: true, errorMsg: "Please fill this field and continue");
+        element.value = CheckTextField(
+            hasValue: false,
+            hasError: true,
+            errorMsg: "Please fill this field and continue");
       } else {
-        element.value = CheckTextField(hasValue: true, hasError: false, errorMsg: "");
+        element.value =
+            CheckTextField(hasValue: true, hasError: false, errorMsg: "");
       }
     }
     if (addressTypeSelectedNotifier.value == "Other") {
       if (!addressTypeNotifier.value.hasValue) {
         readyForUpload = false;
-        addressTypeNotifier.value =
-            CheckTextField(hasValue: false, hasError: true, errorMsg: "Please fill this field and continue");
+        addressTypeNotifier.value = CheckTextField(
+            hasValue: false,
+            hasError: true,
+            errorMsg: "Please fill this field and continue");
       } else {
-        addressTypeNotifier.value = CheckTextField(hasValue: true, hasError: false, errorMsg: "");
+        addressTypeNotifier.value =
+            CheckTextField(hasValue: true, hasError: false, errorMsg: "");
       }
     }
 
@@ -582,9 +640,11 @@ class _AddAddressState extends State<AddAddress> {
       };
       if (widget.addressArgument.isUpdate) {
         request["addressId"] = widget.addressArgument.address!.id.toString();
-        BlocProvider.of<AddressBloc>(context).add(UpdateAddressEvent(addressRequest: request));
+        BlocProvider.of<AddressBloc>(context)
+            .add(UpdateAddressEvent(addressRequest: request));
       } else {
-        BlocProvider.of<AddressBloc>(context).add(AddAddressEvent(addressRequest: request));
+        BlocProvider.of<AddressBloc>(context)
+            .add(AddAddressEvent(addressRequest: request));
       }
       Navigator.pop(context);
     }
@@ -596,5 +656,6 @@ class CheckTextField {
   bool hasError;
   String errorMsg;
 
-  CheckTextField({this.hasError = false, this.hasValue = false, this.errorMsg = ""});
+  CheckTextField(
+      {this.hasError = false, this.hasValue = false, this.errorMsg = ""});
 }

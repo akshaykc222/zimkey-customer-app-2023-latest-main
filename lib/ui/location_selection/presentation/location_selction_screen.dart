@@ -37,6 +37,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   void selectedUserLoc({required GetArea selectedArea}) {
     selectedLoc.value = selectedArea.name!;
     ObjectFactory().prefs.setSelectedLocation(location: selectedLoc.value);
+    ObjectFactory().prefs.setSelectedLocationModel(location: selectedArea);
     // pinCodeListNotifier.value = pinCodeList;
   }
 

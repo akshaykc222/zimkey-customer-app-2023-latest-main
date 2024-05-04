@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:customer/navigation/route_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +18,6 @@ import 'build_carousel_banner.dart';
 import 'build_services.dart';
 import 'build_static_banner.dart';
 import 'popular_services.dart';
-import 'search_location.dart';
 
 class HomeBody extends StatefulWidget {
   final HomeLoaded homeLoadedState;
@@ -34,13 +32,9 @@ class HomeBody extends StatefulWidget {
 }
 
 class _HomeBodyState extends State<HomeBody> {
-
-
   static PageController bannerController = PageController();
   static ValueNotifier<bool> showSearchLocation = ValueNotifier(false);
   static ValueNotifier<String> selectedLoc = ValueNotifier("");
-
-
 
   void showLocationSelection(bool value) {
     showSearchLocation.value = value;
@@ -49,14 +43,15 @@ class _HomeBodyState extends State<HomeBody> {
   void selectedUserLoc({required GetArea selectedArea}) {
     selectedLoc.value = selectedArea.name!;
     ObjectFactory().prefs.setSelectedLocation(location: selectedLoc.value);
+    ObjectFactory().prefs.setSelectedLocationModel(location: selectedArea);
     // pinCodeListNotifier.value = pinCodeList;
   }
+
   @override
   void initState() {
     super.initState();
-    selectedLoc.value = ObjectFactory().prefs.getSelectedLocation()??"";
+    selectedLoc.value = ObjectFactory().prefs.getSelectedLocation() ?? "";
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,9 +81,17 @@ class _HomeBodyState extends State<HomeBody> {
                   shrinkWrap: true,
                   children: [
                     const SizedBox(height: 5),
-                    BuildCarouselBanner(banners: widget.homeLoadedState.homeResponse.getCombinedHome.getBanners!),
+                    BuildCarouselBanner(
+                        banners: widget.homeLoadedState.homeResponse
+                            .getCombinedHome.getBanners!),
                     const SizedBox(height: 10),
-                    widget.homeLoadedState.homeResponse.getCombinedHome.getHomeContent!=null?BuildStaticBanners(homeContent:widget.homeLoadedState.homeResponse.getCombinedHome.getHomeContent!):Container(),
+                    widget.homeLoadedState.homeResponse.getCombinedHome
+                                .getHomeContent !=
+                            null
+                        ? BuildStaticBanners(
+                            homeContent: widget.homeLoadedState.homeResponse
+                                .getCombinedHome.getHomeContent!)
+                        : Container(),
                     const SizedBox(height: 15),
                     //Home Services----------
                     BuildServices(state: widget.homeLoadedState),
@@ -96,7 +99,9 @@ class _HomeBodyState extends State<HomeBody> {
                     buildViewAllService(),
                     const SizedBox(height: 15),
                     // Popular Services--------
-                    PopularService(popularService: widget.homeLoadedState.homeResponse.getCombinedHome.getPopularServices!),
+                    PopularService(
+                        popularService: widget.homeLoadedState.homeResponse
+                            .getCombinedHome.getPopularServices!),
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -104,7 +109,9 @@ class _HomeBodyState extends State<HomeBody> {
             ),
           ],
         ),
-        HelperWidgets.searchLocationScreen(areaList: widget.homeLoadedState.homeResponse.getCombinedHome.getAreas!,
+        HelperWidgets.searchLocationScreen(
+            areaList:
+                widget.homeLoadedState.homeResponse.getCombinedHome.getAreas!,
             showLocationSelection: showLocationSelection,
             selectUserLoc: selectedUserLoc,
             valueNotifier: showSearchLocation)
@@ -116,7 +123,7 @@ class _HomeBodyState extends State<HomeBody> {
     return Align(
       alignment: Alignment.center,
       child: GestureDetector(
-        onTap: ()=>HelperFunctions.navigateToServices(context),
+        onTap: () => HelperFunctions.navigateToServices(context),
         child: const Text(
           'View All',
           style: TextStyle(
@@ -130,7 +137,7 @@ class _HomeBodyState extends State<HomeBody> {
   }
 
   Widget searchService() {
-    return  InkWell(
+    return InkWell(
       onTap: () {
         Navigator.pushNamed(context, RouteGenerator.searchServiceScreen);
       },
@@ -146,7 +153,8 @@ class _HomeBodyState extends State<HomeBody> {
           children: [
             SvgPicture.asset(
               Assets.iconSearch,
-              colorFilter: const ColorFilter.mode(AppColors.zimkeyDarkGrey, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(
+                  AppColors.zimkeyDarkGrey, BlendMode.srcIn),
               width: 18,
             ),
             const SizedBox(
@@ -192,10 +200,14 @@ class _HomeBodyState extends State<HomeBody> {
             //   ),
             // ),
             Padding(
-              padding: EdgeInsets.only(top: 0.0,),
+              padding: EdgeInsets.only(
+                top: 0.0,
+              ),
               child: SvgPicture.asset(
                 Assets.iconLocation,
-                colorFilter: const ColorFilter.mode(AppColors.zimkeyOrange, BlendMode.srcIn), fit: BoxFit.contain,
+                colorFilter: const ColorFilter.mode(
+                    AppColors.zimkeyOrange, BlendMode.srcIn),
+                fit: BoxFit.contain,
                 height: 16,
               ),
             ),

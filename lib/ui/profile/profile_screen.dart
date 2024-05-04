@@ -683,11 +683,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (isinfo)
               GestureDetector(
                 onTap: () => HelperDialog.confirmActionDialog(
-                  title: "",
+                  title: "Zimkey Points",
                   context: context,
                   msg: description,
                 ),
-                child: SvgPicture.asset(
+                child: SvgPicture.asset( 
                   'assets/images/icons/question.svg',
                   colorFilter: const ColorFilter.mode(
                       AppColors.zimkeyOrange, BlendMode.srcIn),

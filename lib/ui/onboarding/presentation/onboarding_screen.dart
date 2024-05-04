@@ -96,7 +96,9 @@ class _OnboardingState extends State<Onboarding> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 15),
                           decoration: BoxDecoration(
-                            color: AppColors.zimkeyWhite,
+                            color: currentPage == 4
+                                ? AppColors.zimkeyOrange
+                                : AppColors.zimkeyWhite,
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
@@ -115,7 +117,9 @@ class _OnboardingState extends State<Onboarding> {
                             'Get Started',
                             style: TextStyle(
                               // fontSize: 16,
-                              color: AppColors.zimkeyBlack,
+                              color: currentPage == 4
+                                  ? AppColors.zimkeyWhite
+                                  : AppColors.zimkeyBlack,
                               fontFamily: 'Inter',
                               // fontWeight: FontWeight.bold,
                             ),

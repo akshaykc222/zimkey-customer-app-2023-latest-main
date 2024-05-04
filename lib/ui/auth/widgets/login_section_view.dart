@@ -9,6 +9,8 @@ import '../../../utils/helper/helper_functions.dart';
 import '../../../utils/helper/helper_widgets.dart';
 import '../bloc/auth_bloc.dart';
 
+ValueNotifier<bool> skipped = ValueNotifier(false);
+
 class LoginSection extends StatefulWidget {
   final FocusNode focusNode;
   final TextEditingController textEditingController;
@@ -29,6 +31,7 @@ class _LoginSectionState extends State<LoginSection> {
 
   @override
   void initState() {
+    skipped.value = false;
     if (widget.textEditingController.text.isNotEmpty) {
       showClearIcon.value = true;
     }
@@ -339,6 +342,7 @@ class _LoginSectionState extends State<LoginSection> {
                       ),
                       GestureDetector(
                         onTap: () {
+                          skipped.value = true;
                           // fbState.setUserLoggedIn('false');
                           // // -------------!!! Go to Dashboard-----------
                           // // Get.offAllNamed('/dashboard');

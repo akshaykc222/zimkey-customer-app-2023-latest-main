@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:customer/ui/auth/widgets/login_section_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -122,8 +123,8 @@ class HelperFunctions {
         context, RouteGenerator.authScreen, (route) => false);
   }
 
-  static setupInitialNavigation(BuildContext context,{bool? isFromReg}) {
-    if (isFromReg==true) {
+  static setupInitialNavigation(BuildContext context, {bool? isFromReg}) {
+    if (isFromReg == true) {
       print("navigating to onboarding");
       navigateToOnBoarding(context);
     } else {
@@ -135,8 +136,7 @@ class HelperFunctions {
     if (ObjectFactory().prefs.isOnboardViewed()!) {
       checkLoggedIn() ? navigateToHome(context) : navigateToLogin(context);
     } else {
-
-      checkLoggedIn()?navigateToHome(context) : navigateToOnBoarding(context);
+      checkLoggedIn() ? navigateToHome(context) : navigateToOnBoarding(context);
     }
   }
 
@@ -147,7 +147,9 @@ class HelperFunctions {
   static checkNavigationWithLocation(BuildContext context) {
     checkLoggedIn()
         ? navigateToLocationSelection(context)
-        : navigateToLogin(context);
+        : skipped.value
+            ? navigateToHome(context)
+            : navigateToLogin(context);
   }
 
   static navigateToHome(BuildContext context) {

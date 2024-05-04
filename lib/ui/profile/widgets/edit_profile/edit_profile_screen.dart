@@ -48,6 +48,12 @@ class EditProfileState extends State<EditProfile> {
     clearButtonList.addAll([showClearName, showClearMail, showClearReferral]);
     nameTextController.text = ObjectFactory().prefs.getUserData().name;
     mailTextController.text = ObjectFactory().prefs.getUserData().email;
+    mailTextController.addListener(() {
+      HelperFunctions.isValidEmail(mailTextController.text)
+          ? validEmail.value = true
+          : validEmail.value = false;
+      validEmail.notifyListeners();
+    });
   }
 
   @override
@@ -70,9 +76,10 @@ class EditProfileState extends State<EditProfile> {
         (index) => KeyboardActionsItem(
           focusNode: focusNodeList[index],
           onTapAction: () {
-            if(mailTextController.text.isNotEmpty) {
-              HelperFunctions.isValidEmail(mailTextController.text) ? validEmail.value = true : validEmail.value =
-              false;
+            if (mailTextController.text.isNotEmpty) {
+              HelperFunctions.isValidEmail(mailTextController.text)
+                  ? validEmail.value = true
+                  : validEmail.value = false;
             }
             checkButtonEnabled();
           },
@@ -82,10 +89,15 @@ class EditProfileState extends State<EditProfile> {
   }
 
   void checkButtonEnabled() {
-    if (nameTextController.text.isNotEmpty && mailTextController.text.isEmpty ) {
+    HelperFunctions.isValidEmail(mailTextController.text)
+        ? validEmail.value = true
+        : validEmail.value = false;
+    validEmail.notifyListeners();
+    if (nameTextController.text.isNotEmpty && mailTextController.text.isEmpty) {
       isButtonEnabled.value = true;
-    }
-    else if (nameTextController.text.isNotEmpty && mailTextController.text.isNotEmpty && validEmail.value) {
+    } else if (nameTextController.text.isNotEmpty &&
+        mailTextController.text.isNotEmpty &&
+        validEmail.value) {
       isButtonEnabled.value = true;
     } else {
       isButtonEnabled.value = false;
@@ -118,7 +130,7 @@ class EditProfileState extends State<EditProfile> {
             preferredSize: const Size.fromHeight(30.0),
             child: Container(
               color: AppColors.zimkeyWhite,
-              padding:const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(left: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -175,9 +187,14 @@ class EditProfileState extends State<EditProfile> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        HelperWidgets.buildText(text: Strings.registrationTitle, fontSize: 24, fontWeight: FontWeight.w700),
+        HelperWidgets.buildText(
+            text: Strings.registrationTitle,
+            fontSize: 24,
+            fontWeight: FontWeight.w700),
         const SizedBox(height: 5),
-        HelperWidgets.buildText(text: Strings.registrationSubTitle, color: AppColors.zimkeyDarkGrey.withOpacity(0.6)),
+        HelperWidgets.buildText(
+            text: Strings.registrationSubTitle,
+            color: AppColors.zimkeyDarkGrey.withOpacity(0.6)),
         const SizedBox(height: 10),
         Container(
           color: AppColors.zimkeyDarkGrey.withOpacity(0.3),
@@ -246,7 +263,8 @@ class EditProfileState extends State<EditProfile> {
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -254,6 +272,9 @@ class EditProfileState extends State<EditProfile> {
               buildTextField(
                   context: context,
                   controller: nameTextController,
+                  onChage: (val) {
+                    checkButtonEnabled();
+                  },
                   icon: Assets.iconUser,
                   hintText: Strings.nameHintText,
                   focusNodePosition: 0),
@@ -262,6 +283,14 @@ class EditProfileState extends State<EditProfile> {
               buildTextField(
                   context: context,
                   controller: mailTextController,
+                  onChage: (val) {
+                    if (val.isNotEmpty) {
+                      HelperFunctions.isValidEmail(val)
+                          ? validEmail.value = true
+                          : validEmail.value = false;
+                    }
+                    checkButtonEnabled();
+                  },
                   icon: Assets.iconRegMail,
                   hintText: Strings.mailHintText,
                   focusNodePosition: 1),
@@ -279,7 +308,8 @@ class EditProfileState extends State<EditProfile> {
       required String icon,
       required String hintText,
       required TextEditingController controller,
-      required int focusNodePosition}) {
+      required int focusNodePosition,
+      Function(String)? onChage}) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -295,32 +325,44 @@ class EditProfileState extends State<EditProfile> {
             padding: const EdgeInsets.only(right: 8.0),
             child: SvgPicture.asset(
               icon,
-              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              colorFilter:
+                  const ColorFilter.mode(Colors.black, BlendMode.srcIn),
             ),
           ),
           Expanded(
             child: TextFormField(
               controller: controller,
               focusNode: focusNodeList[focusNodePosition],
-              textCapitalization: focusNodePosition != 2 ? TextCapitalization.words : TextCapitalization.characters,
+              textCapitalization: focusNodePosition != 2
+                  ? TextCapitalization.words
+                  : TextCapitalization.characters,
               maxLength: focusNodePosition == 2 ? 6 : 45,
-              textInputAction: focusNodePosition == 2 ? TextInputAction.done : TextInputAction.next,
-              keyboardType: focusNodePosition == 1 ? TextInputType.emailAddress : TextInputType.text,
+              textInputAction: focusNodePosition == 2
+                  ? TextInputAction.done
+                  : TextInputAction.next,
+              keyboardType: focusNodePosition == 1
+                  ? TextInputType.emailAddress
+                  : TextInputType.text,
               onEditingComplete: () {
                 if (focusNodePosition == 2) {
                   focusNodeList[focusNodePosition].unfocus();
                 } else {
-                  FocusScope.of(context).requestFocus(focusNodeList[focusNodePosition++]);
+                  FocusScope.of(context)
+                      .requestFocus(focusNodeList[focusNodePosition++]);
                 }
                 checkButtonEnabled();
               },
               onChanged: (value) {
+                print("OnChanging");
                 if (value.isNotEmpty) {
                   clearButtonList[focusNodePosition].value = true;
                 } else {
                   clearButtonList[focusNodePosition].value = false;
                 }
                 checkButtonEnabled();
+                if (onChage != null) {
+                  onChage(value);
+                }
               },
               style: const TextStyle(
                 fontSize: 16,
