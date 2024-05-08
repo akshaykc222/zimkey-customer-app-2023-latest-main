@@ -957,7 +957,8 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
           //Cancellation Details
           widget.getBookingServiceItem.isCancelled &&
                   widget.getBookingServiceItem.bookingServiceItemType !=
-                      "REWORK"
+                      "REWORK" &&
+                  widget.getBookingServiceItem.cancelDetails != null
               ? cancellationDetails(widget.getBookingServiceItem.cancelDetails!)
               : const SizedBox(),
           //Payment details---

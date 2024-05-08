@@ -27,10 +27,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<SendOtp>((event, emit) async {
       emit(AuthLoadingState());
+      // try{
       ResponseModel stateModel = await authProvider.sendOtp(event.phoneNum);
       if (stateModel is SuccessResponse) {
         emit(OtpSendSuccessState(sendOtpResponse: stateModel.value));
-      } else {}
+      } else if (stateModel is ErrorResponse) {
+        print(stateModel.msg is OperationException);
+        if(stateModel.msg is OperationException){
+          emit(OtpVerifyErrorState(errorMsg:( stateModel.msg as OperationException).graphqlErrors.first.message));
+        }else{
+          emit(OtpVerifyErrorState(errorMsg: stateModel.msg.toString()));
+        }
+
+        Future.delayed(const Duration(seconds: 1), () {
+          emit(AuthInitialState());
+        });
+      }
+      // }catch(e){
+      //   emit(AuthInitialState());
+      // }
     });
     on<ReSendOtp>((event, emit) async {
       ResponseModel stateModel = await authProvider.sendOtp(event.phoneNum);
@@ -95,7 +110,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<GetUserDetails>((event, emit) async {
-      try{
+      try {
         emit(AuthLoadingState());
         ResponseModel stateModel = await authProvider.getUserDetails();
 
@@ -104,11 +119,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } else if (stateModel is ErrorResponse) {
           emit(AuthErrors());
         }
-      }catch(e){
-
-
-      }
-
+      } catch (e) {}
     });
   }
 }

@@ -61,12 +61,15 @@ class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
   Widget build(BuildContext context) {
     // bottom = MediaQuery.of(context).viewInsets.bottom;
     return PopScope(
-      canPop: Navigator.canPop(context),
-      onPopInvoked: (v){
-        if(Navigator.canPop(context)){
-
-        }else{
+      canPop: widget.bookingDetailScreenArg.isFromNotifications == true
+          ? false
+          : true,
+      onPopInvoked: (v) {
+        if (widget.bookingDetailScreenArg.isFromNotifications == true) {
           HelperFunctions.navigateToHome(context);
+        } else {
+          print("else is working");
+          // Navigator.pop(context);
         }
       },
       child: MultiBlocProvider(
@@ -87,7 +90,8 @@ class _SingleBookingDetailScreenState extends State<SingleBookingDetailScreen> {
                       RepositoryProvider.of<BookingsProvider>(context))),
           BlocProvider(
               create: (context) => ReviewBloc(
-                  reviewProvider: RepositoryProvider.of<ReviewProvider>(context)))
+                  reviewProvider:
+                      RepositoryProvider.of<ReviewProvider>(context)))
         ],
         child: Scaffold(
           appBar: AppBar(

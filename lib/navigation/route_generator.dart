@@ -21,8 +21,8 @@ import '../ui/profile/widgets/faq/faq_screen.dart';
 import '../ui/profile/widgets/html_view/html_view_screen.dart';
 import '../ui/sample/sample_page.dart';
 import '../ui/search_services/search_services_screen.dart';
-import '../ui/services/service_details_screen.dart';
 import '../ui/service_categories/presentation/screens/service_category_screen.dart';
+import '../ui/services/service_details_screen.dart';
 import '../ui/splash/splash_screen.dart';
 import '../ui/success_booking/success_booking_screen.dart';
 import '../utils/helper/helper_widgets.dart';
@@ -75,7 +75,9 @@ class RouteGenerator {
 
       case bookingListScreen:
         final int index = settings.arguments as int;
-        return animatedRoute( BookingsListScreen(tabIndex: index,));
+        return animatedRoute(BookingsListScreen(
+          tabIndex: index,
+        ));
 
       case profileScreen:
         return animatedRoute(const ProfileScreen());
@@ -99,12 +101,18 @@ class RouteGenerator {
         return animatedRoute(const AddressListScreen());
 
       case reScheduleScreen:
-        final GetBookingServiceItem item = settings.arguments as GetBookingServiceItem;
-        return animatedRoute( RescheduleBooking(serviceItem: item,));
+        final GetBookingServiceItem item =
+            settings.arguments as GetBookingServiceItem;
+        return animatedRoute(RescheduleBooking(
+          serviceItem: item,
+        ));
 
       case reworkScreen:
-        final GetBookingServiceItem item = settings.arguments as GetBookingServiceItem;
-        return animatedRoute( ReworkService(serviceItem: item,));
+        final GetBookingServiceItem item =
+            settings.arguments as GetBookingServiceItem;
+        return animatedRoute(ReworkService(
+          serviceItem: item,
+        ));
 
       case locationSelectionScreen:
         return animatedRoute(const LocationSelectionScreen());
@@ -116,18 +124,23 @@ class RouteGenerator {
         return animatedRoute(const SearchServiceScreen());
 
       case singleBookingDetailScreen:
-        final BookingDetailScreenArg arg = settings.arguments as BookingDetailScreenArg;
-        return animatedRoute(SingleBookingDetailScreen(bookingDetailScreenArg: arg,));
+        final BookingDetailScreenArg arg =
+            settings.arguments as BookingDetailScreenArg;
+        return animatedRoute(SingleBookingDetailScreen(
+          bookingDetailScreenArg: arg,
+        ));
 
       case comingSoonScreen:
         return _comingSoonRoute();
 
       case htmlViewerScreen:
         final htmlViewerScreenArg = settings.arguments as HtmlViewerScreenArg;
-        return animatedRoute(HtmlViewerScreen(htmlViewerScreenArg: htmlViewerScreenArg));
+        return animatedRoute(
+            HtmlViewerScreen(htmlViewerScreenArg: htmlViewerScreenArg));
 
       case addAddressScreen:
-        final AddressArgument addressArgument = settings.arguments as AddressArgument;
+        final AddressArgument addressArgument =
+            settings.arguments as AddressArgument;
         return animatedRoute(AddAddress(
           addressArgument: addressArgument,
         ));
@@ -139,8 +152,10 @@ class RouteGenerator {
         ));
 
       case bookingSuccessScreen:
-        final PaymentConfirmGqlInput paymentConfirmGqlInput = settings.arguments as PaymentConfirmGqlInput;
-        return animatedRoute(BookingSuccessScreen(paymentConfirmGqlInput: paymentConfirmGqlInput));
+        final PaymentConfirmGqlInput paymentConfirmGqlInput =
+            settings.arguments as PaymentConfirmGqlInput;
+        return animatedRoute(BookingSuccessScreen(
+            paymentConfirmGqlInput: paymentConfirmGqlInput));
 
       default:
         return _errorRoute();
@@ -159,7 +174,8 @@ class RouteGenerator {
         const end = Offset.zero;
         const curve = Curves.easeIn;
 
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),
@@ -181,7 +197,8 @@ class RouteGenerator {
           backgroundColor: Colors.transparent,
         ),
         body: Center(
-          child: SizedBox(height: 200, width: 250, child: HelperWidgets.errorWidget()),
+          child: SizedBox(
+              height: 200, width: 250, child: HelperWidgets.errorWidget()),
         ),
       );
     });
@@ -198,21 +215,28 @@ class RouteGenerator {
           backgroundColor: Colors.transparent,
         ),
         body: Center(
-          child: SizedBox(height: 200, width: 250, child: HelperWidgets.lottieComingSoon()),
+          child: SizedBox(
+              height: 200, width: 250, child: HelperWidgets.lottieComingSoon()),
         ),
       );
     });
   }
 }
-class BookingDetailScreenArg{
+
+class BookingDetailScreenArg {
   final String id;
+  final bool? isFromNotifications;
   final bool fromPaymentPending;
 
-  BookingDetailScreenArg({required this.id, required this.fromPaymentPending});
+  BookingDetailScreenArg(
+      {required this.id,
+      required this.fromPaymentPending,
+      this.isFromNotifications});
 }
-class HomeNavigationArg{
+
+class HomeNavigationArg {
   final int bottomNavIndex;
   final int bookingTabIndex;
 
-  HomeNavigationArg({ this.bottomNavIndex=0,this.bookingTabIndex=0});
+  HomeNavigationArg({this.bottomNavIndex = 0, this.bookingTabIndex = 0});
 }
