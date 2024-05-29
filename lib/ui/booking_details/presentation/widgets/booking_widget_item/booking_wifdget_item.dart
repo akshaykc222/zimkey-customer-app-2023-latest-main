@@ -954,6 +954,12 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                   ],
                 ),
 
+          //Payment details---
+          widget.getBookingServiceItem.bookingServiceItemType == "REWORK"
+              ? const SizedBox()
+              : paymentDetailsSection(widget.getBookingServiceItem.chargedPrice,
+                  widget.getBookingServiceItem.additionalWorks),
+
           //Cancellation Details
           widget.getBookingServiceItem.isCancelled &&
                   widget.getBookingServiceItem.bookingServiceItemType !=
@@ -961,11 +967,6 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                   widget.getBookingServiceItem.cancelDetails != null
               ? cancellationDetails(widget.getBookingServiceItem.cancelDetails!)
               : const SizedBox(),
-          //Payment details---
-          widget.getBookingServiceItem.bookingServiceItemType == "REWORK"
-              ? const SizedBox()
-              : paymentDetailsSection(widget.getBookingServiceItem.chargedPrice,
-                  widget.getBookingServiceItem.additionalWorks),
         ],
       ),
     );
@@ -1215,8 +1216,8 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                     print(
                         "add on length ${addonList.length} : pending ${getBookingServiceItem.isPaymentPending}");
                     return Visibility(
-                        visible: addonList.isNotEmpty && isPaymentPending ||
-                            isPaymentPending,
+                        visible: isPaymentPending &&
+                            !getBookingServiceItem.isCancelled,
                         child: Container(
                           width: double.infinity,
                           margin: const EdgeInsets.symmetric(
@@ -1717,6 +1718,30 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
             children: [
               Expanded(
                 child: Text(
+                  'Refund Status',
+                  style: TextStyle(
+                    color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              Text(
+                '${cancelDetails.cancelRefundStatus}',
+                style: const TextStyle(
+                  color: AppColors.zimkeyDarkGrey,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
                   'Cancellation Charge(Inclusive GST)',
                   style: TextStyle(
                     color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
@@ -1981,61 +2006,68 @@ class _BookingDetailsItemState extends State<BookingDetailsItem> {
                               ),
                             ),
                           ),
-                          Text(
-                            '₹ ${chargedPrice.grandTotal.toString()}',
-                            style: TextStyle(
-                              color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7),
+                                color: AppColors.zimkeyOrange.withOpacity(0.3)),
+                            child: Text(
+                              '₹ ${chargedPrice.grandTotal.toString()}',
+                              style: const TextStyle(
+                                color: AppColors.zimkeyDarkGrey,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    ...List.generate(
-                        additionalWorks.length,
-                        (index) => additionalWorks[index].isPaid
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Additional work ${index + 1}',
-                                    style: const TextStyle(
-                                      color: AppColors.zimkeyDarkGrey,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Total price',
-                                          style: TextStyle(
-                                            color: AppColors.zimkeyDarkGrey
-                                                .withOpacity(0.7),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        '₹ ${additionalWorks[index].totalAdditionalWorkAmount!.grandTotal.toString()}',
-                                        style: TextStyle(
-                                          color: AppColors.zimkeyDarkGrey
-                                              .withOpacity(0.7),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                            : const SizedBox())
+                    // ...List.generate(
+                    //     additionalWorks.length,
+                    //     (index) => additionalWorks[index].isPaid
+                    //         ? Column(
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Text(
+                    //                 'Additional work ${index + 1}',
+                    //                 style: const TextStyle(
+                    //                   color: AppColors.zimkeyDarkGrey,
+                    //                   fontWeight: FontWeight.bold,
+                    //                   fontSize: 13,
+                    //                 ),
+                    //               ),
+                    //               const SizedBox(
+                    //                 height: 2,
+                    //               ),
+                    //               Row(
+                    //                 children: [
+                    //                   Expanded(
+                    //                     child: Text(
+                    //                       'Total price',
+                    //                       style: TextStyle(
+                    //                         color: AppColors.zimkeyDarkGrey
+                    //                             .withOpacity(0.7),
+                    //                         fontWeight: FontWeight.bold,
+                    //                         fontSize: 13,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                   Text(
+                    //                     '₹ ${additionalWorks[index].totalAdditionalWorkAmount!.grandTotal.toString()}',
+                    //                     style: TextStyle(
+                    //                       color: AppColors.zimkeyDarkGrey
+                    //                           .withOpacity(0.7),
+                    //                       fontWeight: FontWeight.bold,
+                    //                       fontSize: 13,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ],
+                    //           )
+                    //         : const SizedBox())
                   ],
                 ),
             ],

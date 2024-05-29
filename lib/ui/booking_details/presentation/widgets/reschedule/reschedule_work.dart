@@ -82,6 +82,9 @@ class _RescheduleBookingState extends State<RescheduleBooking> {
 
     BlocProvider.of<OverviewDataCubit>(context)
         .setSelectedBillingOption(billingOption);
+    BlocProvider.of<OverviewDataCubit>(context).addSelectedMonth(null);
+    BlocProvider.of<OverviewDataCubit>(context).addSelectedDay(null);
+    BlocProvider.of<OverviewDataCubit>(context).addSelectedSlotTiming(null);
 
     // int monthNo = 0;
     // for (int i = 0; i < months.length; i++) {
@@ -139,304 +142,312 @@ class _RescheduleBookingState extends State<RescheduleBooking> {
   @override
   Widget build(BuildContext context) {
     bottom = MediaQuery.of(context).viewInsets.bottom;
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => ScheduleBloc(
-              scheduleProvider:
-                  RepositoryProvider.of<ScheduleProvider>(context)),
-        ),
-        BlocProvider(
-            create: (context) => RescheduleCubit(
-                bookingsProvider:
-                    RepositoryProvider.of<BookingsProvider>(context))),
-      ],
-      child: Stack(
-        children: [
-          Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              backgroundColor: AppColors.zimkeyOrange,
-              title: Text(
-                'Reschedule Booking',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.zimkeyWhite,
+    return PopScope(
+      onPopInvoked: (bool val) {
+        BlocProvider.of<OverviewDataCubit>(context).addSelectedMonth(null);
+        BlocProvider.of<OverviewDataCubit>(context).addSelectedDay(null);
+        BlocProvider.of<OverviewDataCubit>(context).addSelectedSlotTiming(null);
+      },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => ScheduleBloc(
+                scheduleProvider:
+                    RepositoryProvider.of<ScheduleProvider>(context)),
+          ),
+          BlocProvider(
+              create: (context) => RescheduleCubit(
+                  bookingsProvider:
+                      RepositoryProvider.of<BookingsProvider>(context))),
+        ],
+        child: Stack(
+          children: [
+            Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                backgroundColor: AppColors.zimkeyOrange,
+                title: Text(
+                  'Reschedule Booking',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.zimkeyWhite,
+                  ),
+                ),
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: AppColors.zimkeyWhite,
+                    size: 18,
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, RouteGenerator.singleBookingDetailScreen,
+                        arguments: BookingDetailScreenArg(
+                          id: widget.serviceItem.id,
+                          fromPaymentPending: false,
+                        ));
+                  },
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(25),
+                  ),
                 ),
               ),
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: AppColors.zimkeyWhite,
-                  size: 18,
-                ),
-                onPressed: () {
-                  Navigator.pushReplacementNamed(
-                      context, RouteGenerator.singleBookingDetailScreen,
-                      arguments: BookingDetailScreenArg(
-                        id: widget.serviceItem.id,
-                        fromPaymentPending: false,
-                      ));
+              backgroundColor: AppColors.zimkeyWhite,
+              body: BlocConsumer<RescheduleCubit, RescheduleState>(
+                listener: (context, rescheduleState) {
+                  if (rescheduleState is RescheduleUpdatedState) {
+                    Navigator.pushReplacementNamed(
+                        context, RouteGenerator.singleBookingDetailScreen,
+                        arguments: BookingDetailScreenArg(
+                          id: widget.serviceItem.id,
+                          fromPaymentPending: false,
+                        ));
+                  }
                 },
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(25),
-                ),
-              ),
-            ),
-            backgroundColor: AppColors.zimkeyWhite,
-            body: BlocConsumer<RescheduleCubit, RescheduleState>(
-              listener: (context, rescheduleState) {
-                if (rescheduleState is RescheduleUpdatedState) {
-                  Navigator.pushReplacementNamed(
-                      context, RouteGenerator.singleBookingDetailScreen,
-                      arguments: BookingDetailScreenArg(
-                        id: widget.serviceItem.id,
-                        fromPaymentPending: false,
-                      ));
-                }
-              },
-              builder: (context, rescheduleState) {
-                if (rescheduleState is RescheduleLoadingState) {
-                  return SizedBox(
-                    height: MediaQuery.sizeOf(context).height,
-                    width: MediaQuery.sizeOf(context).width,
-                    child: Center(child: HelperWidgets.progressIndicator()),
-                  );
-                }
-                return SingleChildScrollView(
-                  child: SafeArea(
-                    bottom: true,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          // height: addheight
-                          //     ? MediaQuery.of(context).size.height / 1.25
-                          //     : MediaQuery.of(context).size.height + 200,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Container(
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                    color: AppColors.zimkeyBodyOrange,
-                                    borderRadius: BorderRadius.circular(5)),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Original Booking Service ',
+                builder: (context, rescheduleState) {
+                  if (rescheduleState is RescheduleLoadingState) {
+                    return SizedBox(
+                      height: MediaQuery.sizeOf(context).height,
+                      width: MediaQuery.sizeOf(context).width,
+                      child: Center(child: HelperWidgets.progressIndicator()),
+                    );
+                  }
+                  return SingleChildScrollView(
+                    child: SafeArea(
+                      bottom: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            // height: addheight
+                            //     ? MediaQuery.of(context).size.height / 1.25
+                            //     : MediaQuery.of(context).size.height + 200,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                      color: AppColors.zimkeyBodyOrange,
+                                      borderRadius: BorderRadius.circular(5)),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 10),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Original Booking Service ',
+                                              style: TextStyle(
+                                                color: AppColors.zimkeyDarkGrey
+                                                    .withOpacity(1.0),
+                                                fontSize: 13,
+                                                // fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            widget.serviceItem.bookingService
+                                                .service.name,
                                             style: TextStyle(
                                               color: AppColors.zimkeyDarkGrey
-                                                  .withOpacity(1.0),
+                                                  .withOpacity(1),
                                               fontSize: 13,
                                               // fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        ),
-                                        Text(
-                                          widget.serviceItem.bookingService
-                                              .service.name,
-                                          style: TextStyle(
-                                            color: AppColors.zimkeyDarkGrey
-                                                .withOpacity(1),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Original Date & Time ',
+                                              style: TextStyle(
+                                                color: AppColors.zimkeyDarkGrey
+                                                    .withOpacity(1.0),
+                                                fontSize: 13,
+                                                // fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          HelperWidgets.buildText(
+                                            text:
+                                                '${widget.serviceItem.startDateTime.day.toString().padLeft(2, '0')}-${widget.serviceItem.startDateTime.month.toString().padLeft(2, '0')}-${widget.serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: widget.serviceItem.startDateTime, end: widget.serviceItem.endDateTime, available: false))}',
+                                            color: AppColors.zimkeyDarkGrey,
                                             fontSize: 13,
-                                            // fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 20.0, left: 20, right: 20),
+                                  child: Text(
+                                    'Select date',
+                                    style: TextStyle(
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.7),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    const SizedBox(
-                                      height: 5,
+                                  ),
+                                ),
+                                MonthAndDateView(
+                                  id: widget.serviceItem.id,
+                                  isReschedule: true,
+                                ),
+                                const BookingSlotView(),
+                                SizedBox(
+                                  height: 25,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: Text(
+                                    'Additional comments, if any',
+                                    style: TextStyle(
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.7),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Original Date & Time ',
-                                            style: TextStyle(
-                                              color: AppColors.zimkeyDarkGrey
-                                                  .withOpacity(1.0),
-                                              fontSize: 13,
-                                              // fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.zimkeyLightGrey,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  margin: EdgeInsets.symmetric(horizontal: 20),
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: TextFormField(
+                                    controller: commentTextController,
+                                    focusNode: _commentMsgNode,
+                                    textCapitalization:
+                                        TextCapitalization.sentences,
+                                    // scrollPadding: EdgeInsets.only(bottom: bottom),
+                                    maxLength: 300,
+                                    maxLines: 5,
+                                    style: TextStyle(
+                                      color: AppColors.zimkeyDarkGrey,
+                                      // fontSize: 14,
+                                    ),
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.done,
+                                    decoration: InputDecoration(
+                                      counterText: '',
+                                      border: InputBorder.none,
+                                      hintText: 'Enter your comments here',
+                                      hintStyle: TextStyle(
+                                        color: AppColors.zimkeyDarkGrey,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 30,
+                                ),
+                              ],
+                            ),
+                          ),
+                          BlocBuilder<OverviewDataCubit,
+                              OverviewDataCubitState>(
+                            builder: (context, overViewState) {
+                              return Center(
+                                  child: InkWell(
+                                onTap: () {
+                                  if (overViewState
+                                      .selectedSlotTiming.available) {
+                                    BlocProvider.of<RescheduleCubit>(context)
+                                        .rescheduleWork(
+                                            bookingServiceItemId:
+                                                widget.serviceItem.id,
+                                            scheduleTime: overViewState
+                                                .selectedSlotTiming.start,
+                                            scheduleEndDateTime: overViewState
+                                                .selectedSlotTiming.end,
+                                            modificationReason:
+                                                commentTextController.text);
+                                  } else {
+                                    HelperWidgets.showTopSnackBar(
+                                        context: context,
+                                        title: "Oops",
+                                        message:
+                                            "Please select Time slot to continue",
+                                        icon: const Icon(
+                                          Icons.error,
+                                          color: Colors.red,
+                                          size: 28,
                                         ),
-                                        HelperWidgets.buildText(
-                                          text:
-                                              '${widget.serviceItem.startDateTime.day.toString().padLeft(2, '0')}-${widget.serviceItem.startDateTime.month.toString().padLeft(2, '0')}-${widget.serviceItem.startDateTime.year} | ${HelperFunctions.filterTimeSlot(GetServiceBookingSlot(start: widget.serviceItem.startDateTime, end: widget.serviceItem.endDateTime, available: false))}',
-                                          color: AppColors.zimkeyDarkGrey,
-                                          fontSize: 13,
+                                        isError: false);
+                                  }
+                                },
+                                child: Container(
+                                    alignment: Alignment.center,
+                                    width:
+                                        MediaQuery.of(context).size.width - 190,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 20),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.zimkeyOrange,
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.zimkeyLightGrey
+                                              .withOpacity(0.1),
+                                          blurRadius: 5.0, // soften the shadow
+                                          spreadRadius: 2.0, //extend the shadow
+                                          offset: Offset(
+                                            1.0, // Move to right 10  horizontally
+                                            1.0, // Move to bottom 10 Vertically
+                                          ),
                                         )
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 20.0, left: 20, right: 20),
-                                child: Text(
-                                  'Select date',
-                                  style: TextStyle(
-                                    color: AppColors.zimkeyDarkGrey
-                                        .withOpacity(0.7),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              MonthAndDateView(
-                                id: widget.serviceItem.id,
-                                isReschedule: true,
-                              ),
-                              const BookingSlotView(),
-                              SizedBox(
-                                height: 25,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0),
-                                child: Text(
-                                  'Additional comments, if any',
-                                  style: TextStyle(
-                                    color: AppColors.zimkeyDarkGrey
-                                        .withOpacity(0.7),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.zimkeyLightGrey,
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                margin: EdgeInsets.symmetric(horizontal: 20),
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: TextFormField(
-                                  controller: commentTextController,
-                                  focusNode: _commentMsgNode,
-                                  textCapitalization:
-                                      TextCapitalization.sentences,
-                                  // scrollPadding: EdgeInsets.only(bottom: bottom),
-                                  maxLength: 300,
-                                  maxLines: 5,
-                                  style: TextStyle(
-                                    color: AppColors.zimkeyDarkGrey,
-                                    // fontSize: 14,
-                                  ),
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.done,
-                                  decoration: InputDecoration(
-                                    counterText: '',
-                                    border: InputBorder.none,
-                                    hintText: 'Enter your comments here',
-                                    hintStyle: TextStyle(
-                                      color: AppColors.zimkeyDarkGrey,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 30,
-                              ),
-                            ],
-                          ),
-                        ),
-                        BlocBuilder<OverviewDataCubit, OverviewDataCubitState>(
-                          builder: (context, overViewState) {
-                            return Center(
-                                child: InkWell(
-                              onTap: () {
-                                if (overViewState
-                                    .selectedSlotTiming.available) {
-                                  BlocProvider.of<RescheduleCubit>(context)
-                                      .rescheduleWork(
-                                          bookingServiceItemId:
-                                              widget.serviceItem.id,
-                                          scheduleTime: overViewState
-                                              .selectedSlotTiming.start,
-                                          scheduleEndDateTime: overViewState
-                                              .selectedSlotTiming.end,
-                                          modificationReason:
-                                              commentTextController.text);
-                                } else {
-                                  HelperWidgets.showTopSnackBar(
-                                      context: context,
-                                      title: "Oops",
-                                      message:
-                                          "Please select Time slot to continue",
-                                      icon: const Icon(
-                                        Icons.error,
-                                        color: Colors.red,
-                                        size: 28,
+                                    child: Text(
+                                      'Confirm',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.zimkeyWhite,
+                                        fontFamily: 'Inter',
+                                        // fontWeight: FontWeight.bold,
                                       ),
-                                      isError: false);
-                                }
-                              },
-                              child: Container(
-                                  alignment: Alignment.center,
-                                  width:
-                                      MediaQuery.of(context).size.width - 190,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 15, horizontal: 20),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.zimkeyOrange,
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.zimkeyLightGrey
-                                            .withOpacity(0.1),
-                                        blurRadius: 5.0, // soften the shadow
-                                        spreadRadius: 2.0, //extend the shadow
-                                        offset: Offset(
-                                          1.0, // Move to right 10  horizontally
-                                          1.0, // Move to bottom 10 Vertically
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  child: Text(
-                                    'Confirm',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.zimkeyWhite,
-                                      fontFamily: 'Inter',
-                                      // fontWeight: FontWeight.bold,
-                                    ),
-                                  )),
-                            ));
-                          },
-                        ),
-                        SizedBox(
-                          height: addheight
-                              ? MediaQuery.of(context).size.height / 4.5
-                              : 40,
-                        ),
-                      ],
+                                    )),
+                              ));
+                            },
+                          ),
+                          SizedBox(
+                            height: addheight
+                                ? MediaQuery.of(context).size.height / 4.5
+                                : 40,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

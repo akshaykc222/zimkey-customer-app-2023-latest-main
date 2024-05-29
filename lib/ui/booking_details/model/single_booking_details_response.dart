@@ -401,16 +401,17 @@ class ChargedPrice {
 class CancelDetails {
   final dynamic cancelAmount;
   final dynamic cancelTotalAmount;
+  final dynamic cancelRefundStatus;
 
-  CancelDetails({
-    required this.cancelAmount,
-    required this.cancelTotalAmount,
-  });
+  CancelDetails(
+      {required this.cancelAmount,
+      required this.cancelTotalAmount,
+      this.cancelRefundStatus});
 
   factory CancelDetails.fromJson(Map<String, dynamic> json) => CancelDetails(
-        cancelAmount: json["cancelAmount"],
-        cancelTotalAmount: json["cancelTotalAmount"],
-      );
+      cancelAmount: json["cancelAmount"],
+      cancelTotalAmount: json["cancelTotalAmount"],
+      cancelRefundStatus: json['cancelRefundStatus']);
 
   Map<String, dynamic> toJson() => {
         "cancelAmount": cancelAmount,

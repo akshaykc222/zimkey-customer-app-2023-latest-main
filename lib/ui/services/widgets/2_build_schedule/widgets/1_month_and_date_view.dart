@@ -25,9 +25,18 @@ class _MonthAndDateViewState extends State<MonthAndDateView> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    var b = BlocProvider.of<OverviewDataCubit>(context);
+    b.addSelectedMonth(null);
+    b.addSelectedDay(null);
+    print("state jjd =${b.state.selectedDay}  ${b.state.selectedMonth}");
     super.initState();
     calculateMonths();
+  }
+
+  @override
+  void dispose() {
+    tempMonthNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -113,7 +122,8 @@ class _MonthAndDateViewState extends State<MonthAndDateView> {
                   //     listedDay: state.daysList[index])) {
                   BlocProvider.of<OverviewDataCubit>(context)
                       .addSelectedDay(state.daysList[index]);
-                  print("biiling id :${state.selectedBillingOption.length}");
+                  print(
+                      "biiling id :${state.selectedBillingOption.length} ${state.selectedBillingOption.isNotEmpty}");
                   if (state.selectedBillingOption.isNotEmpty) {
                     BlocProvider.of<ScheduleBloc>(context).add(LoadTimeSlots(
                         billingId: state.selectedBillingOption.first.id,
@@ -202,7 +212,7 @@ class _MonthAndDateViewState extends State<MonthAndDateView> {
     if (selectedMonthValue == Strings.months[now.month - 1]) {
       final lastDayDateTime = DateTime(now.year, now.month + 1, 0);
       startDate = now.isAfter(DateTime(now.year, now.month, now.day, 15))
-          ? DateTime(now.year, now.month, now.day )
+          ? DateTime(now.year, now.month, now.day)
           : now;
       endDate = lastDayDateTime;
     } else {

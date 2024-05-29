@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../../../../../data/client/queries.dart';
@@ -17,14 +18,15 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
     on<LoadTimeSlots>((event, emit) async {
       emit(ScheduleLoading());
-      print({
+      debugPrint("Loading timeslot");
+      debugPrint({
         "date": event.date,
         "billingOptionId": event.billingId,
         "partnerId": "",
         "addressId": event.addressId,
         "isReschedule": event.isReschedule,
         "bookingServiceItemId": event.bookingServiceItemId
-      });
+      }.toString());
       final QueryOptions options = QueryOptions(
         document: gql(Queries.getTimeSlots),
         variables: <String, dynamic>{

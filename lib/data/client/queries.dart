@@ -313,6 +313,7 @@ query getCombinedHome {
       id
       name
       code
+      isCleaningService
       isTeamService
       medias {
         type
@@ -632,6 +633,7 @@ query GetBookingServiceItem(\$id:String!) {
         workCode
             cancelDetails {
         cancelAmount
+        cancelRefundStatus
         cancelTotalAmount
     }
     pendingRescheduleByPartner {

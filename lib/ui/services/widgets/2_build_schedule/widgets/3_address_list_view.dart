@@ -10,33 +10,81 @@ import '../../../../../utils/helper/helper_dialog.dart';
 import '../../../../../utils/helper/helper_widgets.dart';
 import '../../../../profile/widgets/address/address_argument.dart';
 import '../../../../profile/widgets/address/bloc/address_bloc.dart';
+import '../../../bloc/services_bloc.dart';
 import '../../../cubit/overview_data_cubit.dart';
+import '../bloc/schedule_bloc.dart';
 
 class AddressListView extends StatefulWidget {
-   final bool showAll;
-   final bool fromProfile;
-   const AddressListView({Key? key,this.showAll=false,this.fromProfile =false}) : super(key: key);
+  final bool showAll;
+  final bool fromProfile;
+  const AddressListView(
+      {Key? key, this.showAll = false, this.fromProfile = false})
+      : super(key: key);
 
   @override
   State<AddressListView> createState() => _AddressListViewState();
 }
 
 class _AddressListViewState extends State<AddressListView> {
-  static ValueNotifier<List<CustomerAddress>> addressListNotifier = ValueNotifier(List.empty(growable: true));
+  static ValueNotifier<List<CustomerAddress>> addressListNotifier =
+      ValueNotifier(List.empty(growable: true));
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OverviewDataCubit, OverviewDataCubitState>(
+    return BlocConsumer<OverviewDataCubit, OverviewDataCubitState>(
+      listener: (context, state) {
+        var serviceBloc = BlocProvider.of<ServicesBloc>(context);
+        if (serviceBloc.state is SingleServiceLoaded) {
+          // BlocProvider.of<OverviewDataCubit>(context)
+          //     .addSelectedAddress(state.addressList.first);
+          // if (cubitState.selectedBillingOption.isNotEmpty) {
+          print("LOADING TIMESLOTS");
+          BlocProvider.of<ScheduleBloc>(context).add(LoadTimeSlots(
+              billingId: state.selectedBillingOption.first.id,
+              date: state.selectedDay.toString(),
+              isReschedule: false,
+              addressId: state.customerAddress.id,
+              bookingServiceItemId: (serviceBloc.state as SingleServiceLoaded)
+                  .serviceResponse
+                  .getService
+                  .id));
+          // }
+        }
+      },
+      listenWhen: (previous, current) =>
+          previous.customerAddress != current.customerAddress,
       builder: (context, cubitState) {
         return BlocConsumer<AddressBloc, AddressState>(
           listener: (context, state) {
+            debugPrint("LISTENING AGAIN $state");
             if (state is AddressLoadedState) {
               addressListNotifier.value = state.addressList;
               if (cubitState.customerAddress.id.isEmpty) {
                 for (var element in state.addressList) {
                   if (element.isDefault) {
-                    BlocProvider.of<OverviewDataCubit>(context).addSelectedAddress(element);
+                    BlocProvider.of<OverviewDataCubit>(context)
+                        .addSelectedAddress(element);
                   }
+                }
+              } else {
+                debugPrint("ELSE IS LOADING");
+                var serviceBloc = BlocProvider.of<ServicesBloc>(context);
+                if (serviceBloc.state is SingleServiceLoaded) {
+                  BlocProvider.of<OverviewDataCubit>(context)
+                      .addSelectedAddress(state.addressList.first);
+                  // if (cubitState.selectedBillingOption.isNotEmpty) {
+                  print("LOADING TIMESLOTS");
+                  BlocProvider.of<ScheduleBloc>(context).add(LoadTimeSlots(
+                      billingId: cubitState.selectedBillingOption.first.id,
+                      date: cubitState.selectedDay.toString(),
+                      isReschedule: false,
+                      addressId: cubitState.customerAddress.id,
+                      bookingServiceItemId:
+                          (serviceBloc.state as SingleServiceLoaded)
+                              .serviceResponse
+                              .getService
+                              .id));
+                  // }
                 }
               }
             }
@@ -49,22 +97,33 @@ class _AddressListViewState extends State<AddressListView> {
             } else if (state is AddressLoadedState) {
               return ValueListenableBuilder(
                 valueListenable: addressListNotifier,
-                builder: (BuildContext context, List<CustomerAddress> addressListValue, Widget? child) {
-                  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    buildAddressTitle(
-                        addressListValue: addressListValue,
-                        context: context,
-                        icon: Icons.add,
-                        iconPressed: () => addressListValue.isNotEmpty && !(widget.showAll)
-                            ? showAddressBottomSheet(context: context, addressList: addressListValue)
-                            : Navigator.pushNamed(context, RouteGenerator.addAddressScreen,
-                                arguments: const AddressArgument(isUpdate: false))),
-                    buildAddressList(
-                        context: context,
-                        addressListValue: addressListValue,
-                        selectedAddressValue: cubitState.customerAddress,showAll: widget.showAll),
-                    addressListValue.isEmpty ? buildEmptyAddressView() : Container()
-                  ]);
+                builder: (BuildContext context,
+                    List<CustomerAddress> addressListValue, Widget? child) {
+                  return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildAddressTitle(
+                            addressListValue: addressListValue,
+                            context: context,
+                            icon: Icons.add,
+                            iconPressed: () => addressListValue.isNotEmpty &&
+                                    !(widget.showAll)
+                                ? showAddressBottomSheet(
+                                    context: context,
+                                    addressList: addressListValue)
+                                : Navigator.pushNamed(
+                                    context, RouteGenerator.addAddressScreen,
+                                    arguments: const AddressArgument(
+                                        isUpdate: false))),
+                        buildAddressList(
+                            context: context,
+                            addressListValue: addressListValue,
+                            selectedAddressValue: cubitState.customerAddress,
+                            showAll: widget.showAll),
+                        addressListValue.isEmpty
+                            ? buildEmptyAddressView()
+                            : Container()
+                      ]);
                 },
               );
             } else {
@@ -84,16 +143,20 @@ class _AddressListViewState extends State<AddressListView> {
     return Column(
       children: List.generate(
           addressListValue.length,
-          (index) => addressListValue[index].id == selectedAddressValue.id || showAll
+          (index) => addressListValue[index].id == selectedAddressValue.id ||
+                  showAll
               ? Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     color: AppColors.zimkeyLightGrey,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
-                  margin: const EdgeInsets.only(bottom: 15, left: 20, right: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+                  margin:
+                      const EdgeInsets.only(bottom: 15, left: 20, right: 20),
                   child: Center(
-                    child: Row(mainAxisSize: MainAxisSize.max,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -103,11 +166,15 @@ class _AddressListViewState extends State<AddressListView> {
                             child: InkWell(
                               onTap: () {
                                 if (showAll) {
-                                  BlocProvider.of<OverviewDataCubit>(context).addSelectedAddress(addressListValue[index]);
+                                  BlocProvider.of<OverviewDataCubit>(context)
+                                      .addSelectedAddress(
+                                          addressListValue[index]);
                                   Navigator.pop(context);
                                 } else {
                                   if (addressListValue.length > 2) {
-                                    showAddressBottomSheet(context: context, addressList: addressListValue);
+                                    showAddressBottomSheet(
+                                        context: context,
+                                        addressList: addressListValue);
                                   }
                                 }
                               },
@@ -118,28 +185,37 @@ class _AddressListViewState extends State<AddressListView> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     HelperWidgets.buildText(
-                                      text: ReCase(addressListValue[index].otherText).titleCase,
-                                      color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                                      text: ReCase(
+                                              addressListValue[index].otherText)
+                                          .titleCase,
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.7),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                     ),
                                     HelperWidgets.buildText(
-                                      text: '${ReCase(addressListValue[index].buildingName).originalText}, ',
-                                      color: AppColors.zimkeyDarkGrey.withOpacity(0.7),
+                                      text:
+                                          '${ReCase(addressListValue[index].buildingName).originalText}, ',
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.7),
                                       fontWeight: FontWeight.normal,
                                       fontSize: 12,
                                     ),
                                     Wrap(
                                       children: [
                                         HelperWidgets.buildText(
-                                          text: '${ReCase(addressListValue[index].locality).originalText}, ',
-                                          color: AppColors.zimkeyDarkGrey.withOpacity(0.9),
+                                          text:
+                                              '${ReCase(addressListValue[index].locality).originalText}, ',
+                                          color: AppColors.zimkeyDarkGrey
+                                              .withOpacity(0.9),
                                           fontWeight: FontWeight.normal,
                                           fontSize: 12,
                                         ),
                                         HelperWidgets.buildText(
-                                          text: '${ReCase(addressListValue[index].landmark).originalText}, ',
-                                          color: AppColors.zimkeyDarkGrey.withOpacity(0.9),
+                                          text:
+                                              '${ReCase(addressListValue[index].landmark).originalText}, ',
+                                          color: AppColors.zimkeyDarkGrey
+                                              .withOpacity(0.9),
                                           fontWeight: FontWeight.normal,
                                           fontSize: 12,
                                         ),
@@ -151,7 +227,8 @@ class _AddressListViewState extends State<AddressListView> {
                                     ),
                                     HelperWidgets.buildText(
                                       text: addressListValue[index].postalCode,
-                                      color: AppColors.zimkeyDarkGrey.withOpacity(0.9),
+                                      color: AppColors.zimkeyDarkGrey
+                                          .withOpacity(0.9),
                                       fontWeight: FontWeight.normal,
                                       fontSize: 12,
                                     ),
@@ -164,7 +241,8 @@ class _AddressListViewState extends State<AddressListView> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Expanded(flex: 1,
+                        Expanded(
+                          flex: 1,
                           child: Visibility(
                             visible: showAll,
                             child: InkWell(
@@ -174,10 +252,12 @@ class _AddressListViewState extends State<AddressListView> {
                                   msg: Strings.confirmDeleteMsg,
                                   btn2Text: Strings.confirm,
                                   btn1Text: Strings.no,
-                                  btn2Pressed: () => deleteConfirmPressed(context: context, id: addressListValue[index].id),
+                                  btn2Pressed: () => deleteConfirmPressed(
+                                      context: context,
+                                      id: addressListValue[index].id),
                                   btn1Pressed: () => Navigator.pop(context)),
                               child: SizedBox(
-                              height: 50,
+                                height: 50,
                                 child: Center(
                                   child: HelperWidgets.buildText(
                                     text: Strings.delete,
@@ -193,15 +273,24 @@ class _AddressListViewState extends State<AddressListView> {
                         const SizedBox(
                           width: 15,
                         ),
-                        Expanded(flex: 1,
+                        Expanded(
+                          flex: 1,
                           child: InkWell(
                             onTap: () => showAll
-                                ?widget.fromProfile?
-                            Navigator.pushNamed(context, RouteGenerator.addAddressScreen,
-                                arguments: AddressArgument(isUpdate: true, address: addressListValue[index]))
-                                : Navigator.pushReplacementNamed(context, RouteGenerator.addAddressScreen,
-                                    arguments: AddressArgument(isUpdate: true, address: addressListValue[index]))
-                                : showAddressBottomSheet(context: context, addressList: addressListValue),
+                                ? widget.fromProfile
+                                    ? Navigator.pushNamed(context,
+                                        RouteGenerator.addAddressScreen,
+                                        arguments: AddressArgument(
+                                            isUpdate: true,
+                                            address: addressListValue[index]))
+                                    : Navigator.pushReplacementNamed(context,
+                                        RouteGenerator.addAddressScreen,
+                                        arguments: AddressArgument(
+                                            isUpdate: true,
+                                            address: addressListValue[index]))
+                                : showAddressBottomSheet(
+                                    context: context,
+                                    addressList: addressListValue),
                             child: SizedBox(
                               height: 50,
                               child: Center(
@@ -245,7 +334,9 @@ class _AddressListViewState extends State<AddressListView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           HelperWidgets.buildText(
-              text: addressListValue.isEmpty ? Strings.addAddressTitle : Strings.addressTitle,
+              text: addressListValue.isEmpty
+                  ? Strings.addAddressTitle
+                  : Strings.addressTitle,
               color: AppColors.zimkeyDarkGrey,
               fontWeight: FontWeight.bold,
               fontSize: 14),
@@ -270,7 +361,9 @@ class _AddressListViewState extends State<AddressListView> {
         ));
   }
 
-  void showAddressBottomSheet({required BuildContext context, required List<CustomerAddress> addressList}) {
+  void showAddressBottomSheet(
+      {required BuildContext context,
+      required List<CustomerAddress> addressList}) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -286,7 +379,8 @@ class _AddressListViewState extends State<AddressListView> {
             builder: (context, cubitState) {
               return ValueListenableBuilder(
                   valueListenable: addressListNotifier,
-                  builder: (BuildContext context, value, Widget? child) => Column(
+                  builder: (BuildContext context, value, Widget? child) =>
+                      Column(
                         children: [
                           buildAddressTitle(
                               addressListValue: value,
@@ -294,14 +388,16 @@ class _AddressListViewState extends State<AddressListView> {
                               icon: Icons.add_circle,
                               iconPressed: () => Navigator.pushReplacementNamed(
                                   context, RouteGenerator.addAddressScreen,
-                                  arguments: const AddressArgument(isUpdate: false))),
+                                  arguments:
+                                      const AddressArgument(isUpdate: false))),
                           Expanded(
                             child: SingleChildScrollView(
                               physics: const BouncingScrollPhysics(),
                               child: buildAddressList(
                                   context: context,
                                   addressListValue: addressList,
-                                  selectedAddressValue: cubitState.customerAddress,
+                                  selectedAddressValue:
+                                      cubitState.customerAddress,
                                   showAll: true),
                             ),
                           ),

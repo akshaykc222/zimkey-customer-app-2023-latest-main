@@ -1,6 +1,7 @@
 import 'package:customer/data/provider/app_config_provider.dart';
 import 'package:customer/ui/splash/data/bloc/app_config_bloc.dart';
 import 'package:customer/utils/buttons/favourite/cubit/favourite_cubit.dart';
+import 'package:customer/utils/helper/no_internet_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -36,69 +37,73 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(create: (context) => ConnectivityService()),
-        RepositoryProvider(create: (context) => AuthProvider()),
-        RepositoryProvider(create: (context) => HomeProvider()),
-        RepositoryProvider(create: (context) => ServicesProvider()),
-        RepositoryProvider(create: (context) => ScheduleProvider()),
-        RepositoryProvider(create: (context) => AddressProvider()),
-        RepositoryProvider(create: (context) => CheckoutProvider()),
-        RepositoryProvider(create: (context) => ProfileProvider()),
-        RepositoryProvider(create: (context) => BookingsProvider()),
-        RepositoryProvider(create: (context) => ReviewProvider()),
-        RepositoryProvider(create: (context) => AppConfigProvider()),
-      ],
-      child: MultiBlocProvider(
+    return ConnectionStatusManager(
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider(create: (_) => ThemeCubit()),
-          BlocProvider(create: (_) => OverviewDataCubit()),
-          BlocProvider(create: (_) => CalculatedServiceCostCubit()),
-          BlocProvider(
-              create: (context) => SearchServiceCubit(
-                  servicesProvider:
-                      RepositoryProvider.of<ServicesProvider>(context))),
-          BlocProvider(
-              create: (context) => PendingPaymentCubit(
-                  bookingsProvider:
-                      RepositoryProvider.of<BookingsProvider>(context))),
-          BlocProvider(
-              create: (context) => FavouriteCubit(
-                  profileProvider:
-                      RepositoryProvider.of<ProfileProvider>(context))),
-          BlocProvider(
-              create: (context) => AppConfigBloc(
-                  appConfigProvider:
-                      RepositoryProvider.of<AppConfigProvider>(context))),
-          BlocProvider(
-              create: (context) => AuthBloc(
-                  authProvider: RepositoryProvider.of<AuthProvider>(context))),
-          BlocProvider(
-              create: (context) => AddressBloc(
-                  addressProvider:
-                      RepositoryProvider.of<AddressProvider>(context))),
-          BlocProvider(
-              create: (context) => ConnectivityBloc(
-                  connectivityService:
-                      RepositoryProvider.of<ConnectivityService>(context))),
-          BlocProvider(
-              create: (context) => HomeBloc(
-                  homeProvider: RepositoryProvider.of<HomeProvider>(context))),
-          BlocProvider(
-              create: (context) => BookingsBloc(
-                  bookingsProvider:
-                      RepositoryProvider.of<BookingsProvider>(context))),
-          BlocProvider(
-              create: (context) => CheckoutBloc(
-                  checkoutProvider:
-                      RepositoryProvider.of<CheckoutProvider>(context))),
-          BlocProvider(
-              create: (context) => SummaryBloc(
-                  checkoutProvider:
-                      RepositoryProvider.of<CheckoutProvider>(context))),
+          RepositoryProvider(create: (context) => ConnectivityService()),
+          RepositoryProvider(create: (context) => AuthProvider()),
+          RepositoryProvider(create: (context) => HomeProvider()),
+          RepositoryProvider(create: (context) => ServicesProvider()),
+          RepositoryProvider(create: (context) => ScheduleProvider()),
+          RepositoryProvider(create: (context) => AddressProvider()),
+          RepositoryProvider(create: (context) => CheckoutProvider()),
+          RepositoryProvider(create: (context) => ProfileProvider()),
+          RepositoryProvider(create: (context) => BookingsProvider()),
+          RepositoryProvider(create: (context) => ReviewProvider()),
+          RepositoryProvider(create: (context) => AppConfigProvider()),
         ],
-        child: const AppView(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => ThemeCubit()),
+            BlocProvider(create: (_) => OverviewDataCubit()),
+            BlocProvider(create: (_) => CalculatedServiceCostCubit()),
+            BlocProvider(
+                create: (context) => SearchServiceCubit(
+                    servicesProvider:
+                        RepositoryProvider.of<ServicesProvider>(context))),
+            BlocProvider(
+                create: (context) => PendingPaymentCubit(
+                    bookingsProvider:
+                        RepositoryProvider.of<BookingsProvider>(context))),
+            BlocProvider(
+                create: (context) => FavouriteCubit(
+                    profileProvider:
+                        RepositoryProvider.of<ProfileProvider>(context))),
+            BlocProvider(
+                create: (context) => AppConfigBloc(
+                    appConfigProvider:
+                        RepositoryProvider.of<AppConfigProvider>(context))),
+            BlocProvider(
+                create: (context) => AuthBloc(
+                    authProvider:
+                        RepositoryProvider.of<AuthProvider>(context))),
+            BlocProvider(
+                create: (context) => AddressBloc(
+                    addressProvider:
+                        RepositoryProvider.of<AddressProvider>(context))),
+            BlocProvider(
+                create: (context) => ConnectivityBloc(
+                    connectivityService:
+                        RepositoryProvider.of<ConnectivityService>(context))),
+            BlocProvider(
+                create: (context) => HomeBloc(
+                    homeProvider:
+                        RepositoryProvider.of<HomeProvider>(context))),
+            BlocProvider(
+                create: (context) => BookingsBloc(
+                    bookingsProvider:
+                        RepositoryProvider.of<BookingsProvider>(context))),
+            BlocProvider(
+                create: (context) => CheckoutBloc(
+                    checkoutProvider:
+                        RepositoryProvider.of<CheckoutProvider>(context))),
+            BlocProvider(
+                create: (context) => SummaryBloc(
+                    checkoutProvider:
+                        RepositoryProvider.of<CheckoutProvider>(context))),
+          ],
+          child: const AppView(),
+        ),
       ),
     );
   }

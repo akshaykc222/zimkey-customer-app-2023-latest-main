@@ -292,6 +292,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                             Center(
                               child: InkWell(
                                 onTap: () {
+                                  debugPrint("RATING ${starRating.value + 1}");
                                   if (starRating.value != -1) {
                                     final request = <String, dynamic>{
                                       "type": "FIRST_BOOKING",
@@ -301,7 +302,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                                           .bookingServiceItems
                                           .first
                                           .id,
-                                      "rating": starRating.value,
+                                      "rating": starRating.value + 1,
                                       "review": reviewTextController.text,
                                     };
                                     BlocProvider.of<ReviewBloc>(context).add(
@@ -498,7 +499,9 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                             height: 3,
                           ),
                           Text(
-                            booking.bookingService.bookingServiceItems.first.workCode??"",
+                            booking.bookingService.bookingServiceItems.first
+                                    .workCode ??
+                                "",
                             style: const TextStyle(
                               color: AppColors.zimkeyDarkGrey,
                               fontSize: 13,

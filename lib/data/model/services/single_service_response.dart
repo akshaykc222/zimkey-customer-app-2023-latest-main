@@ -43,6 +43,7 @@ class GetService {
   final List<PropertyArea>? propertyArea;
   final List<Room>? room;
   final bool? isTeamService;
+  final bool? isCleaningService;
 
   GetService(
       {required this.id,
@@ -57,9 +58,11 @@ class GetService {
       required this.propertyType,
       required this.propertyArea,
       required this.room,
-      this.isTeamService});
+      this.isTeamService,
+      this.isCleaningService});
 
   factory GetService.fromJson(Map<String, dynamic> json) => GetService(
+      isCleaningService: json['isCleaningService'],
       id: json["id"],
       name: json["name"],
       code: json["code"],

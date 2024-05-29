@@ -257,7 +257,10 @@ class _ReworkServiceState extends State<ReworkService> {
                                   ),
                                 ),
                               ),
-                              const MonthAndDateView(),
+                              MonthAndDateView(
+                                isReschedule: true,
+                                id: widget.serviceItem.id,
+                              ),
                               const BookingSlotView(),
                               const SizedBox(
                                 height: 25,

@@ -70,7 +70,7 @@ class _BuildServiceOptionsState extends State<BuildServiceOptions> {
                 widget.service.propertyArea?.isEmpty == true
             ? null
             : widget.service.propertyArea!.first);
-    bool serviceEnable = widget.service.isTeamService ?? false;
+    bool serviceEnable = widget.service.isCleaningService ?? false;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,

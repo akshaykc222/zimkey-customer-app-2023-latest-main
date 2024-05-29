@@ -64,18 +64,20 @@ class OverviewDataCubit extends Cubit<OverviewDataCubitState> {
 
   //build schedule
   //1.month and days view
-  void addSelectedMonth(String text) {
+  void addSelectedMonth(String? text) {
     emit(InitialObjectValues.overviewDataCubitState);
     cubitState = cubitState.copyWith(selectedMonth: text);
     emit(cubitState);
   }
 
-  void addSelectedDay(DateTime dateTime) {
+  void addSelectedDay(DateTime? dateTime) {
     emit(InitialObjectValues.overviewDataCubitState);
     cubitState = cubitState.copyWith(
         selectedDay: dateTime,
-        selectedSlotTiming: GetServiceBookingSlot(
-            start: DateTime.now(), end: DateTime.now(), available: false));
+        selectedSlotTiming: dateTime == null
+            ? null
+            : GetServiceBookingSlot(
+                start: DateTime.now(), end: DateTime.now(), available: false));
     emit(cubitState);
   }
 
@@ -92,7 +94,7 @@ class OverviewDataCubit extends Cubit<OverviewDataCubitState> {
     emit(cubitState);
   }
 
-  void addSelectedSlotTiming(GetServiceBookingSlot slotTiming) {
+  void addSelectedSlotTiming(GetServiceBookingSlot? slotTiming) {
     emit(InitialObjectValues.overviewDataCubitState);
     cubitState = cubitState.copyWith(selectedSlotTiming: slotTiming);
     emit(cubitState);
